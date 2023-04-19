@@ -1,5 +1,5 @@
 # 💫
-🌱 I’m currently learning <pt-BR> "No mento estou estudando"</><br>Sou um (Dev) apaixonado por encontrar soluções que tornem a vida mais fácil.<br><br>⚡ Fun fact <pt-BR> "Fato Engraçado"</><br><><br>     Eu sou um tipo de pessoa que, <br>     se você faz uma pergunta e eu não tenho certeza, <br>     vou dizer que não sei, mas aposto que posso encontrar a resposta <br></>
+🌱 I’m currently learning <pt-BR "No mento estou estudando"> </> <br>Sou um (Dev) apaixonado por encontrar soluções que tornem a vida mais fácil.<br><br>⚡ Fun fact <pt-BR> "Fato Engraçado"</><br><><br>     Eu sou um tipo de pessoa que, <br>     se você faz uma pergunta e eu não tenho certeza, <br>     vou dizer que não sei, mas aposto que posso encontrar a resposta <br></>
 
 
 ## 🌐 Socials:
