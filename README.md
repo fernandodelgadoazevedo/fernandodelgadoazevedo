@@ -7,7 +7,7 @@
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-%230077B5.svg?logo=linkedin&logoColor=white)](https://linkedin.com/in/https://www.linkedin.com/in/fernandodazevedo)
 [![Whatsapp](https://img.shields.io/badge/WhatsApp-25D366?style=flat-square&logo=whatsapp&logoColor=white)](https://wa.me/5511983078800)
 [![Telegram](https://img.shields.io/badge/Telegram-2CA5E0?style=flat-square&logo=telegram&logoColor=white)](https://web.telegram.org/k/#@FernandoAzevedo)
-[![Gmail](https://img.shields.io/badge/Gmail-D14836?style=flat-square&logo=gmail&logoColor=white)](fernandodelgadoazevedo@gmail.com)
+[![Gmail](https://img.shields.io/badge/Gmail-D14836?style=flat-square&logo=gmail&logoColor=white)](mailto:fernandodelgadoazevedo@gmail.com)
 
 
 ### 🌱 I’m currently learning <pt-BR> "No mento estou estudando"</><br>Sou um (Dev) apaixonado por encontrar soluções que tornem a vida mais fácil.<br><br>⚡ Fun fact <pt-BR> < "Fato Engraçado" > </> <br><><br>     Eu sou um tipo de pessoa que, <br>     se você faz uma pergunta e eu não tenho certeza, <br>     vou dizer que não sei, mas aposto que posso encontrar a resposta <br></>
