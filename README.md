@@ -91,6 +91,7 @@
 <img align="left" alt="HTML" width="50px" style="padding-right:10px;" src="https://raw.githubusercontent.com/fernandodelgadoazevedo/fernandodelgadoazevedo/cba9c2447609c4781407237d8bff7f973751e36d/imgs/tecw/html5-plain-wordmark.svg"/>
 <img align="left" alt="CSS" width="50px" style="padding-right:10px;" src="https://raw.githubusercontent.com/fernandodelgadoazevedo/fernandodelgadoazevedo/cba9c2447609c4781407237d8bff7f973751e36d/imgs/tecw/css3-plain-wordmark.svg"/>
 <img align="left" alt="Material-UI" width="50px" style="padding-right:10px;" src="https://raw.githubusercontent.com/fernandodelgadoazevedo/fernandodelgadoazevedo/cba9c2447609c4781407237d8bff7f973751e36d/imgs/tecw/materialui-original.svg"/>
+<br>
 <img align="left" alt="GitHub" width="50px" style="padding-right:10px;" src="https://raw.githubusercontent.com/fernandodelgadoazevedo/fernandodelgadoazevedo/cba9c2447609c4781407237d8bff7f973751e36d/imgs/tecw/github-original-wordmark.svg"/>
 <img align="left" alt="Git" width="50px" style="padding-right:10px;" src="https://raw.githubusercontent.com/fernandodelgadoazevedo/fernandodelgadoazevedo/cba9c2447609c4781407237d8bff7f973751e36d/imgs/tecw/git-plain-wordmark.svg"/>
 <img align="left" alt="GoogleCloud" width="50px" style="padding-right:10px;" src="https://raw.githubusercontent.com/fernandodelgadoazevedo/devicon/1f15a183db812b53e4f2435a5a9e2cb2c9d50b0c/icons/googlecloud/googlecloud-original.svg"/>
@@ -98,7 +99,7 @@
 <br>
 <br>
 
-#
+###
 ---
 
 ### GitHub Stats: <img align="left" alt="Stats" width="35px" style="padding-right:15px;" src="https://raw.githubusercontent.com/fernandodelgadoazevedo/fernandodelgadoazevedo/94efc1ab1afefa04fcf54507d638c535baa6c49d/imgs/tecw/increase-stats-svgrepo-com.svg"/>
