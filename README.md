@@ -1,13 +1,39 @@
-### 💻 Tecnologias:
-![JavaScript](https://img.shields.io/badge/javascript-%23323330.svg?style=flat-square&logo=javascript&logoColor=%23F7DF1E) ![Java](https://img.shields.io/badge/java-%23ED8B00.svg?style=flat-square&logo=java&logoColor=white) ![HTML5](https://img.shields.io/badge/html5-%23E34F26.svg?style=flat-square&logo=html5&logoColor=white) ![CSS3](https://img.shields.io/badge/css3-%231572B6.svg?style=flat-square&logo=css3&logoColor=white) ![TypeScript](https://img.shields.io/badge/typescript-%23007ACC.svg?style=flat-square&logo=typescript&logoColor=white) ![Google Cloud](https://img.shields.io/badge/Google%20Cloud-%234285F4.svg?style=flat-square&logo=google-cloud&logoColor=white) ![React](https://img.shields.io/badge/react-%2320232a.svg?style=flat-square&logo=react&logoColor=%2361DAFB) ![Spring](https://img.shields.io/badge/spring-%236DB33F.svg?style=flat-square&logo=spring&logoColor=white) ![MySQL](https://img.shields.io/badge/mysql-%2300f.svg?style=flat-square&logo=mysql&logoColor=white) ![Postgres](https://img.shields.io/badge/postgres-%23316192.svg?style=flat-square&logo=postgresql&logoColor=white) ![Yarn](https://img.shields.io/badge/yarn-%232C8EBB.svg?style=flat-square&logo=yarn&logoColor=white)
-![Material-UI](https://img.shields.io/badge/Material--UI-0081CB?style=flat-square&logo=material-ui&logoColor=white)
+### Contatos : <img align="left" alt="Foguete" width="35px" style="padding-right:15px;" src="https://raw.githubusercontent.com/fernandodelgadoazevedo/fernandodelgadoazevedo/fa922e6090bc3b9c9bf4b317d075a0c501731250/imgs/contatos/megaphone-svgrepo-com.svg"/>
 
-##### 🌐 Contatos :
-[![Discord](https://img.shields.io/badge/Discord-%237289DA.svg?logo=discord&logoColor=white)](https://discord.gg/FernandoAzevedo#8268)
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-%230077B5.svg?logo=linkedin&logoColor=white)](https://linkedin.com/in/https://www.linkedin.com/in/fernandodazevedo)
-[![Whatsapp](https://img.shields.io/badge/WhatsApp-25D366?style=flat-square&logo=whatsapp&logoColor=white)](https://wa.me/5511983078800)
-[![Telegram](https://img.shields.io/badge/Telegram-2CA5E0?style=flat-square&logo=telegram&logoColor=white)](https://web.telegram.org/k/#@FernandoAzevedo)
-[![Gmail](https://img.shields.io/badge/Gmail-D14836?style=flat-square&logo=gmail&logoColor=white)](mailto:fernandodelgadoazevedo@gmail.com)
+<br>
+<a href="https://discord.gg/FernandoAzevedo#8268">
+  <img alt="Java" width="30px" style="padding-right:30px;" src="https://github.com/fernandodelgadoazevedo/fernandodelgadoazevedo/blob/main/imgs/contatos/discord.svg"/>
+</a>
+<a href="https://web.telegram.org/k/#@FernandoAzevedo">
+  <img alt="Java" width="30px" style="padding-right:30px;" src="https://github.com/fernandodelgadoazevedo/fernandodelgadoazevedo/blob/main/imgs/contatos/telegram.svg"/>
+</a>
+<a href="https://www.linkedin.com/in/fernandodazevedo">
+  <img alt="Java" width="34px" style="padding-right:30px;" src="https://github.com/fernandodelgadoazevedo/fernandodelgadoazevedo/blob/main/imgs/contatos/linkedin.svg"/>
+</a>
+<a href="https://wa.me/5511983078800">
+  <img alt="Java" width="30px" style="padding-right:30px;" src="https://github.com/fernandodelgadoazevedo/fernandodelgadoazevedo/blob/main/imgs/contatos/whatsapp-svgrepo-com.svg"/>
+</a>
+<a href="mailto:fernandodelgadoazevedo@gmail.com">
+  <img alt="Java" width="30px" style="padding-right:30px;" src="https://github.com/fernandodelgadoazevedo/fernandodelgadoazevedo/blob/main/imgs/contatos/mailbox-svgrepo-com.svg"/>
+</a>
+
+---
+
+### Tecnologias: <img align="left" alt="Foguete" width="35px" style="padding-right:15px;" src="https://raw.githubusercontent.com/fernandodelgadoazevedo/fernandodelgadoazevedo/99925bcc95bc126a3f712db3b9a8c9c2d84fb96a/imgs/teconologias/foguete.svg"/>
+
+<img align="left" alt="Java" width="30px" style="padding-right:10px;" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/java/java-original.svg"/>
+<img align="left" alt="Spring" width="30px" style="padding-right:10px;" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/spring/spring-original.svg" />
+<img align="left" alt="TypeScript" width="30px" style="padding-right:10px;" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/typescript/typescript-plain.svg" />
+<img align="left" alt="HTML" width="30px" style="padding-right:10px;" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/html5/html5-plain.svg" />
+<img align="left" alt="CSS" width="30px" style="padding-right:10px;" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/css3/css3-plain.svg" />
+<img align="left" alt="JavaScript" width="30px" style="padding-right:10px;" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-plain.svg" />
+<img align="left" alt="React" width="30px" style="padding-right:10px;" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg" />
+<img align="left" alt="Bash" width="30px" style="padding-right:10px;" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mysql/mysql-original.svg" />
+<img align="left" alt="Git" width="30px" style="padding-right:10px;" src="https://github.com/fernandodelgadoazevedo/devicon/tree/master/icons/git/git-original.svg" />
+<br />
+
+###
+----
 
 
 ### 🌱 I’m currently learning <pt-BR> "No mento estou estudando"</><br>Sou um (Dev) apaixonado por encontrar soluções que tornem a vida mais fácil.<br><br>⚡ Fun fact <pt-BR> < "Fato Engraçado" > </> <br><><br>     Eu sou um tipo de pessoa que, <br>     se você faz uma pergunta e eu não tenho certeza, <br>     vou dizer que não sei, mas aposto que posso encontrar a resposta <br></>
