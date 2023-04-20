@@ -95,6 +95,8 @@
 <img align="left" alt="Git" width="50px" style="padding-right:10px;" src="https://raw.githubusercontent.com/fernandodelgadoazevedo/fernandodelgadoazevedo/cba9c2447609c4781407237d8bff7f973751e36d/imgs/tecw/git-plain-wordmark.svg"/>
 <img align="left" alt="GoogleCloud" width="50px" style="padding-right:10px;" src="https://raw.githubusercontent.com/fernandodelgadoazevedo/devicon/1f15a183db812b53e4f2435a5a9e2cb2c9d50b0c/icons/googlecloud/googlecloud-original.svg"/>
 
+<br>
+<br>
 
 ###
 ---
