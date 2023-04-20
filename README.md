@@ -95,13 +95,11 @@
 <img align="left" alt="Git" width="50px" style="padding-right:10px;" src="https://raw.githubusercontent.com/fernandodelgadoazevedo/fernandodelgadoazevedo/cba9c2447609c4781407237d8bff7f973751e36d/imgs/tecw/git-plain-wordmark.svg"/>
 <img align="left" alt="GoogleCloud" width="50px" style="padding-right:10px;" src="https://raw.githubusercontent.com/fernandodelgadoazevedo/devicon/1f15a183db812b53e4f2435a5a9e2cb2c9d50b0c/icons/googlecloud/googlecloud-original.svg"/>
 
-<br>
-<br>
 
 ###
 ---
 
-### GitHub Stats: <img align="left" alt="Foguete" width="35px" style="padding-right:15px;" src="https://raw.githubusercontent.com/fernandodelgadoazevedo/fernandodelgadoazevedo/94efc1ab1afefa04fcf54507d638c535baa6c49d/imgs/tecw/increase-stats-svgrepo-com.svg"/>
+### GitHub Stats: <img align="left" alt="Stats" width="35px" style="padding-right:15px;" src="https://raw.githubusercontent.com/fernandodelgadoazevedo/fernandodelgadoazevedo/94efc1ab1afefa04fcf54507d638c535baa6c49d/imgs/tecw/increase-stats-svgrepo-com.svg"/>
 ![](https://github-readme-stats.vercel.app/api?username=fernandodelgadoazevedo&theme=darcula&hide_border=true&include_all_commits=true&count_private=false)<br/>
 
 
