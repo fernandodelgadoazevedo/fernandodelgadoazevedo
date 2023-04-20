@@ -20,7 +20,7 @@
 ---
 
 <details>
-<summary> <h3><img align="left" alt="Foguete" width="40px" style="padding-right:15px;" src="https://raw.githubusercontent.com/fernandodelgadoazevedo/fernandodelgadoazevedo/26c65e5b8805c90aa465484d5d4547921dc00ac8/imgs/tecw/asphalt-highway-journey-svgrepo-com%20(1).svg"/> Minha Jornada</h3></summary>
+<summary> <h3><img align="left" alt="Foguete" width="40px" style="padding-right:15px;" src="https://raw.githubusercontent.com/fernandodelgadoazevedo/fernandodelgadoazevedo/26c65e5b8805c90aa465484d5d4547921dc00ac8/imgs/tecw/asphalt-highway-journey-svgrepo-com%20(1).svg"/> Clique para ver minha jornada</h3></summary>
 
  <h3>Sou um desenvolvedor (Dev) apaixonado por encontrar soluções que tornem a vida mais fácil.</h3>
     <p>Com mais de 10 anos de experiência em tecnologia, gestão de processos e equipes, adquiri bons conhecimentos nas regras de negócio e habilidades para compreender as histórias e codar. "Clique em ...ver mais"</p>
@@ -34,7 +34,7 @@
   <li>Estruturação da área de faturamento e expedição, mapeamento de processos, implantação ERP, treinamento, monitorar e definir KPIs na TecnoWise.</li>
 </ul>
 
-<h4>Formações</h4>
+<h3>Formações</h3>
 <ul>
   <li>Desenvolvedor Web FullStack. 2023</li>
   <li>Pós-graduação em Gestão de Projetos com ênfase em Ágil. 2021</li>
