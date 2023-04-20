@@ -81,20 +81,21 @@
 
 ### Tecnologias: <img align="left" alt="Foguete" width="35px" style="padding-right:15px;" src="https://raw.githubusercontent.com/fernandodelgadoazevedo/fernandodelgadoazevedo/99925bcc95bc126a3f712db3b9a8c9c2d84fb96a/imgs/teconologias/foguete.svg"/>
 
-<img align="left" alt="Java" width="50px" style="padding-right:10px;" src="https://raw.githubusercontent.com/fernandodelgadoazevedo/fernandodelgadoazevedo/cba9c2447609c4781407237d8bff7f973751e36d/imgs/tecw/java-original-wordmark.svg"/>
-<img align="left" alt="Spring" width="50px" style="padding-right:10px;" src="https://raw.githubusercontent.com/fernandodelgadoazevedo/fernandodelgadoazevedo/cba9c2447609c4781407237d8bff7f973751e36d/imgs/tecw/spring-original-wordmark.svg"/>
-<img align="left" alt="MySQL" width="60px" style="padding-right:10px;" src="https://raw.githubusercontent.com/fernandodelgadoazevedo/devicon/1f15a183db812b53e4f2435a5a9e2cb2c9d50b0c/icons/mysql/mysql-original-wordmark.svg"/>
-<img align="left" alt="PostgreSQL" width="50px" style="padding-right:10px;" src="https://raw.githubusercontent.com/fernandodelgadoazevedo/fernandodelgadoazevedo/cba9c2447609c4781407237d8bff7f973751e36d/imgs/tecw/postgresql-plain-wordmark.svg"/>
-<img align="left" alt="React" width="50px" style="padding-right:10px;" src="https://raw.githubusercontent.com/fernandodelgadoazevedo/fernandodelgadoazevedo/cba9c2447609c4781407237d8bff7f973751e36d/imgs/tecw/react-original-wordmark.svg"/>
-<img align="left" alt="JavaScript" width="50px" style="padding-right:10px;" src="https://raw.githubusercontent.com/fernandodelgadoazevedo/fernandodelgadoazevedo/cba9c2447609c4781407237d8bff7f973751e36d/imgs/tecw/javascript-original.svg"/>
-<img align="left" alt="TypeScript" width="50px" style="padding-right:10px;" src="https://raw.githubusercontent.com/fernandodelgadoazevedo/fernandodelgadoazevedo/cba9c2447609c4781407237d8bff7f973751e36d/imgs/tecw/typescript-plain.svg"/>
-<img align="left" alt="HTML" width="50px" style="padding-right:10px;" src="https://raw.githubusercontent.com/fernandodelgadoazevedo/fernandodelgadoazevedo/cba9c2447609c4781407237d8bff7f973751e36d/imgs/tecw/html5-plain-wordmark.svg"/>
-<img align="left" alt="CSS" width="50px" style="padding-right:10px;" src="https://raw.githubusercontent.com/fernandodelgadoazevedo/fernandodelgadoazevedo/cba9c2447609c4781407237d8bff7f973751e36d/imgs/tecw/css3-plain-wordmark.svg"/>
-<img align="left" alt="Material-UI" width="50px" style="padding-right:10px;" src="https://raw.githubusercontent.com/fernandodelgadoazevedo/fernandodelgadoazevedo/cba9c2447609c4781407237d8bff7f973751e36d/imgs/tecw/materialui-original.svg"/>
+<img align="left" alt="Java" width="35px" style="padding-right:10px;" src="https://raw.githubusercontent.com/fernandodelgadoazevedo/fernandodelgadoazevedo/cba9c2447609c4781407237d8bff7f973751e36d/imgs/tecw/java-original-wordmark.svg"/>
+<img align="left" alt="Spring" width="35px" style="padding-right:10px;" src="https://raw.githubusercontent.com/fernandodelgadoazevedo/fernandodelgadoazevedo/cba9c2447609c4781407237d8bff7f973751e36d/imgs/tecw/spring-original-wordmark.svg"/>
+<img align="left" alt="MySQL" width="45px" style="padding-right:10px;" src="https://raw.githubusercontent.com/fernandodelgadoazevedo/devicon/1f15a183db812b53e4f2435a5a9e2cb2c9d50b0c/icons/mysql/mysql-original-wordmark.svg"/>
+<img align="left" alt="PostgreSQL" width="35px" style="padding-right:10px;" src="https://raw.githubusercontent.com/fernandodelgadoazevedo/fernandodelgadoazevedo/cba9c2447609c4781407237d8bff7f973751e36d/imgs/tecw/postgresql-plain-wordmark.svg"/>
+<img align="left" alt="React" width="35px" style="padding-right:10px;" src="https://raw.githubusercontent.com/fernandodelgadoazevedo/fernandodelgadoazevedo/cba9c2447609c4781407237d8bff7f973751e36d/imgs/tecw/react-original-wordmark.svg"/>
+<img align="left" alt="JavaScript" width="35px" style="padding-right:10px;" src="https://raw.githubusercontent.com/fernandodelgadoazevedo/fernandodelgadoazevedo/cba9c2447609c4781407237d8bff7f973751e36d/imgs/tecw/javascript-original.svg"/>
+<img align="left" alt="TypeScript" width="35px" style="padding-right:10px;" src="https://raw.githubusercontent.com/fernandodelgadoazevedo/fernandodelgadoazevedo/cba9c2447609c4781407237d8bff7f973751e36d/imgs/tecw/typescript-plain.svg"/>
+<img align="left" alt="HTML" width="35px" style="padding-right:10px;" src="https://raw.githubusercontent.com/fernandodelgadoazevedo/fernandodelgadoazevedo/cba9c2447609c4781407237d8bff7f973751e36d/imgs/tecw/html5-plain-wordmark.svg"/>
+<img align="left" alt="CSS" width="35px" style="padding-right:10px;" src="https://raw.githubusercontent.com/fernandodelgadoazevedo/fernandodelgadoazevedo/cba9c2447609c4781407237d8bff7f973751e36d/imgs/tecw/css3-plain-wordmark.svg"/>
+<img align="left" alt="Material-UI" width="35px" style="padding-right:10px;" src="https://raw.githubusercontent.com/fernandodelgadoazevedo/fernandodelgadoazevedo/cba9c2447609c4781407237d8bff7f973751e36d/imgs/tecw/materialui-original.svg"/>
 <br />
-<img align="left" alt="GitHub" width="50px" style="padding-right:10px;" src="https://raw.githubusercontent.com/fernandodelgadoazevedo/fernandodelgadoazevedo/cba9c2447609c4781407237d8bff7f973751e36d/imgs/tecw/github-original-wordmark.svg"/>
-<img align="left" alt="Git" width="50px" style="padding-right:10px;" src="https://raw.githubusercontent.com/fernandodelgadoazevedo/fernandodelgadoazevedo/cba9c2447609c4781407237d8bff7f973751e36d/imgs/tecw/git-plain-wordmark.svg"/>
-<img align="left" alt="GoogleCloud" width="50px" style="padding-right:10px;" src="https://raw.githubusercontent.com/fernandodelgadoazevedo/devicon/1f15a183db812b53e4f2435a5a9e2cb2c9d50b0c/icons/googlecloud/googlecloud-original.svg"/>
+<br />
+<img align="left" alt="GitHub" width="35px" style="padding-right:10px;" src="https://raw.githubusercontent.com/fernandodelgadoazevedo/fernandodelgadoazevedo/cba9c2447609c4781407237d8bff7f973751e36d/imgs/tecw/github-original-wordmark.svg"/>
+<img align="left" alt="Git" width="35px" style="padding-right:10px;" src="https://raw.githubusercontent.com/fernandodelgadoazevedo/fernandodelgadoazevedo/cba9c2447609c4781407237d8bff7f973751e36d/imgs/tecw/git-plain-wordmark.svg"/>
+<img align="left" alt="GoogleCloud" width="35px" style="padding-right:10px;" src="https://raw.githubusercontent.com/fernandodelgadoazevedo/devicon/1f15a183db812b53e4f2435a5a9e2cb2c9d50b0c/icons/googlecloud/googlecloud-original.svg"/>
 
 <br>
 <br>
