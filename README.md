@@ -117,11 +117,11 @@ Tem seu início como um MVP de rede social voltado para artistas e pessoas que t
   <p>Também deixamos um espaço para breve comentário e para colocar a região ou comunidade a que o vídeo pertence.<p/>
   
 
-<img align="center" alt="Região" width="320px" height="180px" style="padding:100px;" src="https://github.com/fernandodelgadoazevedo/fernandodelgadoazevedo/blob/main/imgs/pdp/Atualizarperfil.PNG?raw=true"/>
+<img align="center" alt="Região" width="336px" height="168px" style="padding:100px;" src="https://github.com/fernandodelgadoazevedo/fernandodelgadoazevedo/blob/main/imgs/pdp/Atualizarperfil.PNG?raw=true"/>
   
-<img align="center" alt="Região" width="320px" height="180px" style="padding:100px;" src="https://github.com/fernandodelgadoazevedo/fernandodelgadoazevedo/blob/main/imgs/pdp/parallax.PNG?raw=true">
+<img align="center" alt="Região" width="336px" height="168px" style="padding:100px;" src="https://github.com/fernandodelgadoazevedo/fernandodelgadoazevedo/blob/main/imgs/pdp/parallax.PNG?raw=true">
   
-<img align="center" alt="Região" width="320px" height="180px" style="padding:100px;" src="https://github.com/fernandodelgadoazevedo/fernandodelgadoazevedo/blob/main/imgs/pdp/sobre.PNG?raw=true"/>
+<img align="center" alt="Região" width="368px" height="207px" style="padding:100px;" src="https://github.com/fernandodelgadoazevedo/fernandodelgadoazevedo/blob/main/imgs/pdp/sobre.PNG?raw=true"/>
   
   <p><p/>
  <p>É possível também efetuar o ajuste no cadastro, não apenas do usuário, mas também da postagem e região. Além disso, deixamos uma parallax com a imagem que retrata uma entrada de comunidade e, mais abaixo, a equipe que criou o projeto do backend ao frontend.<p/>
