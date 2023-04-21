@@ -20,7 +20,7 @@
 ---
 
 <details>
-<summary> <h3><img align="left" alt="Foguete" width="40px" style="padding-right:15px;" src="https://raw.githubusercontent.com/fernandodelgadoazevedo/fernandodelgadoazevedo/26c65e5b8805c90aa465484d5d4547921dc00ac8/imgs/tecw/asphalt-highway-journey-svgrepo-com%20(1).svg"/> Clique para ver minha jornada</h3></summary>
+<summary> <h3><img align="left" alt="Foguete" width="40px" style="padding-right:15px;" src="https://raw.githubusercontent.com/fernandodelgadoazevedo/fernandodelgadoazevedo/26c65e5b8805c90aa465484d5d4547921dc00ac8/imgs/tecw/asphalt-highway-journey-svgrepo-com%20(1).svg"/> 🖱 Clique para ver minha jornada</h3></summary>
 
  <h3>Sou um desenvolvedor (Dev) apaixonado por encontrar soluções que tornem a vida mais fácil.</h3>
     <p>Com mais de 10 anos de experiência em tecnologia, gestão de processos e equipes, adquiri bons conhecimentos nas regras de negócio e habilidades para compreender as histórias e codar. "Clique em ...ver mais"</p>
@@ -80,10 +80,10 @@
 ##
 
 <details>
-<summary> <h3><img align="left" alt="Foguete" width="40px" style="padding-right:15px;" src="https://raw.githubusercontent.com/fernandodelgadoazevedo/fernandodelgadoazevedo/c0dd68c09d851c050bfc1cd412e2d1781f6ae4e5/imgs/tecw/construction-danger-exclamantion-svgrepo-com.svg"/> Portfólio (Em Contrução)</h3></summary>
+<summary> <h3><img align="left" alt="Foguete" width="40px" style="padding-right:15px;" src="https://raw.githubusercontent.com/fernandodelgadoazevedo/fernandodelgadoazevedo/c0dd68c09d851c050bfc1cd412e2d1781f6ae4e5/imgs/tecw/construction-danger-exclamantion-svgrepo-com.svg"/> 🖱 Click para entrar Portfólio (Em Contrução)</h3></summary>
 
 <details>
-<summary> <h3><img align="left" alt="Foguete" width="40px" style="padding-right:15px;" src="https://github.com/fernandodelgadoazevedo/fernandodelgadoazevedo/blob/main/imgs/tecw/Designsfundo.png?raw=true"/> PdP - Poder Digital Periférico </h3></summary>
+<summary> <h3><img align="left" alt="Foguete" width="40px" style="padding-right:15px;" src="https://github.com/fernandodelgadoazevedo/fernandodelgadoazevedo/blob/main/imgs/tecw/Designsfundo.png?raw=true"/> 🖱 Click para saber mais - PdP Poder Digital Periférico </h3></summary>
  <p><p/>
    <h4>Poder Digital Periférico</h4>
  <p>
@@ -93,10 +93,10 @@ Tem seu início como um MVP de rede social voltado para artistas e pessoas que t
 <!-- BEGIN CARDS -->
 <!-- ![Pagina de Login](https://github.com/fernandodelgadoazevedo/fernandodelgadoazevedo/blob/main/imgs/pdp/pglogin.PNG?raw=true) -->
 
-<img align="left" alt="Login" width="480px" height="240px" style="padding:100px;" src="https://github.com/fernandodelgadoazevedo/fernandodelgadoazevedo/blob/main/imgs/pdp/pglogin.PNG?raw=true"/>
+<img align="left" alt="Login" width="336px" height="168px" style="padding:100px;" src="https://github.com/fernandodelgadoazevedo/fernandodelgadoazevedo/blob/main/imgs/pdp/pglogin.PNG?raw=true"/>
   
   
-<img align="center" alt="Região" width="480px" height="240px" style="padding:100px;" src="https://github.com/fernandodelgadoazevedo/fernandodelgadoazevedo/blob/main/imgs/pdp/pghome.PNG?raw=true"/>
+<img align="center" alt="Região" width="336px" height="168px" style="padding:100px;" src="https://github.com/fernandodelgadoazevedo/fernandodelgadoazevedo/blob/main/imgs/pdp/pghome.PNG?raw=true"/>
   <p><p/>
   <p>O propósito é a criação de uma aplicação web para desktop, mas buscamos trazer alguma responsividade no MVP.<p/>
   
@@ -135,7 +135,12 @@ Tem seu início como um MVP de rede social voltado para artistas e pessoas que t
  
   
 </details>
+  
+<details>
 
+<summary> <h3><img align="left" alt="Foguete" width="40px" style="padding-right:15px;" src="https://raw.githubusercontent.com/fernandodelgadoazevedo/fernandodelgadoazevedo/17718a6b2a0cb3eb44e2420ffec8c2cb3140f313/imgs/tecw/blogger-color-svgrepo-com.svg"/> 🖱 Click para saber mais - (Em Construção) Blog Azevedo </h3></summary>
+  
+</details>
 
 </details>
 
@@ -176,3 +181,5 @@ Tem seu início como um MVP de rede social voltado para artistas e pessoas que t
 
 [Linkedin]: https://www.linkedin.com/in/fernandodazevedo
 [PdP]: https://poderdigitalperiferico.netlify.app/
+
+
