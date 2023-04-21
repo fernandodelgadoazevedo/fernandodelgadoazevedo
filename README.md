@@ -136,6 +136,7 @@ Tem seu início como um MVP de rede social voltado para artistas e pessoas que t
   
 </details>
   
+ ##
 <details>
 
 <summary> <h3><img align="left" alt="Foguete" width="40px" style="padding-right:15px;" src="https://raw.githubusercontent.com/fernandodelgadoazevedo/fernandodelgadoazevedo/17718a6b2a0cb3eb44e2420ffec8c2cb3140f313/imgs/tecw/blogger-color-svgrepo-com.svg"/> 🖱 Click para saber mais - (Em Construção) Blog Azevedo </h3></summary>
