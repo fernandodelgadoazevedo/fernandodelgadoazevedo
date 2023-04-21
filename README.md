@@ -79,6 +79,69 @@
 
 ##
 
+<details>
+<summary> <h3><img align="left" alt="Foguete" width="40px" style="padding-right:15px;" src="https://raw.githubusercontent.com/fernandodelgadoazevedo/fernandodelgadoazevedo/c0dd68c09d851c050bfc1cd412e2d1781f6ae4e5/imgs/tecw/construction-danger-exclamantion-svgrepo-com.svg"/> Portfólio (Em Contrução)</h3></summary>
+
+<details>
+<summary> <h3><img align="left" alt="Foguete" width="40px" style="padding-right:15px;" src="https://github.com/fernandodelgadoazevedo/fernandodelgadoazevedo/blob/main/imgs/tecw/Designsfundo.png?raw=true"/> PdP - Poder Digital Periférico </h3></summary>
+ <p><p/>
+   <h4>Poder Digital Periférico</h4>
+ <p>
+Tem seu início como um MVP de rede social voltado para artistas e pessoas que têm ações sociais na comunidade e que precisam de alguma forma criar uma divulgação mais direta. Pedimos em criar com base em fatos reais e ajudar a comunidade a se promover.
+   
+ <p/> 
+<!-- BEGIN CARDS -->
+<!-- ![Pagina de Login](https://github.com/fernandodelgadoazevedo/fernandodelgadoazevedo/blob/main/imgs/pdp/pglogin.PNG?raw=true) -->
+
+<img align="left" alt="Login" width="480px" height="240px" style="padding:100px;" src="https://github.com/fernandodelgadoazevedo/fernandodelgadoazevedo/blob/main/imgs/pdp/pglogin.PNG?raw=true"/>
+  
+  
+<img align="center" alt="Região" width="480px" height="240px" style="padding:100px;" src="https://github.com/fernandodelgadoazevedo/fernandodelgadoazevedo/blob/main/imgs/pdp/pghome.PNG?raw=true"/>
+  <p><p/>
+  <p>O propósito é a criação de uma aplicação web para desktop, mas buscamos trazer alguma responsividade no MVP.<p/>
+  
+<img align="center" alt="Região" width="480px" height="240px" style="padding:100px;" src="https://github.com/fernandodelgadoazevedo/fernandodelgadoazevedo/blob/main/imgs/pdp/pgcomunidadedeskusercomun.PNG?raw=true"/>
+
+<img align="center" alt="Região" width="480px" height="240px" style="padding:100px;" src="https://github.com/fernandodelgadoazevedo/fernandodelgadoazevedo/blob/main/imgs/pdp/pgcomunidadedesk.PNG?raw=true"/>
+  
+ <p><p/>
+ <p>Um ponto super importante foi a questão da segurança. Apenas o usuário que fez a postagem pode apagar ou alterar. Para as regiões ou comunidades, apenas o usuário administrador tem acesso para excluir.<p/>
+  
+  
+<img align="center" alt="Região" width="480px" height="240px" style="padding:100px;" src="https://github.com/fernandodelgadoazevedo/fernandodelgadoazevedo/blob/main/imgs/pdp/post.PNG?raw=true/">
+  
+<img align="center" alt="Região" width="480px" height="240px" style="padding:100px;" src="https://github.com/fernandodelgadoazevedo/fernandodelgadoazevedo/blob/main/imgs/pdp/todasaspostagens.PNG?raw=true"/>
+  
+  <p><p/>
+ <p>A ideia é republicar qualquer URL das mais diversas redes sociais, como Youtube, Facebook, Instagram, Tiktok e outras. Pode incluir fotos e vídeos no formato *.mp4. Posso dizer que é possível postar qualquer coisa que tenha uma URL válida, e para isso utilizamos a estrutura switch case para renderizar todas as situações.<p/>
+  <p>Também deixamos um espaço para breve comentário e para colocar a região ou comunidade a que o vídeo pertence.<p/>
+  
+
+<img align="center" alt="Região" width="320px" height="180px" style="padding:100px;" src="https://github.com/fernandodelgadoazevedo/fernandodelgadoazevedo/blob/main/imgs/pdp/Atualizarperfil.PNG?raw=true"/>
+  
+<img align="center" alt="Região" width="320px" height="180px" style="padding:100px;" src="https://github.com/fernandodelgadoazevedo/fernandodelgadoazevedo/blob/main/imgs/pdp/parallax.PNG?raw=true">
+  
+<img align="center" alt="Região" width="320px" height="180px" style="padding:100px;" src="https://github.com/fernandodelgadoazevedo/fernandodelgadoazevedo/blob/main/imgs/pdp/sobre.PNG?raw=true"/>
+  
+  <p><p/>
+ <p>É possível também efetuar o ajuste no cadastro, não apenas do usuário, mas também da postagem e região. Além disso, deixamos uma parallax com a imagem que retrata uma entrada de comunidade e, mais abaixo, a equipe que criou o projeto do backend ao frontend.<p/>
+  
+<!-- END CARDS -->
+<p><p/>  
+  
+  
+  "[Acesse nosso MVP e deixe seu comentário.][PdP]"
+  
+ 
+  
+</details>
+
+
+</details>
+
+##
+
+
 ### Tecnologias: <img align="left" alt="Foguete" width="35px" style="padding-right:15px;" src="https://raw.githubusercontent.com/fernandodelgadoazevedo/fernandodelgadoazevedo/99925bcc95bc126a3f712db3b9a8c9c2d84fb96a/imgs/teconologias/foguete.svg"/>
 
 <img align="left" alt="Java" width="35px" style="padding-right:10px;" src="https://raw.githubusercontent.com/fernandodelgadoazevedo/fernandodelgadoazevedo/cba9c2447609c4781407237d8bff7f973751e36d/imgs/tecw/java-original-wordmark.svg"/>
@@ -112,3 +175,4 @@
 
 
 [Linkedin]: https://www.linkedin.com/in/fernandodazevedo
+[PdP]: https://poderdigitalperiferico.netlify.app/
