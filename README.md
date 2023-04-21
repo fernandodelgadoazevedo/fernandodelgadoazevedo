@@ -100,17 +100,17 @@ Tem seu início como um MVP de rede social voltado para artistas e pessoas que t
   <p><p/>
   <p>O propósito é a criação de uma aplicação web para desktop, mas buscamos trazer alguma responsividade no MVP.<p/>
   
-<img align="center" alt="Região" width="480px" height="240px" style="padding:100px;" src="https://github.com/fernandodelgadoazevedo/fernandodelgadoazevedo/blob/main/imgs/pdp/pgcomunidadedeskusercomun.PNG?raw=true"/>
+<img align="center" alt="Região" width="336px" height="168px" style="padding:100px;" src="https://github.com/fernandodelgadoazevedo/fernandodelgadoazevedo/blob/main/imgs/pdp/pgcomunidadedeskusercomun.PNG?raw=true"/>
 
-<img align="center" alt="Região" width="480px" height="240px" style="padding:100px;" src="https://github.com/fernandodelgadoazevedo/fernandodelgadoazevedo/blob/main/imgs/pdp/pgcomunidadedesk.PNG?raw=true"/>
+<img align="center" alt="Região" width="336px" height="168px" style="padding:100px;" src="https://github.com/fernandodelgadoazevedo/fernandodelgadoazevedo/blob/main/imgs/pdp/pgcomunidadedesk.PNG?raw=true"/>
   
  <p><p/>
  <p>Um ponto super importante foi a questão da segurança. Apenas o usuário que fez a postagem pode apagar ou alterar. Para as regiões ou comunidades, apenas o usuário administrador tem acesso para excluir.<p/>
   
   
-<img align="center" alt="Região" width="480px" height="240px" style="padding:100px;" src="https://github.com/fernandodelgadoazevedo/fernandodelgadoazevedo/blob/main/imgs/pdp/post.PNG?raw=true/">
+<img align="center" alt="Região" width="336px" height="168px" style="padding:100px;" src="https://github.com/fernandodelgadoazevedo/fernandodelgadoazevedo/blob/main/imgs/pdp/post.PNG?raw=true/">
   
-<img align="center" alt="Região" width="480px" height="240px" style="padding:100px;" src="https://github.com/fernandodelgadoazevedo/fernandodelgadoazevedo/blob/main/imgs/pdp/todasaspostagens.PNG?raw=true"/>
+<img align="center" alt="Região" width="336px" height="168px" style="padding:100px;" src="https://github.com/fernandodelgadoazevedo/fernandodelgadoazevedo/blob/main/imgs/pdp/todasaspostagens.PNG?raw=true"/>
   
   <p><p/>
  <p>A ideia é republicar qualquer URL das mais diversas redes sociais, como Youtube, Facebook, Instagram, Tiktok e outras. Pode incluir fotos e vídeos no formato *.mp4. Posso dizer que é possível postar qualquer coisa que tenha uma URL válida, e para isso utilizamos a estrutura switch case para renderizar todas as situações.<p/>
