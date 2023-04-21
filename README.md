@@ -120,7 +120,7 @@ Tem seu início como um MVP de rede social voltado para artistas e pessoas que t
 <img align="center" alt="Região" width="336px" height="168px" style="padding:100px;" src="https://github.com/fernandodelgadoazevedo/fernandodelgadoazevedo/blob/main/imgs/pdp/Atualizarperfil.PNG?raw=true"/>
   
 <img align="center" alt="Região" width="336px" height="168px" style="padding:100px;" src="https://github.com/fernandodelgadoazevedo/fernandodelgadoazevedo/blob/main/imgs/pdp/parallax.PNG?raw=true">
-  
+  <p><p/>
 <img align="center" alt="Região" width="368px" height="207px" style="padding:100px;" src="https://github.com/fernandodelgadoazevedo/fernandodelgadoazevedo/blob/main/imgs/pdp/sobre.PNG?raw=true"/>
   
   <p><p/>
