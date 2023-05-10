@@ -20,10 +20,15 @@
 ---
 
 <details>
-<summary> <h3><img align="left" alt="Foguete" width="40px" style="padding-right:15px;" src="https://raw.githubusercontent.com/fernandodelgadoazevedo/fernandodelgadoazevedo/26c65e5b8805c90aa465484d5d4547921dc00ac8/imgs/tecw/asphalt-highway-journey-svgrepo-com%20(1).svg"/> 🖱 Clique para ver minha jornada</h3></summary>
+<summary>
+  <h3>
+    <img align="left" alt="Foguete" width="40px" style="padding-right:15px; border-radius:5em" src="https://raw.githubusercontent.com/fernandodelgadoazevedo/fernandodelgadoazevedo/26c65e5b8805c90aa465484d5d4547921dc00ac8/imgs/tecw/asphalt-highway-journey-svgrepo-com%20(1).svg"/>
+    🖱 Clique para ver minha jornada
+  </h3>
+</summary>
 
  <h3>Sou um desenvolvedor (Dev) apaixonado por encontrar soluções que tornem a vida mais fácil.</h3>
-    <p>Com mais de 10 anos de experiência em tecnologia, gestão de processos e equipes, adquiri bons conhecimentos nas regras de negócio e habilidades para compreender as histórias e codar. "Clique em ...ver mais"</p>
+    <p>Com mais de 10 anos de experiência em tecnologia, gestão de processos e equipes, adquiri bons conhecimentos nas regras de negócio e habilidades para compreender as histórias e codar.</p>
     <p>Acredito que posso contribuir com minha visão ampla e habilidades tanto em soft skills quanto em hard skills para ajudar na resolução de desafios e na construção de projetos de sucesso.</p>
     <p>Sou um profissional em transição de carreira que busca uma nova oportunidade no mercado de tecnologia.</p>
 <h4>Destaque</h4>
@@ -156,7 +161,7 @@ Tem seu início como um MVP de rede social voltado para artistas e pessoas que t
 <img align="left" alt="PostgreSQL" width="35px" style="padding-right:10px;" src="https://raw.githubusercontent.com/fernandodelgadoazevedo/fernandodelgadoazevedo/cba9c2447609c4781407237d8bff7f973751e36d/imgs/tecw/postgresql-plain-wordmark.svg"/>
 <img align="left" alt="React" width="35px" style="padding-right:10px;" src="https://raw.githubusercontent.com/fernandodelgadoazevedo/fernandodelgadoazevedo/cba9c2447609c4781407237d8bff7f973751e36d/imgs/tecw/react-original-wordmark.svg"/>
 <img align="left" alt="JavaScript" width="35px" style="padding-right:10px;" src="https://raw.githubusercontent.com/fernandodelgadoazevedo/fernandodelgadoazevedo/cba9c2447609c4781407237d8bff7f973751e36d/imgs/tecw/javascript-original.svg"/>
-<img align="left" alt="TypeScript" width="35px" style="padding-right:10px;" src="https://raw.githubusercontent.com/fernandodelgadoazevedo/fernandodelgadoazevedo/cba9c2447609c4781407237d8bff7f973751e36d/imgs/tecw/typescript-plain.svg"/>
+<img align="left" alt="TypeScript" width="35px" style="padding-right:10px;border-radius:5em;" src="https://raw.githubusercontent.com/fernandodelgadoazevedo/fernandodelgadoazevedo/cba9c2447609c4781407237d8bff7f973751e36d/imgs/tecw/typescript-plain.svg"/>
 <img align="left" alt="HTML" width="35px" style="padding-right:10px;" src="https://raw.githubusercontent.com/fernandodelgadoazevedo/fernandodelgadoazevedo/cba9c2447609c4781407237d8bff7f973751e36d/imgs/tecw/html5-plain-wordmark.svg"/>
 <img align="left" alt="CSS" width="35px" style="padding-right:10px;" src="https://raw.githubusercontent.com/fernandodelgadoazevedo/fernandodelgadoazevedo/cba9c2447609c4781407237d8bff7f973751e36d/imgs/tecw/css3-plain-wordmark.svg"/>
 <img align="left" alt="Material-UI" width="35px" style="padding-right:10px;" src="https://raw.githubusercontent.com/fernandodelgadoazevedo/fernandodelgadoazevedo/cba9c2447609c4781407237d8bff7f973751e36d/imgs/tecw/materialui-original.svg"/>
