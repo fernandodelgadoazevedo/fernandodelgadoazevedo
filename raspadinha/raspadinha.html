@@ -118,6 +118,7 @@ ol,ul{padding-left:20px} li{margin:4px 0}
   <button data-t="pedidos" class="on">Pedidos e QR</button>
   <button data-t="painel">Painel</button>
   <button data-t="lwhats">WhatsApp</button>
+  <button data-t="linsta">Instagram</button>
   <button data-t="impressora">Impressora</button>
   <button data-t="legal">Antes de lançar</button>
 </nav>
@@ -125,6 +126,7 @@ ol,ul{padding-left:20px} li{margin:4px 0}
   <button data-t="raspa">Raspadinha</button>
   <button data-t="cardapio">Cardápio</button>
   <button data-t="cwhats">Meu WhatsApp</button>
+  <button data-t="cinsta">Instagram</button>
 </nav>
 <main>
 
@@ -271,6 +273,48 @@ ol,ul{padding-left:20px} li{margin:4px 0}
   <div class="card"><div class="wa-box" id="waLoja"></div></div>
 </section>
 
+<!-- [D20–D27] Poste e ganhe: desconto variável por regras, conferido sozinho pela API oficial do Instagram -->
+<section id="linsta">
+  <div class="card">
+    <h2>Poste e ganhe <span class="tag">Instagram</span></h2>
+    <p class="muted">Quem comprou, posta a foto do pedido marcando a loja e segue a página ganha desconto no próximo pedido pelo cardápio. O sistema confere tudo sozinho pela API oficial do Instagram e libera o cupom na conta do cliente. Ninguém da loja precisa conferir print.</p>
+    <div class="tg"><span>Poste e ganhe ligado</span><input type="checkbox" class="sw" id="igAtivo" onchange="setIg('ativo',this.checked)"></div>
+    <div class="row mt"><span class="muted">Perfil da loja: @</span><input id="igPerfil" style="flex:1;min-width:140px" onchange="setIg('perfil',igNorm(this.value)||S.cfg.insta.perfil)"></div>
+  </div>
+  <div class="card">
+    <h2>Quanto vale cada ação</h2>
+    <div class="tbl"><table>
+      <thead><tr><th>Ação</th><th>Desconto %</th><th>Obrigatória</th><th>Como o sistema confere</th></tr></thead>
+      <tbody id="igAcoesTb"></tbody>
+    </table></div>
+    <h3>Bônus por alcance <span class="muted">(seguidores do cliente, lidos pela API)</span></h3>
+    <div id="igFaixas"></div>
+    <h3>Limites e condições</h3>
+    <div class="row"><span class="muted">Desconto máximo %:</span><input type="number" min="1" max="100" id="igMaxPct" style="width:70px" onchange="setIg('maxPct',+this.value)">
+      <span class="muted">Máximo R$:</span><input type="number" min="0" step="1" id="igMaxReais" style="width:80px" onchange="setIg('maxReais',+this.value)"></div>
+    <div class="row mt"><span class="muted">Pedido mínimo R$:</span><input type="number" min="0" step="1" id="igMinimo" style="width:80px" onchange="setIg('minimo',+this.value)">
+      <span class="muted">Validade (dias):</span><input type="number" min="1" id="igValidade" style="width:70px" onchange="setIg('validade',+this.value)"></div>
+    <div class="row mt"><span class="muted">Pedido de até</span><input type="number" min="1" id="igJanela" style="width:60px" onchange="setIg('janelaPedidoDias',+this.value)"><span class="muted">dias atrás · 1 desconto a cada</span><input type="number" min="0" id="igIntervalo" style="width:60px" onchange="setIg('intervaloDias',+this.value)"><span class="muted">dias por cliente</span></div>
+    <div class="row mt"><span class="muted">Hashtag de transparência no feed:</span><input id="igHashtag" style="width:120px" onchange="setIg('hashtag',this.value.trim()||'#publi')"></div>
+    <div class="tg mt"><span>Acumula com o brinde da raspadinha</span><input type="checkbox" class="sw" id="igAcumula" onchange="setIg('acumula',this.checked)"></div>
+    <div id="igExemplos"></div>
+    <p class="muted">O desconto é variável, mas <b>nunca por sorte</b> [D01][D20]: quem faz as mesmas ações, com o mesmo alcance, ganha sempre o mesmo %. Vale sobre os produtos (não sobre o frete), só no cardápio próprio. O custo vai para o gasto de marketing e conta no teto.</p>
+  </div>
+  <div class="card">
+    <h2>Participações</h2>
+    <div class="tbl"><table>
+      <thead><tr><th>@</th><th>Cliente</th><th>Pedido</th><th>Ações</th><th>Seguid.</th><th>%</th><th>Status</th></tr></thead>
+      <tbody id="igPartsTb"></tbody>
+    </table></div>
+    <button class="btn alt full mt" onclick="igJob();render()">Rodar a conferência automática agora</button>
+    <p class="muted">No sistema real, a conferência roda sozinha (webhooks da Meta + uma rotina periódica). Este botão só adianta a rotina.</p>
+  </div>
+  <div class="card">
+    <h2>Eventos recebidos do Instagram</h2>
+    <div class="log" id="igLog"></div>
+  </div>
+</section>
+
 <section id="impressora">
   <div class="card">
     <h2>Impressora</h2>
@@ -340,6 +384,16 @@ ol,ul{padding-left:20px} li{margin:4px 0}
     </ul>
   </div>
   <div class="card">
+    <h2>📸 Poste e ganhe (Instagram)</h2>
+    <ul>
+      <li><b>Sem sorte:</b> o desconto varia por regras públicas (ações feitas e alcance), nunca por sorteio. Assim continua fora da Lei 5.768/1971 [D01][D20].</li>
+      <li><b>Regras do Instagram:</b> as diretrizes proíbem oferecer <b>dinheiro</b> em troca de curtidas, seguidores ou comentários. Desconto em produto é zona cinzenta, e há relatos de que a Meta passou a desencorajar “seguir” como condição obrigatória. Por isso “seguir” pode ser desligado como obrigatório no painel. Nunca peça para marcar quem não está na foto.</li>
+      <li><b>Publicidade (CONAR):</b> post feito em troca de desconto é conteúdo incentivado. O guia de influenciadores do CONAR (edição 2026) pede que o incentivo fique claro. O sistema pede #publi e confere a hashtag no feed (no story a API não lê o texto).</li>
+      <li><b>LGPD:</b> o @ é pedido com autorização, para uma finalidade só. Mídia do story não é guardada (regra da Meta) [D24].</li>
+      <li><b>API oficial:</b> exige conta profissional do Instagram e app aprovado pela Meta (permissões de mensagens). Nada de senha do cliente nem robô.</li>
+    </ul>
+  </div>
+  <div class="card">
     <h2>🧪 Piloto sugerido (2 a 3 semanas)</h2>
     <p>Comece <b>só com os pedidos próprios</b> e meça: % de QR escaneados, % de brindes usados, % de clientes que voltam em até 15 e 30 dias, e o custo dos brindes por pedido de retorno. Com bons números e a questão legal resolvida, leve para o QR avulso.</p>
   </div>
@@ -377,6 +431,42 @@ ol,ul{padding-left:20px} li{margin:4px 0}
     <div id="resumoBox"></div>
     <div id="cardMsg"></div>
     <button class="btn full" onclick="finalizarPedido()">Finalizar pedido (pagamento simulado)</button>
+  </div>
+</section>
+
+<section id="cinsta">
+  <div class="card">
+    <h2>📸 Poste e ganhe</h2>
+    <div id="igRegrasCli"></div>
+    <div class="row mt">
+      <input id="igTel" placeholder="Seu WhatsApp (DDD+número)" inputmode="numeric" style="flex:1;min-width:150px" oninput="renderIgCli()">
+      <input id="igUser" placeholder="@seu.instagram" autocapitalize="none" spellcheck="false" style="flex:1;min-width:150px">
+    </div>
+    <div class="row mt"><input id="igRef" placeholder="Código do QR ou nº do pedido" style="flex:1;min-width:160px"></div>
+    <label class="muted mt" style="display:flex;gap:8px;align-items:flex-start"><input type="checkbox" id="igOk"><span>Autorizo a Recheadinha a usar meu @ do Instagram só para conferir as ações desta campanha e guardar meu desconto.</span></label>
+    <button class="btn full mt" onclick="igParticipar()">Quero meu desconto</button>
+    <div id="igCliMsg"></div>
+    <div id="igMinhas"></div>
+  </div>
+  <div class="card">
+    <h2>Simulador do Instagram <span class="tag">só no protótipo</span></h2>
+    <p class="muted">No sistema real isto não existe: o cliente usa o próprio Instagram e a Meta avisa o sistema sozinha (webhook). Aqui você faz o papel do cliente.</p>
+    <div class="row"><span class="muted">Conta:</span><input id="sUser" placeholder="@cliente" autocapitalize="none" style="flex:1;min-width:120px">
+      <span class="muted">Seguidores:</span><input id="sSeg" type="number" min="0" value="800" style="width:90px"></div>
+    <label class="muted mt" style="display:flex;gap:8px"><input type="checkbox" id="sPub" checked> Conta pública</label>
+    <div class="pbar">
+      <button class="btn alt sm" onclick="simSeguir(true)">Seguir a loja</button>
+      <button class="btn alt sm" onclick="simSeguir(false)">Deixar de seguir</button>
+      <button class="btn alt sm" onclick="simStory()">Story marcando</button>
+      <button class="btn alt sm" onclick="simDM()">Direct: "Já segui"</button>
+    </div>
+    <div class="row mt"><input id="sLegenda" style="flex:1;min-width:160px"><button class="btn alt sm" onclick="simFeed()">Post no feed</button></div>
+    <div id="simMsg"></div>
+  </div>
+  <div class="card">
+    <h2>Direct do Instagram</h2>
+    <p class="muted">Respostas automáticas da loja no Direct.</p>
+    <div class="wa-box" id="igDm"></div>
   </div>
 </section>
 
@@ -434,6 +524,23 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
    [D17] Limite de raspadinhas por cliente por dia (antiabuso), configurável.
    [D18] Sem regras de repetição: o cliente pode escolher o mesmo brinde de antes.
    [D19] Comunicação sem termos de sorte: não usar "sorteio", "sorte", "sortudo" ou "concorra".
+
+   Poste e ganhe (Instagram), definido em 22/10/2026:
+   [D20] Desconto VARIÁVEL POR REGRAS, nunca por sorte [D01]: % = soma das ações conferidas
+         (seguir, story, feed) + bônus por faixa de seguidores, limitado ao máximo % e ao máximo em R$.
+         Mesmas ações e mesmo alcance = mesmo desconto, sempre.
+   [D21] Exige compra: a participação aponta para um pedido (código do QR ou nº do pedido próprio)
+         dos últimos N dias. 1 participação por pedido e intervalo mínimo entre descontos por cliente.
+   [D22] Conferência 100% automática pela API oficial: webhook story_mention (story marcando a loja),
+         webhook mentions (feed) e User Profile API (is_user_follow_business, follower_count).
+         Sem print, sem conferência manual, sem senha do cliente, sem robô.
+   [D23] "Seguir" é conferido de novo no checkout e pela rotina. Quem deixou de seguir tem o desconto
+         pausado (se seguir for obrigatório) ou recalculado, até voltar a seguir.
+   [D24] A mídia do story NÃO é baixada nem guardada (regra da Meta): só ID, link CDN e horário.
+   [D25] Transparência (CONAR/FTC): instruções e Direct pedem #publi; no feed a hashtag é conferida.
+   [D26] @ do Instagram pedido com autorização (LGPD), só para esta campanha. 1 @ por WhatsApp e vice-versa.
+   [D27] O desconto vale só no cardápio próprio, sobre os produtos (não o frete), entra como cupom na
+         conta do WhatsApp. Custo no marketing; o teto só alerta [D11].
    ===================================================================================== */
 // ================= base =================
 const W=384, DIA=864e5, CHAVE='saasdelivery_raspadinha_v2';   // v2 = mecânica de escolha [D01]; dados da v1 (sorteio) são ignorados
@@ -466,6 +573,10 @@ function estadoInicial(){
       pausaDias:[false,false,false,false,false,false,false], pausaIni:'', pausaFim:'',
       lembrete:{ativo:true, diasAntes:2, max:1,
         texto:'Ei! 🍟 Tem um(a) *{brinde}* com o seu nome aqui na Recheadinha. Quando bater aquela vontade, é só pedir que ele vai junto! 😋\n\n_Vale para {condicao}, até {validade}. Para não receber lembretes, responda SAIR._'},
+      insta:{ ativo:true, perfil:'recheadinha',                       // [D20] variável por regras, sem sorte
+        acoes:{seguir:{pct:5,obrig:true}, story:{pct:7,obrig:true}, feed:{pct:5,obrig:false}},
+        faixas:[{min:1000,pct:2},{min:5000,pct:3}], maxPct:20, maxReais:15, minimo:30, validade:15,
+        janelaPedidoDias:7, intervaloDias:7, hashtag:'#publi', acumula:true },
       imp:{ nome:'BlueTooth Printer', metodo:'rawbt', corte:true, loja:'RECHEADINHA', site:'recheadinha.delivery', base:'https://recheadinha.delivery/r/' } },
     regras:{versao:1, limiteDia:2},   // [D17] limite diário; [D18] sem regras de repetição; versao = versão da configuração
     premios:[
@@ -474,11 +585,13 @@ function estadoInicial(){
       {id:3,nome:'Refrigerante lata',tipo:'produto',estoque:60,custo:3,ativo:true,minimo:0,produtoReq:'Batata recheada de costela'},
       // [D01] brindes NÃO têm peso/probabilidade: o cliente escolhe. [D10] minimo OU produtoReq.
       {id:4,nome:'Frete grátis',tipo:'frete',estoque:null,custo:8,ativo:true,minimo:40,produtoReq:''}],
-    participacoes:{}, historico:{}, carteira:{}, qrPorPedido:{}, msgs:[], logs:[],
+    participacoes:{}, historico:{}, carteira:{}, qrPorPedido:{}, pedidosProprios:{}, msgs:[], logs:[],
+    insta:{contas:{}, parts:{}, pendentes:[], eventos:[], mundo:{}, midias:{}},   // [D20–D27]
     seqPedido:1040, nextId:5, alertasTeto:{}, offsetDias:0, ticket:null,
     ui:{view:'loja', tab:'pedidos'} };
 }
-function carregar(){ try{ const j=localStorage.getItem(CHAVE); if(j){ const o=JSON.parse(j); if(o&&o.v===2) return o; } }catch(e){} return null; }
+function carregar(){ try{ const j=localStorage.getItem(CHAVE); if(j){ const o=JSON.parse(j); if(o&&o.v===2) return migrar(o); } }catch(e){} return null; }
+function migrar(o){ const b=estadoInicial(); o.cfg.insta||=b.cfg.insta; o.insta||=b.insta; o.pedidosProprios||={}; return o; }   // dados salvos antes do Poste e ganhe
 function salvar(){ try{ localStorage.setItem(CHAVE,JSON.stringify(S)); }catch(e){} }
 let S=carregar()||estadoInicial();
 let clienteTel=null, carrinho={}, brindeSel=null, bleDev=null;
@@ -540,6 +653,7 @@ function opcoesBrinde(p){
 function participar(token){
   const p=S.participacoes[token];
   if(!p) return {erro:'Código inválido. Confira o QR do seu pedido.'};
+  if(p.status==='QR expirado') return {erro:'Este código expirou.'};
   if(p.status!=='gerado') return {ok:true,p,repetido:true};          // idempotente [D05]
   if(agora()>p.expira){ p.status='QR expirado'; render(); return {erro:'Este código expirou.'}; }
   if(p.cliente){                                                      // [D17]
@@ -583,12 +697,14 @@ function creditar(p,tel){
   audit('Brinde '+b.nome+' guardado na conta '+fim4(tel)+' (válido até '+dataBR(b.validade)+')');
   checarTeto();
 }
-function gastos(){ let real=0,comp=0; Object.values(S.carteira).flat().forEach(b=>{ if(b.status==='usado') real+=b.custoReal; else if(b.status==='disponivel') comp+=b.custo; }); return {real,comp}; }
+const mesStr=ms=>diaStr(ms).slice(0,7);
+// [D11] teto MENSAL: o realizado conta só o que foi usado no mês corrente
+function gastos(){ const mes=mesStr(agora()); let real=0,comp=0; Object.values(S.carteira).flat().forEach(b=>{ if(b.status==='usado'){ if(!b.usadoEm||mesStr(b.usadoEm)===mes) real+=b.custoReal; } else if(b.status==='disponivel') comp+=b.custo; }); return {real,comp}; }
 // [D11] só alerta, nunca bloqueia
 function checarTeto(){
   const t=S.cfg.teto; if(!(t>0)) return;
   const {real}=gastos(), pct=real/t*100;
-  [S.cfg.alerta,100].forEach(l=>{ if(pct>=l&&!S.alertasTeto[l]){ S.alertasTeto[l]=true;
+  [S.cfg.alerta,100].forEach(l=>{ const k=mesStr(agora())+'|'+l; if(pct>=l&&!S.alertasTeto[k]){ S.alertasTeto[k]=true;
     msgLoja('⚠️ O gasto da raspadinha chegou a '+Math.floor(pct)+'% do teto do mês ('+brl(real)+' de '+brl(t)+'). Nada foi bloqueado: você decide se pausa.');
     audit('Alerta de teto: '+Math.floor(pct)+'%'); } });
 }
@@ -602,6 +718,7 @@ function rodarLembretes(){
     const dias=Math.ceil((b.validade-agora())/DIA);
     if(dias<=L.diasAntes&&b.lembretes<L.max){ b.lembretes++; n++; msgCliente(tel,aplicarTemplate(L.texto,b)); }
   }));
+  igJob();
   audit('Rotina de lembretes: '+n+' enviado(s), '+x+' brinde(s) expirado(s)');
   render();
 }
@@ -652,6 +769,7 @@ function gerarProprio(){
   const itens=[{nome:'Batata recheada de costela',preco:36.9,qtd:1},{nome:'Sopa de mandioquinha',preco:24.9,qtd:1}];
   const frete=dist!=null?freteTaxa(dist):null, sub=61.8;
   const r=criarParticipacao('Próprio',numero,tel,dist,ms,numero);
+  S.pedidosProprios[numero]={tel,quando:ms};                          // [D21] pedido que dá direito ao Poste e ganhe
   const t={tipo:'proprio',numero,canal:'Próprio',cliente:tel,itens,frete,dist,brinde:null,total:sub+(frete||0),pagamento:'Pix (pago)',quando:ms,token:r.token||null,semQr:r.motivo||null};
   if(r.motivo) aviso('warn','Pedido impresso sem QR: '+esc(r.motivo)+'.'); else aviso('ok','Pedido próprio recebido, com o QR no fim do cupom.');
   mostrarTicket(t,'Pedido próprio '+numero);
@@ -712,6 +830,9 @@ function blocoRaspadinha(c,p,proprio){
   c.dash();
   if(proprio) c.text('O brinde fica guardado na sua conta e vai junto no próximo pedido.',{s:19,a:'center'});
   else { c.text('Use o brinde nos pedidos pelo nosso cardápio:',{s:19,a:'center'}); c.text(imp.site,{s:22,b:true,a:'center'}); }
+  const ig=S.cfg.insta;
+  if(ig.ativo){ c.dash(); c.text('POSTE E GANHE ATÉ '+igMaxPct()+'% OFF',{s:22,b:true,a:'center'});    // [D20][D19] sem termos de sorte
+    c.text('Siga e marque @'+ig.perfil+' no story com a foto do pedido. Cadastre seu @ em '+imp.site+'/instagram',{s:18,a:'center'}); }
   c.text('Regras na página da raspadinha.',{s:17,a:'center'});
 }
 function cupomPedido(c,t){
@@ -734,6 +855,7 @@ function cupomPedido(c,t){
       if(t.brinde.tipo==='frete') c.text('FRETE GRÁTIS',{s:22,b:true,a:'center'}); else c.row('1x '+t.brinde.nome,'0,00',{s:21,b:true});
       c.text('CONFERIR NA ENTREGA',{s:19,b:true,a:'center'}); });
     c.dash(); const sub=t.itens.reduce((s,i)=>s+i.preco*i.qtd,0); c.row('Subtotal',num(sub));
+    if(t.desconto) c.row('Desconto Instagram ('+t.desconto.pct+'%)','-'+num(t.desconto.valor));
     if(t.frete!=null) c.row('Frete ('+String(t.dist).replace('.',',')+' km)',t.brinde&&t.brinde.tipo==='frete'?'0,00':num(t.frete));
     c.row('TOTAL',num(t.total),{s:24,b:true}); c.text('Pagamento: '+t.pagamento,{s:20});
   }
@@ -904,7 +1026,10 @@ function condOk(b,c){
   if(ok&&b.tipo==='frete'&&!(S.cfg.raioKm>0&&c.dist!=null&&c.dist<=S.cfg.raioKm)){ ok=false; falta='endereço fora do raio do frete grátis ('+(S.cfg.raioKm||'?')+' km)'; }
   return {ok,falta};
 }
-function brindesDisp(){ return clienteTel?(S.carteira[clienteTel]||[]).filter(b=>b.status==='disponivel'&&agora()<=b.validade):[]; }
+function brindesDisp(){ return clienteTel?(S.carteira[clienteTel]||[]).filter(b=>b.tipo!=='desconto'&&b.status==='disponivel'&&agora()<=b.validade):[]; }
+function descDisp(){ return clienteTel?(S.carteira[clienteTel]||[]).filter(b=>b.tipo==='desconto'&&b.status==='disponivel'&&agora()<=b.validade).sort((a,b)=>b.pct-a.pct):[]; }
+// [D27] desconto sobre os produtos, limitado ao máximo em R$; não acumula com brinde se a loja desligar
+function descAplicado(d,sub,ap){ if(!d||sub<d.minimo||(ap&&!S.cfg.insta.acumula)) return 0; return Math.round(Math.min(sub*d.pct/100,d.maxReais)*100)/100; }
 function renderCardapio(){
   const c=ctxPedido(), disp=brindesDisp();
   if(brindeSel&&!disp.find(b=>b.id===brindeSel)) brindeSel=null;
@@ -917,14 +1042,18 @@ function renderCardapio(){
       g+='<label class="mt"><input type="radio" name="bsel" '+(brindeSel===b.id?'checked':'')+' onchange="brindeSel=\''+b.id+'\';renderCardapio()"><span><b>'+esc(b.nome)+'</b><br><span class="muted">Vale para '+esc(condicaoTxt(b))+' · até '+dataBR(b.validade)+'</span><br>'+
         (k.ok?'<span style="color:var(--ok);font-weight:700">✅ Vai junto neste pedido!</span>':'<span style="color:var(--warn)">'+esc(k.falta)+'</span>')+'</span></label>'; });
     g+='</div>'; }
+  const d=descDisp()[0], bSel=disp.find(x=>x.id===brindeSel), apSel=bSel&&condOk(bSel,c).ok?bSel:null, dv=descAplicado(d,c.sub,apSel);
+  if(d) g+='<div class="gift"><b>📸 Desconto do Instagram: '+d.pct+'%</b> <span class="muted">(até '+brl(d.maxReais)+' · até '+dataBR(d.validade)+')</span><br>'+
+    (dv>0?'<span style="color:var(--ok);font-weight:700">✅ Aplicado neste pedido: −'+brl(dv)+'</span>':
+      '<span style="color:var(--warn)">'+(c.sub<=0?'Adicione produtos ao pedido.':c.sub<d.minimo?'faltam '+brl(d.minimo-c.sub)+' para usar':'não acumula com o brinde da raspadinha')+'</span>')+'</div>';
   $('giftBox').innerHTML=g;
   $('menuBox').innerHTML=cardapio.map((x,i)=>'<div class="item"><span>'+esc(x.nome)+'<br><span class="muted">'+brl(x.preco)+'</span></span><span class="qty"><button onclick="mudaQtd('+i+',-1)">−</button><b>'+(carrinho[i]||0)+'</b><button onclick="mudaQtd('+i+',1)">+</button></span></div>').join('');
   const b=disp.find(x=>x.id===brindeSel), ap=b&&condOk(b,c).ok?b:null;
   const frete=c.dist!=null?freteTaxa(c.dist):null, freteCob=ap&&ap.tipo==='frete'?0:(frete||0);
   let r=c.itens.map(x=>'<div class="tl"><span>'+x.qtd+'x '+esc(x.nome)+'</span><span>'+brl(x.preco*x.qtd)+'</span></div>').join('')||'<span class="muted">Carrinho vazio.</span>';
   if(ap&&ap.tipo!=='frete') r+='<div class="gift" style="margin:6px 0"><div class="tl"><span>🎁 '+esc(ap.nome)+' <span class="muted">(brinde da raspadinha)</span></span><span>R$ 0,00</span></div></div>';
-  r+='<div class="mt"><div class="tl"><span>Subtotal</span><span>'+brl(c.sub)+'</span></div><div class="tl"><span>Frete ('+(c.dist??'?')+' km)</span><span>'+(frete==null?'informe a distância':(ap&&ap.tipo==='frete'?'<s>'+brl(frete)+'</s> <b style="color:var(--ok)">GRÁTIS 🎁</b>':brl(frete)))+'</span></div></div>';
-  r+='<div class="mt tl" style="font-size:17px"><b>Total</b><b>'+brl(c.sub+freteCob)+'</b></div>';
+  r+='<div class="mt"><div class="tl"><span>Subtotal</span><span>'+brl(c.sub)+'</span></div>'+(dv>0?'<div class="tl"><span>Desconto Instagram ('+d.pct+'%)</span><span style="color:var(--ok)">−'+brl(dv)+'</span></div>':'')+'<div class="tl"><span>Frete ('+(c.dist??'?')+' km)</span><span>'+(frete==null?'informe a distância':(ap&&ap.tipo==='frete'?'<s>'+brl(frete)+'</s> <b style="color:var(--ok)">GRÁTIS 🎁</b>':brl(frete)))+'</span></div></div>';
+  r+='<div class="mt tl" style="font-size:17px"><b>Total</b><b>'+brl(c.sub-dv+freteCob)+'</b></div>';
   $('resumoBox').innerHTML=r;
 }
 // SERVIDOR (checkout) — [D09][D10] brinde R$ 0,00, condição revalidada, custo no marketing
@@ -934,17 +1063,235 @@ function finalizarPedido(){
   if(c.dist==null) return show('cardMsg','err','Informe a distância do endereço.');
   const disp=brindesDisp(), b=disp.find(x=>x.id===brindeSel), ap=b&&condOk(b,c).ok?b:null;   // condição checada de novo no "servidor"
   const numero='#'+(++S.seqPedido), frete=freteTaxa(c.dist);
-  if(ap){ ap.status='usado'; ap.pedido=numero; ap.custoReal=ap.tipo==='frete'?frete:ap.custo;
+  // [D23] o "seguir" é conferido de novo na API antes de aplicar o desconto
+  let avisoIg='';
+  const d0=descDisp()[0]; if(d0&&S.insta.parts[d0.igPart]) igAvaliar(S.insta.parts[d0.igPart]);
+  if(d0&&d0.status!=='disponivel') avisoIg=' Seu desconto do Instagram ficou pausado: volte a seguir @'+esc(S.cfg.insta.perfil)+' e responda "Já segui" no Direct.';
+  const d=descDisp()[0], dv=descAplicado(d,c.sub,ap);
+  if(dv>0){ d.status='usado'; d.pedido=numero; d.custoReal=dv; d.usadoEm=agora();
+    const pt=S.insta.parts[d.igPart]; if(pt) pt.status='desconto usado';
+    audit('Pedido '+numero+': desconto Instagram de '+d.pct+'% (−'+brl(dv)+') lançado no marketing');
+    msgLoja('📸 Pedido '+numero+' usou o desconto do Instagram: '+d.pct+'% (−'+brl(dv)+').'); }
+  if(ap){ ap.status='usado'; ap.pedido=numero; ap.custoReal=ap.tipo==='frete'?frete:ap.custo; ap.usadoEm=agora();
     const p=S.participacoes[ap.token]; if(p) p.status='brinde usado';
     audit('Pedido '+numero+': brinde '+ap.nome+' aplicado (R$ 0,00 no pedido; custo '+brl(ap.custoReal)+' lançado no marketing'+(ap.tipo==='frete'?'':'; baixa no estoque')+')');
-    msgLoja('🧾 Pedido '+numero+' com brinde da raspadinha: '+ap.nome+'. Conferir na entrega!'); checarTeto(); }
+    msgLoja('🧾 Pedido '+numero+' com brinde da raspadinha: '+ap.nome+'. Conferir na entrega!'); }
+  if(dv>0||ap) checarTeto();
   const r=criarParticipacao('Próprio',numero,clienteTel,c.dist,agora(),numero);
+  S.pedidosProprios[numero]={tel:clienteTel,quando:agora()};          // [D21]
   const t={tipo:'proprio',numero,canal:'Próprio',cliente:clienteTel,itens:c.itens,frete,dist:c.dist,brinde:ap?{nome:ap.nome,tipo:ap.tipo}:null,
-    total:c.sub+(ap&&ap.tipo==='frete'?0:frete),pagamento:'Pix (pago)',quando:agora(),token:r.token||null,semQr:r.motivo||null};
+    desconto:dv>0?{pct:d.pct,valor:dv}:null,total:c.sub-dv+(ap&&ap.tipo==='frete'?0:frete),pagamento:'Pix (pago)',quando:agora(),token:r.token||null,semQr:r.motivo||null};
   carrinho={}; brindeSel=null;
   mostrarTicket(t,'Pedido próprio '+numero);
-  show('cardMsg','ok','Pedido '+numero+' confirmado!'+(ap?' Brinde incluído. 🎁':'')+' <button class="btn alt sm" onclick="irView(\'loja\',\'pedidos\')">Ver o cupom na loja</button>');
+  show('cardMsg','ok','Pedido '+numero+' confirmado!'+(ap?' Brinde incluído. 🎁':'')+(dv>0?' Desconto do Instagram aplicado. 📸':'')+avisoIg+' <button class="btn alt sm" onclick="irView(\'loja\',\'pedidos\')">Ver o cupom na loja</button>'+
+    (S.cfg.insta.ativo?' <button class="btn alt sm" onclick="irInsta(\''+numero+'\')">📸 Postar e ganhar até '+igMaxPct()+'%</button>':''));
   render();
+}
+
+// ================= Instagram: Poste e ganhe [D20–D27] =================
+const ACOES_IG={seguir:'Seguir @{perfil}', story:'Story com a foto do pedido marcando @{perfil}', feed:'Post no feed marcando @{perfil} com {hashtag}'};
+const CURTO_IG={seguir:'seguir', story:'story', feed:'feed'};
+const COMO_IG={seguir:'API de perfil (is_user_follow_business). Conferido de novo no checkout [D23]',
+  story:'Webhook story_mention: chega sozinho quando o cliente marca a loja',
+  feed:'Webhook mentions + leitura da legenda (confere a hashtag) [D25]'};
+const igTxt=t=>t.replace(/\{perfil\}/g,S.cfg.insta.perfil).replace(/\{hashtag\}/g,S.cfg.insta.hashtag);
+function igNorm(u){ const s=String(u||'').trim().toLowerCase().replace(/^@+/,''); return /^[a-z0-9._]{1,30}$/.test(s)&&!/^\.|\.$|\.\./.test(s)?s:null; }
+// [D20] cálculo determinístico: ações conferidas + bônus por faixa de seguidores, com teto
+function igCalcular(acoes,seguidores){
+  const c=S.cfg.insta, partes=[], faltam=[]; let pct=0;
+  Object.keys(ACOES_IG).forEach(k=>{ const a=c.acoes[k];
+    if(acoes[k]&&a.pct>0){ pct+=a.pct; partes.push(CURTO_IG[k]+' +'+a.pct+'%'); } else if(!acoes[k]&&a.obrig) faltam.push(k); });
+  const f=c.faixas.filter(x=>x.min>0&&x.pct>0&&seguidores>=x.min).sort((a,b)=>b.pct-a.pct)[0];
+  if(f&&pct>0){ pct+=f.pct; partes.push(f.min.toLocaleString('pt-BR')+'+ seguidores +'+f.pct+'%'); }
+  const bruto=pct; pct=Math.min(pct,c.maxPct);
+  return {pct,bruto,partes,faltam,completo:!faltam.length&&pct>0};
+}
+function igMaxPct(){ const c=S.cfg.insta; return igCalcular({seguir:true,story:true,feed:true},Infinity).pct||c.maxPct; }
+function igDM(user,de,texto){ S.msgs.push({para:'ig',user,de,texto,quando:agora()}); }
+function igEvento(t){ S.insta.eventos.unshift(dataHora(agora())+' · '+t); if(S.insta.eventos.length>200) S.insta.eventos.length=200; }
+
+// ---- SIMULAÇÃO DA META (no real: graph.instagram.com) ----
+// GET /{IGSID}?fields=username,follower_count,is_user_follow_business — só funciona depois que o cliente
+// interagiu com a loja (story marcando, Direct). Por isso o @ sozinho não basta: o vínculo vem do webhook.
+function metaPerfil(igsid){ const e=Object.entries(S.insta.mundo).find(([u,c])=>c.igsid===igsid); return e?{username:e[0],follower_count:e[1].seguidores,is_user_follow_business:e[1].segue}:null; }
+// GET /{media-id}?fields=username,caption,permalink — post do feed em que a loja foi mencionada
+function metaMidia(id){ return S.insta.midias[id]||null; }
+
+// SERVIDOR — acha o pedido que dá direito à participação [D21]
+function igPedido(ref,tel){
+  const r=String(ref||'').trim().toUpperCase().replace(/\s/g,''); if(!r) return {erro:'Informe o código do QR ou o número do pedido.'};
+  const jan=S.cfg.insta.janelaPedidoDias, velho=q=>agora()-q>jan*DIA;
+  const p=S.participacoes[r];
+  if(p){ if(velho(p.criado)) return {erro:'Este pedido tem mais de '+jan+' dias. Vale para pedidos recentes.'};
+    if(p.cliente&&p.cliente!==tel) return {erro:'Este pedido está ligado a outro WhatsApp.'};
+    return {chave:p.canal+'|'+p.pedido,txt:p.pedido}; }
+  const n='#'+r.replace(/^#/,''), pp=S.pedidosProprios[n];
+  if(pp){ if(pp.tel!==tel) return {erro:'Este pedido está ligado a outro WhatsApp.'};
+    if(velho(pp.quando)) return {erro:'Este pedido tem mais de '+jan+' dias. Vale para pedidos recentes.'};
+    return {chave:'Próprio|'+n,txt:n}; }
+  return {erro:'Não achei esse pedido. Use o código impresso abaixo do QR ou o número do pedido do cardápio.'};
+}
+const IG_ABERTA=['aguardando ações','desconto liberado','suspenso'];
+function igAberta(user){ return Object.values(S.insta.parts).filter(p=>p.user===user&&IG_ABERTA.includes(p.status)).sort((a,b)=>b.criado-a.criado)[0]; }
+// SERVIDOR — POST /instagram/participar {tel, usuario, pedido} [D21][D26]
+function igInscrever(tel,user,ref){
+  const c=S.cfg.insta, I=S.insta;
+  if(!c.ativo) return {erro:'O Poste e ganhe está pausado no momento.'};
+  if(tel.length<10) return {erro:'Informe um WhatsApp válido com DDD.'};
+  if(!user) return {erro:'Esse @ não parece válido: use só letras, números, ponto e _ (até 30).'};
+  const ped=igPedido(ref,tel); if(ped.erro) return ped;
+  if(Object.values(I.parts).some(p=>p.pedido===ped.chave)) return {erro:'Este pedido já foi usado no Poste e ganhe.'};
+  if(Object.entries(I.contas).some(([t,u])=>u.user===user&&t!==tel)) return {erro:'Este @ já está ligado a outro WhatsApp. Fale com a loja.'};
+  if(I.contas[tel]&&I.contas[tel].user!==user) return {erro:'Seu WhatsApp já está ligado ao @'+I.contas[tel].user+'. Para trocar, fale com a loja.'};
+  const aberta=igAberta(user); if(aberta&&aberta.status==='aguardando ações') return {erro:'Você já tem uma participação aberta (pedido '+aberta.pedidoTxt+'). É só fazer as ações no Instagram: o sistema confere sozinho.'};
+  const ult=Object.values(I.parts).filter(p=>p.tel===tel&&p.liberadoEm).map(p=>p.liberadoEm).sort((a,b)=>b-a)[0];
+  if(ult&&agora()-ult<c.intervaloDias*DIA) return {erro:'Você ganhou um desconto do Instagram há pouco. Dá para participar de novo a partir de '+dataBR(ult+c.intervaloDias*DIA)+'.'};
+  I.contas[tel]||={user,igsid:null,desde:agora()};
+  const pt={id:tokenSeguro(6),tel,user,pedido:ped.chave,pedidoTxt:ped.txt,acoes:{seguir:false,story:false,feed:false},
+    seguidores:0,igsid:I.contas[tel].igsid,status:'aguardando ações',pct:0,cupomId:null,criado:agora(),provas:[],faltamAvisado:''};
+  I.parts[pt.id]=pt;
+  audit('Instagram: @'+user+' ('+fim4(tel)+') entrou no Poste e ganhe com o pedido '+ped.txt);
+  // o cliente pode ter postado antes de se cadastrar: eventos das últimas 24 h valem [D22]
+  I.pendentes.forEach(e=>{ const u=e.user||(metaPerfil(e.igsid)||{}).username; if(u===user&&agora()-e.quando<=DIA){ e.usado=true; igAplicarEvento(pt,e); } });
+  I.pendentes=I.pendentes.filter(e=>!e.usado);
+  const r=igAvaliar(pt);
+  return {ok:true,pt,r};
+}
+// SERVIDOR — POST /webhooks/instagram. A Meta chama sozinha; ninguém da loja precisa fazer nada [D22]
+function igWebhook(e){
+  e.quando=agora(); const I=S.insta;
+  let user=e.user;
+  if(e.igsid){ const pf=metaPerfil(e.igsid); if(!pf) return; user=pf.username; }
+  igEvento({story_mention:'story_mention',mention:'mentions (feed)',message:'mensagem no Direct'}[e.tipo]+' de @'+user);
+  const pt=igAberta(user);
+  if(!pt){
+    if(e.tipo!=='message') I.pendentes.push(e);
+    if(e.igsid) igDM(user,'loja','Oi! 💛 Vimos que você marcou a @'+S.cfg.insta.perfil+'. Para ganhar seu desconto, cadastre seu @ e o código do pedido em '+S.cfg.imp.site+'/instagram (vale por 24 h).');
+    salvar(); return;
+  }
+  igAplicarEvento(pt,e); igAvaliar(pt);
+}
+function igAplicarEvento(pt,e){
+  const c=S.cfg.insta;
+  if(e.igsid){ pt.igsid=e.igsid; if(S.insta.contas[pt.tel]) S.insta.contas[pt.tel].igsid=e.igsid; }
+  if(e.tipo==='story_mention'){ pt.acoes.story=true; pt.provas.push({tipo:'story',url:e.midia,quando:e.quando}); }   // [D24] só o link, sem baixar
+  if(e.tipo==='mention'){ const m=metaMidia(e.mediaId); if(!m) return;
+    if(m.caption.toLowerCase().includes(c.hashtag.toLowerCase())){ pt.acoes.feed=true; pt.provas.push({tipo:'feed',url:m.permalink,quando:e.quando}); }
+    else if(pt.igsid) igDM(pt.user,'loja','Amamos o post! 😍 Para ele contar no desconto, coloque '+c.hashtag+' na legenda (é a regra de transparência para posts com desconto). O sistema confere de novo sozinho.'); }
+}
+// SERVIDOR — recalcula e libera, aumenta, pausa ou reativa o cupom. Chamado por webhook, rotina e checkout.
+function igAvaliar(pt){
+  const c=S.cfg.insta;
+  if(pt.igsid){ const pf=metaPerfil(pt.igsid); if(pf){ pt.acoes.seguir=pf.is_user_follow_business; pt.seguidores=pf.follower_count; } }   // [D23]
+  const r=igCalcular(pt.acoes,pt.seguidores), lista=S.carteira[pt.tel]||[];
+  let b=pt.cupomId&&lista.find(x=>x.id===pt.cupomId);
+  if(b&&b.status!=='disponivel'&&b.status!=='suspenso') return r;      // usado ou expirado: não muda mais
+  const fim=' Vale para pedidos a partir de '+brl(c.minimo)+' no nosso cardápio, até '+brl(c.maxReais)+' de desconto.';
+  if(r.completo){
+    if(!b){
+      b={id:tokenSeguro(8),token:null,igPart:pt.id,tipo:'desconto',pct:r.pct,nome:r.pct+'% de desconto',custo:c.maxReais,maxReais:c.maxReais,
+        minimo:c.minimo,produtoReq:'',validade:addDias(c.validade),status:'disponivel',lembretes:0};
+      (S.carteira[pt.tel]||=[]).push(b); pt.cupomId=b.id; pt.liberadoEm=agora();
+      msgCliente(pt.tel,'📸 Valeu pelo post, @'+pt.user+'! Seu desconto de *'+r.pct+'%* está guardado na sua conta da Recheadinha e entra sozinho no próximo pedido pelo cardápio.\n\n_'+fim.trim()+' Até '+dataBR(b.validade)+'._');
+      if(pt.igsid) igDM(pt.user,'loja','Obrigado pelo carinho! 🧡 Seu desconto de '+r.pct+'% já está no seu WhatsApp. ('+r.partes.join(', ')+')');
+      msgLoja('📸 @'+pt.user+' ganhou '+r.pct+'% de desconto ('+r.partes.join(', ')+'), pedido '+pt.pedidoTxt+'.');
+      audit('Instagram: @'+pt.user+' → cupom de '+r.pct+'% liberado ('+r.partes.join(', ')+')');
+      checarTeto();
+    } else if(b.pct!==r.pct||b.status==='suspenso'){
+      const subiu=r.pct>b.pct, volta=b.status==='suspenso';
+      b.pct=r.pct; b.nome=r.pct+'% de desconto'; b.status='disponivel';
+      msgCliente(pt.tel,(volta?'✅ Seu desconto do Instagram voltou a valer: *':subiu?'🚀 Seu desconto do Instagram subiu para *':'Seu desconto do Instagram agora é de *')+r.pct+'%*.\n\n_Até '+dataBR(b.validade)+'._');
+      audit('Instagram: @'+pt.user+' → cupom agora '+r.pct+'% ('+r.partes.join(', ')+')');
+    }
+    pt.status='desconto liberado'; pt.faltamAvisado=''; pt.pct=r.pct;
+  } else {
+    if(b){ if(b.status!=='suspenso'){ b.status='suspenso';
+        msgCliente(pt.tel,'Seu desconto do Instagram ficou pausado porque falta: '+r.faltam.map(k=>igTxt(ACOES_IG[k]).toLowerCase()).join(' e ')+'. É só fazer isso e responder "Já segui" no Direct da @'+c.perfil+' que ele volta sozinho. 😉');
+        audit('Instagram: @'+pt.user+' → cupom pausado (falta '+r.faltam.join(', ')+')'); }
+      pt.status='suspenso'; pt.pct=b.pct; }
+    else { pt.status='aguardando ações'; pt.pct=0; }
+    const f=r.faltam.join(',');
+    if(pt.igsid&&f&&f!==pt.faltamAvisado){ pt.faltamAvisado=f;
+      igDM(pt.user,'loja','Quase lá! 🙌 Para liberar seu desconto, falta: '+r.faltam.map(k=>igTxt(ACOES_IG[k]).toLowerCase()).join(' e ')+'. Quando fizer, responda "Já segui" aqui (o story conta sozinho).'); }
+  }
+  render();
+  return r;
+}
+// SERVIDOR (job) — confere de novo quem está aberto, expira o que venceu, limpa eventos velhos
+function igJob(){
+  const c=S.cfg.insta; let n=0;
+  Object.values(S.insta.parts).forEach(pt=>{
+    if(pt.status==='aguardando ações'&&agora()-pt.criado>c.janelaPedidoDias*DIA){ pt.status='participação expirada'; return; }
+    const b=pt.cupomId&&(S.carteira[pt.tel]||[]).find(x=>x.id===pt.cupomId);
+    if(b&&b.status==='suspenso'&&agora()>b.validade){ b.status='expirado'; pt.status='desconto expirado'; return; }
+    if(b&&b.status==='expirado'){ pt.status='desconto expirado'; return; }
+    if(IG_ABERTA.includes(pt.status)&&pt.igsid){ igAvaliar(pt); n++; }
+  });
+  S.insta.pendentes=S.insta.pendentes.filter(e=>agora()-e.quando<=DIA);
+  igEvento('Rotina de conferência: '+n+' participação(ões) conferida(s)'); salvar();
+}
+
+// ---- Cliente ----
+function irInsta(ref){ irView('cliente','cinsta'); $('igTel').value=clienteTel||''; $('igRef').value=ref||''; renderIgCli(); }
+function igParticipar(){
+  const tel=$('igTel').value.replace(/\D/g,''), user=igNorm($('igUser').value);
+  if(!$('igOk').checked) return show('igCliMsg','err','Marque a autorização para usarmos seu @ nesta campanha.');
+  const r=igInscrever(tel,user,$('igRef').value);
+  if(r.erro) return show('igCliMsg','err',esc(r.erro));
+  $('sUser').value='@'+user;
+  const pt=r.pt;
+  show('igCliMsg','ok',pt.cupomId?'Já encontramos seu post! Seu desconto de <b>'+pt.pct+'%</b> está no seu WhatsApp. 🎉':
+    'Pronto, <b>@'+esc(user)+'</b>! Agora é com o Instagram: '+esc(r.r.faltam.map(k=>igTxt(ACOES_IG[k]).toLowerCase()).join(' e '))+'. O sistema confere sozinho e o desconto chega no seu WhatsApp.');
+  render();
+}
+function simConta(){
+  const u=igNorm($('sUser').value); if(!u){ show('simMsg','err','Digite um @ válido.'); return null; }
+  const M=S.insta.mundo; M[u]||={igsid:'IG'+tokenSeguro(8),segue:false,seguidores:0,publica:true};
+  M[u].seguidores=Math.max(0,+$('sSeg').value||0); M[u].publica=$('sPub').checked; return [u,M[u]];
+}
+function simSeguir(v){ const r=simConta(); if(!r) return; r[1].segue=v; salvar();
+  show('simMsg','info',v?'@'+esc(r[0])+' seguiu a loja. O Instagram não avisa quando alguém segue: o sistema confere na próxima ação, quando o cliente responde "Já segui", na rotina ou no checkout.':'@'+esc(r[0])+' deixou de seguir. Na próxima conferência, o desconto é recalculado ou pausado [D23].'); render(); }
+function simStory(){ const r=simConta(); if(!r) return;
+  if(!r[1].publica&&!r[1].segue) return show('simMsg','warn','Story postado, mas a Meta não avisa a loja: conta privada que não segue a página.');
+  igWebhook({tipo:'story_mention',igsid:r[1].igsid,midia:'https://lookaside.fbsbx.com/ig_messaging_cdn/?asset_id='+tokenSeguro(8)});
+  show('simMsg','ok','Story publicado. A Meta enviou o webhook story_mention para o sistema.'); render(); }
+function simFeed(){ const r=simConta(); if(!r) return;
+  const leg=$('sLegenda').value; if(!leg.toLowerCase().includes('@'+S.cfg.insta.perfil)) return show('simMsg','warn','A legenda não marca @'+esc(S.cfg.insta.perfil)+': a loja não é avisada.');
+  if(!r[1].publica) return show('simMsg','warn','Conta privada: a menção no feed não chega para a loja.');
+  const id='M'+tokenSeguro(8); S.insta.midias[id]={username:r[0],caption:leg,permalink:'https://www.instagram.com/p/'+id+'/'};
+  igWebhook({tipo:'mention',user:r[0],mediaId:id});
+  show('simMsg','ok','Post publicado. A Meta enviou o webhook mentions para o sistema.'); render(); }
+function simDM(){ const r=simConta(); if(!r) return; igDM(r[0],'cliente','Já segui ✅'); igWebhook({tipo:'message',igsid:r[1].igsid}); render(); }
+
+// ---- telas ----
+function setIg(k,v){ S.cfg.insta[k]=v; audit('Instagram: '+k+' = '+v); redesenhar(); render(); }
+function setIgAcao(k,campo,v){ S.cfg.insta.acoes[k][campo]=campo==='pct'?Math.max(0,+v||0):v; audit('Instagram: '+k+'.'+campo+' = '+v); redesenhar(); render(); }
+function setIgFaixa(i,campo,v){ S.cfg.insta.faixas[i][campo]=Math.max(0,+v||0); audit('Instagram: faixa '+(i+1)+' '+campo+' = '+v); redesenhar(); render(); }
+function renderIg(){
+  const c=S.cfg.insta;
+  $('igAcoesTb').innerHTML=Object.keys(ACOES_IG).map(k=>'<tr><td>'+esc(igTxt(ACOES_IG[k]))+'</td><td><input type="number" min="0" max="100" value="'+c.acoes[k].pct+'" onchange="setIgAcao(\''+k+'\',\'pct\',this.value)"></td>'+
+    '<td><input type="checkbox" '+(c.acoes[k].obrig?'checked':'')+' onchange="setIgAcao(\''+k+'\',\'obrig\',this.checked)"></td><td class="muted">'+COMO_IG[k]+'</td></tr>').join('');
+  $('igFaixas').innerHTML=c.faixas.map((f,i)=>'<div class="row mt"><span class="muted">A partir de</span><input type="number" min="0" step="100" value="'+f.min+'" style="width:100px" onchange="setIgFaixa('+i+',\'min\',this.value)"><span class="muted">seguidores: +</span><input type="number" min="0" value="'+f.pct+'" style="width:60px" onchange="setIgFaixa('+i+',\'pct\',this.value)"><span class="muted">%</span></div>').join('');
+  const ex=[['Segue + story, 300 seguidores',{seguir:true,story:true},300],['Segue + story, 1.500 seguidores',{seguir:true,story:true},1500],['Segue + story + feed, 6.000 seguidores',{seguir:true,story:true,feed:true},6000],['Só story (não segue)',{story:true},800]];
+  $('igExemplos').innerHTML='<h3>Exemplos com a configuração atual</h3>'+ex.map(([t,a,n])=>{ const r=igCalcular(a,n); return '<div class="tl"><span>'+t+'</span><b>'+(r.completo?r.pct+'%'+(r.bruto>r.pct?' <small class="muted">(teto)</small>':''):'<span style="color:var(--warn)">não libera</span>')+'</b></div>'; }).join('')+
+    (c.ativo&&c.maxReais>0?'':'<div class="msg warn">Com máximo de R$ 0, o desconto nunca terá valor.</div>');
+  const ps=Object.values(S.insta.parts).sort((a,b)=>b.criado-a.criado), ic=v=>v?'✅':'▫️';
+  $('igPartsTb').innerHTML=ps.map(p=>'<tr><td>@'+esc(p.user)+'</td><td>'+fim4(p.tel)+'</td><td>'+esc(p.pedidoTxt)+'</td><td>'+ic(p.acoes.seguir)+' seguir<br>'+ic(p.acoes.story)+' story<br>'+ic(p.acoes.feed)+' feed</td><td>'+(p.igsid?p.seguidores.toLocaleString('pt-BR'):'—')+'</td><td>'+(p.pct?p.pct+'%':'—')+'</td><td>'+esc(p.status)+'</td></tr>').join('')||'<tr><td colspan="7" class="muted">Nenhuma participação ainda.</td></tr>';
+  $('igLog').innerHTML=S.insta.eventos.map(l=>'<div>'+esc(l)+'</div>').join('')||'<div class="muted">Nenhum evento.</div>';
+}
+function renderIgCli(){
+  const c=S.cfg.insta;
+  if(!c.ativo){ $('igRegrasCli').innerHTML='<div class="msg info">O Poste e ganhe está pausado no momento.</div>'; }
+  else $('igRegrasCli').innerHTML='<p>Comprou com a gente? Mostra pra galera e ganhe <b>até '+igMaxPct()+'% de desconto</b> no próximo pedido pelo nosso cardápio. 🧡</p>'+
+    '<div class="gift">'+Object.keys(ACOES_IG).filter(k=>c.acoes[k].pct>0||c.acoes[k].obrig).map(k=>'<div class="tl"><span>'+esc(igTxt(ACOES_IG[k]))+(c.acoes[k].obrig?' <span class="tag">obrigatório</span>':'')+'</span><b>+'+c.acoes[k].pct+'%</b></div>').join('')+
+    c.faixas.filter(f=>f.min>0&&f.pct>0).map(f=>'<div class="tl"><span class="muted">Bônus: perfil com '+f.min.toLocaleString('pt-BR')+'+ seguidores</span><b>+'+f.pct+'%</b></div>').join('')+'</div>'+
+    '<p class="muted">Quanto mais você fizer, maior o desconto, até '+c.maxPct+'% (máximo '+brl(c.maxReais)+'). Vale para pedidos a partir de '+brl(c.minimo)+' no cardápio, por '+c.validade+' dias, sobre os produtos. '+
+    'Use <b>'+esc(c.hashtag)+'</b> no post: assim fica claro para seus seguidores que você ganhou desconto. A conferência é automática pelo Instagram: não precisa mandar print.</p>';
+  const tel=$('igTel').value.replace(/\D/g,''), ps=Object.values(S.insta.parts).filter(p=>tel.length>=10&&p.tel===tel).sort((a,b)=>b.criado-a.criado);
+  $('igMinhas').innerHTML=ps.length?'<h3>Suas participações</h3>'+ps.map(p=>{ const r=igCalcular(p.acoes,p.seguidores);
+    return '<div class="item"><span>@'+esc(p.user)+' · pedido '+esc(p.pedidoTxt)+'<br><span class="muted">'+esc(p.status)+(r.faltam.length&&IG_ABERTA.includes(p.status)?' · falta: '+esc(r.faltam.map(k=>CURTO_IG[k]).join(', ')):'')+'</span></span><b>'+(p.pct?p.pct+'%':'—')+'</b></div>'; }).join(''):'';
+  const dm=S.msgs.filter(m=>m.para==='ig').slice().reverse();
+  $('igDm').innerHTML=dm.map(m=>'<div class="bub'+(m.de==='loja'?'':' c')+'"><small>'+(m.de==='loja'?'@'+esc(S.cfg.insta.perfil)+' → @'+esc(m.user):'@'+esc(m.user))+' · '+dataHora(m.quando)+'</small>'+waFmt(m.texto)+'</div>').join('')||'<span class="muted">Nenhuma mensagem.</span>';
 }
 
 // ================= Painel =================
@@ -971,16 +1318,17 @@ function render(){
   const ps=Object.values(S.participacoes), rasp=ps.filter(p=>p.raspadoEm), conc=ps.filter(p=>p.premio);
   const cont={}; conc.forEach(p=>cont[p.premio.nome]=(cont[p.premio.nome]||0)+1);
   const top=Object.entries(cont).sort((a,b)=>b[1]-a[1])[0];
-  const usados=Object.values(S.carteira).flat().filter(b=>b.status==='usado'), g=gastos();
+  const usados=Object.values(S.carteira).flat().filter(b=>b.status==='usado'&&b.tipo!=='desconto'), g=gastos(), igs=Object.values(S.insta.parts);
   const pct=(a,b)=>b?Math.round(a/b*100)+'%':'—';
   $('kpis').innerHTML=[
     ['QR gerados',ps.length],['Raspados',rasp.length+' <small class="muted">'+pct(rasp.length,ps.length)+'</small>'],
     ['Brindes escolhidos',conc.length],['Usados em pedidos',usados.length+' <small class="muted">'+pct(usados.length,conc.length)+'</small>'],
-    ['Gasto realizado',brl(g.real)],['Mais escolhido',top?esc(top[0])+' <small class="muted">'+top[1]+'x</small>':'—']
+    ['Gasto no mês',brl(g.real)],['Mais escolhido',top?esc(top[0])+' <small class="muted">'+top[1]+'x</small>':'—'],
+    ['Descontos Instagram',igs.filter(p=>p.cupomId).length+' <small class="muted">'+igs.filter(p=>p.status==='desconto usado').length+' usados</small>']
   ].map(k=>'<div class="kpi"><span class="muted">'+k[0]+'</span><b>'+k[1]+'</b></div>').join('');
   const t=S.cfg.teto||0, pr=t?Math.min(100,g.real/t*100):0, pc=t?Math.min(100-pr,g.comp/t*100):0;
   $('tetoBar').innerHTML='<span style="width:'+pr+'%;background:'+(pr>=S.cfg.alerta?'var(--err)':'var(--brand2)')+'"></span><span style="width:'+pc+'%;background:var(--gold);opacity:.6"></span>';
-  $('tetoTxt').innerHTML='Realizado (brindes usados): <b>'+brl(g.real)+'</b> · Comprometido (guardados nas contas): <b>'+brl(g.comp)+'</b> · Teto: <b>'+brl(t)+'</b>';
+  $('tetoTxt').innerHTML='Realizado no mês (brindes e descontos usados): <b>'+brl(g.real)+'</b> · Comprometido (guardados nas contas): <b>'+brl(g.comp)+'</b> · Teto: <b>'+brl(t)+'</b>';
   $('canaisBox').innerHTML=CANAIS.map(c=>'<div class="tg"><span>'+c+(c==='Próprio'?' <span class="muted">(QR automático)</span>':' <span class="muted">(QR avulso)</span>')+'</span><input type="checkbox" class="sw" '+(S.cfg.canais[c]?'checked':'')+' onchange="S.cfg.canais[\''+c+'\']=this.checked;audit(\'Canal '+c+': \'+(this.checked?\'ligado\':\'desligado\'))"></div>').join('');
   $('freteMsg').innerHTML=S.cfg.freteAtivo&&!(S.cfg.raioKm>0)?'<div class="msg warn">Defina o raio: sem ele, o frete grátis nunca pode ser escolhido.</div>':S.cfg.freteAtivo&&!S.cfg.canais['Próprio']?'<div class="msg warn">O canal Próprio está desligado, então o frete grátis nunca pode ser escolhido.</div>':'';
   $('diasBox').innerHTML=DIAS.map((d,i)=>'<label><input type="checkbox" '+(S.cfg.pausaDias[i]?'checked':'')+' onchange="S.cfg.pausaDias['+i+']=this.checked;audit(\'Pausa '+d+': \'+this.checked)"> '+d+'</label>').join('');
@@ -1000,7 +1348,7 @@ function render(){
   $('tbHist').innerHTML=ps.slice().reverse().map(p=>'<tr><td>'+esc(p.pedido)+'</td><td>'+esc(p.canal)+'</td><td>'+(p.premio?esc(p.premio.nome)+' <span class="tag">v'+p.regrasVersao+'</span>':'—')+'</td><td>'+esc(p.status)+'</td><td>'+(p.cliente?fim4(p.cliente):'não identificado')+'</td></tr>').join('')||'<tr><td colspan="5" class="muted">Nenhuma participação ainda.</td></tr>';
   $('rVersao').textContent='v'+S.regras.versao;
   $('relogio').textContent=new Date(agora()).toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'2-digit',year:'numeric'});
-  renderCardapio(); renderWhats(); renderQrList(); renderLog(); salvar();
+  renderIg(); renderIgCli(); renderCardapio(); renderWhats(); renderQrList(); renderLog(); salvar();
 }
 function waFmt(t){ return esc(t).replace(/\*([^*\n]+)\*/g,'<b>$1</b>').replace(/_([^_\n]+)_/g,'<i>$1</i>').replace(/\n/g,'<br>'); }
 function renderWhats(){
@@ -1036,6 +1384,9 @@ function initForm(){
   $('rDia').value=S.regras.limiteDia;
   $('lAtivo').checked=c.lembrete.ativo; $('lDias').value=c.lembrete.diasAntes; $('lMax').value=c.lembrete.max; $('lTexto').value=c.lembrete.texto;
   $('imNome').value=c.imp.nome; $('imMetodo').value=c.imp.metodo; $('imCorte').checked=c.imp.corte; $('imLoja').value=c.imp.loja; $('imSite').value=c.imp.site; $('imBase').value=c.imp.base;
+  const ig=c.insta; $('igAtivo').checked=ig.ativo; $('igPerfil').value=ig.perfil; $('igMaxPct').value=ig.maxPct; $('igMaxReais').value=ig.maxReais;
+  $('igMinimo').value=ig.minimo; $('igValidade').value=ig.validade; $('igJanela').value=ig.janelaPedidoDias; $('igIntervalo').value=ig.intervaloDias;
+  $('igHashtag').value=ig.hashtag; $('igAcumula').checked=ig.acumula; $('sLegenda').value='Batata recheada da @'+ig.perfil+' 😍 '+ig.hashtag;
   previewLembrete(); desenharTeste(); $('testBar').innerHTML=printBar('testCv');
 }
 initForm();
