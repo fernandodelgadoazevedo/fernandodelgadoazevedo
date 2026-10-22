@@ -58,61 +58,79 @@ Data: 22/10/2026 · Arquivo: `raspadinha.html` (protótipo de 1 arquivo, sem bac
 - **Lei 5.768/1971:** o desconto varia **por regra pública e sem sorte**, então segue fora do regime de autorização (D01).
 - **LGPD:** o @ é pedido com consentimento, para uma finalidade só, e o vínculo é 1 @ para 1 WhatsApp.
 
-## 3. O que foi implementado: "Poste e ganhe" (D20 a D27)
+## 3. O que foi implementado: "Poste e ganhe" (D20 a D31), versão que evita banimento
 
 **Como funciona para o cliente**
 
-1. Compra (qualquer canal). No cupom sai "POSTE E GANHE ATÉ 20% OFF".
-2. Na página, informa o WhatsApp, o **@ do Instagram** e o código do pedido, e dá a autorização.
-3. Segue a loja e posta story com a foto do pedido marcando @recheadinha. O post no feed com #publi é opcional e aumenta o desconto.
-4. **O sistema faz o resto sozinho:**
-   - recebe o webhook;
-   - descobre o @ pela API;
-   - confere se o cliente segue e quantos seguidores tem;
-   - calcula o %;
-   - guarda o cupom na conta do WhatsApp;
-   - avisa no WhatsApp e no Direct.
+1. Compra no cardápio próprio. No cupom sai: "POSTE E GANHE ATÉ 20% OFF. Tire foto do seu pedido, poste no story e marque @recheadinha".
+2. Na página, cadastra o WhatsApp, o **@ do Instagram** e o nº do pedido, e dá a autorização (LGPD).
+3. **Tira a foto do item** (ex.: a batata recheada) na própria página. O sistema aplica uma moldura com o nome da loja e o aviso "Ganhei desconto da @recheadinha por este post #publi".
+4. Toca em **Postar no story**. O celular abre o compartilhamento: Instagram → Story. O cliente adiciona a figurinha **Menção** com @recheadinha. Há um botão "Copiar @", e se o aparelho não compartilhar direto, a foto é salva.
+5. **O sistema faz o resto sozinho:**
+   - a Meta avisa a marcação (webhook `story_mention`);
+   - a API informa o @ e os seguidores;
+   - o sistema calcula o %, guarda o cupom na conta e avisa pelo WhatsApp e pelo Direct.
 
-   Se faltar algo, responde no Direct dizendo o que falta. Se o cliente postou antes de se cadastrar, o post vale por 24 h.
-5. No checkout do cardápio, o "seguir" é conferido de novo. Quem deixou de seguir tem o desconto pausado até voltar a seguir.
+   Se o cliente postou antes de se cadastrar, o story vale por 24 h.
+6. **Botão "Abrir @recheadinha no Instagram para seguir"** (opcional). Usa o link universal `https://www.instagram.com/recheadinha/`, que abre o app no perfil, e o cliente toca em Seguir. **Seguir não vale desconto** e aparece no painel só como métrica.
 
-**Desconto variável, sem sorte (padrão, tudo editável no painel)**
+**Desconto variável, sem sorte (padrão, editável no painel)**
 
-| Ação | % | Obrigatória |
+| Ação | % | Regra |
 |---|---|---|
-| Seguir @recheadinha | +5% | sim |
-| Story com a foto do pedido marcando | +7% | sim |
-| Post no feed marcando + #publi | +5% | não |
-| Bônus 1.000+ seguidores | +2% | n/a |
-| Bônus 5.000+ seguidores | +3% | n/a |
+| Story com a foto do item marcando @recheadinha | +12% | base: libera o desconto |
+| Post no feed com a foto do item + #publi | +5% | bônus opcional |
+| Bônus 1.000+ / 5.000+ seguidores | +2% / +3% | lido pela API |
+| Seguir a loja | 0% | só convite (D23) |
 
-O máximo é 20% e R$ 15,00, com pedido mínimo de R$ 30. O desconto vale 15 dias, sobre os produtos (não o frete), e o cliente pode ganhar 1 a cada 7 dias. Cada pedido participa uma vez.
+O máximo é 20% e R$ 15, com pedido mínimo de R$ 30. O desconto vale 15 dias, sobre os produtos, e o cliente pode ganhar 1 a cada 7 dias. Cada pedido participa uma vez. O desconto nunca diminui depois de liberado.
 
-**Painel da loja (aba Instagram):** liga/desliga, perfil, % por ação, o que é obrigatório, faixas de seguidores, limites, hashtag e se acumula com o brinde. Mostra exemplos calculados, a lista de participações e o log dos eventos da Meta. O custo entra no gasto de marketing e no teto (só alerta).
+**Painel da loja:**
+- % por ação, faixas de seguidores e limites;
+- moldura com aviso de publicidade;
+- chave "aceitar pedidos de marketplace", desligada por padrão;
+- lista de participações com link do story e "Anular", disponível por 24 h para story que não mostra o item;
+- log dos eventos da Meta.
 
-**Cliente (aba Instagram):** regras claras, cadastro do @, acompanhamento e Direct. O simulador do Instagram existe só no protótipo.
+## Como não ser banido (o que o sistema respeita)
+
+| Plataforma | Regra | Como foi resolvido |
+|---|---|---|
+| Instagram | Não trocar vantagem por seguidores ou curtidas. As regras de promoção (2025) não aceitam "seguir" como requisito | Seguir vale 0% e não é condição. Só um botão que abre o perfil (D23) |
+| Instagram | Marcação deve ser verdadeira | A foto é do pedido. Nada de "marque amigos". A loja pode anular story sem o item (D29) |
+| Instagram | Direct automático só até 24 h após a última mensagem/marcação do cliente. Message tags não podem levar promoção | O sistema bloqueia o Direct fora da janela e manda o aviso pelo WhatsApp (D28) |
+| Instagram | Só API oficial, app revisado, sem guardar mídia do story | Webhooks + User Profile API. Nada de robô, senha ou raspagem de perfil. Guarda só o link (D22, D24) |
+| WhatsApp | API não oficial (que imita o WhatsApp Web) leva a banimento do número | O sistema real deve usar a WhatsApp Business Platform (Cloud API). Lembretes fora de 24 h só com modelo aprovado (Marketing) e opt-in (D31) |
+| iFood e outros | Contratos costumam vetar desviar o cliente para outro canal | Só pedidos do cardápio próprio participam, por padrão (D30) |
+| CONAR / FTC | Post incentivado precisa deixar claro o benefício | Moldura com #publi e aviso. Hashtag conferida no feed (D25, D29) |
+| Lei 5.768/71 | Sorte exige autorização | % por regra pública, sem sorte (D01, D20) |
+
+Ponto em aberto: a documentação da Meta não diz explicitamente se uma **marcação em story** abre a janela de 24 h (para respostas a story, abre). O protótipo assume que sim. Vale testar no app real antes de lançar; se não abrir, o aviso vai só pelo WhatsApp.
 
 **Para o backend real (FastAPI)**
 
 - `POST /instagram/participar`
-- `POST /webhooks/instagram`, com validação da assinatura `X-Hub-Signature-256`
-- job periódico de reconferência
-- tabelas `ig_conta`, `ig_participacao` e `ig_prova` (sem mídia)
-- cupom tipo `desconto` na carteira já existente
+- `POST /webhooks/instagram`, conferindo `X-Hub-Signature-256`
+- job periódico
+- tabelas `ig_conta`, `ig_participacao` e `ig_prova` (só o link)
+- cupom tipo `desconto` na carteira
 
 ## 4. Textos prontos (redação)
 
 **Cupom impresso**
 > POSTE E GANHE ATÉ 20% OFF
-> Siga e marque @recheadinha no story com a foto do pedido. Cadastre seu @ em recheadinha.delivery/instagram
+> Tire foto do seu pedido, poste no story e marque @recheadinha. Cadastre seu @ em recheadinha.delivery/instagram
+
+**Moldura da foto**
+> RECHEADINHA · Ganhei desconto da @recheadinha por este post #publi
 
 **Página**
-> Comprou com a gente? Mostra pra galera e ganhe até 20% de desconto no próximo pedido pelo nosso cardápio. 🧡 Quanto mais você fizer, maior o desconto. Use #publi no post: assim fica claro para seus seguidores que você ganhou desconto. Não precisa mandar print.
+> Comprou com a gente? Tire uma foto do seu pedido, poste no story marcando a gente e ganhe até 20% de desconto no próximo pedido pelo nosso cardápio. 🧡 A foto precisa mostrar o seu pedido. A conferência é automática: não precisa mandar print.
 
 **Direct (automático)**
 > Oi! 💛 Vimos que você marcou a @recheadinha. Para ganhar seu desconto, cadastre seu @ e o código do pedido em recheadinha.delivery/instagram (vale por 24 h).
 >
-> Quase lá! 🙌 Para liberar seu desconto, falta: seguir @recheadinha. Quando fizer, responda "Já segui" aqui.
+> Quase lá! 🙌 Para liberar seu desconto, poste um story com a foto do seu pedido e marque @recheadinha com a figurinha Menção.
 >
 > Obrigado pelo carinho! 🧡 Seu desconto de 14% já está no seu WhatsApp.
 
@@ -123,12 +141,16 @@ O máximo é 20% e R$ 15,00, com pedido mínimo de R$ 30. O desconto vale 15 dia
 ## 5. Antes de lançar
 
 - Advogado: confirmar "desconto por regras" fora da Lei 5.768 e validar o regulamento curto (com as cláusulas que o Instagram exige: isenção do Instagram e aviso de que a promoção não é dele).
-- Decidir se "seguir" continua **obrigatório** ou vira **bônus** (menor risco com a Meta).
+- Contratar a WhatsApp Business Platform (API oficial) e aprovar os modelos de lembrete.
+- Testar no app real se a marcação em story abre a janela de 24 h do Direct.
 - Criar o app na Meta, pedir as permissões de mensagens e passar pela revisão do app.
 - Fazer o piloto só com pedidos próprios e medir: % que posta, % que usa o desconto, retorno em 15 e 30 dias e custo por pedido de retorno.
 
 ## Fontes
 
+- [Meta/Instagram promotion rules (ShortStack)](https://www.shortstack.com/help/facebook-promotion-guidelines/) · [Plexus 2025](https://www.plexus.co/resources/blog/trade-promotions/social-media/terms-and-conditions/instagram)
+- [Janela de 24 h (Meta)](https://developers.facebook.com/docs/messenger-platform/send-messages) · [Política da plataforma](https://developers.facebook.com/documentation/business-messaging/messenger-platform/policy)
+- [Web Share API (MDN)](https://developer.mozilla.org/docs/Web/API/Navigator/share)
 - [Instagram User Profile API](https://developers.facebook.com/docs/instagram-platform/instagram-api-with-instagram-login/messaging-api/user-profile)
 - [Story Mention (Instagram Messaging)](https://developers.facebook.com/docs/messenger-platform/instagram/features/story-mention)
 - [Webhooks for Instagram Messaging](https://developers.facebook.com/docs/instagram-messaging/webhooks)
