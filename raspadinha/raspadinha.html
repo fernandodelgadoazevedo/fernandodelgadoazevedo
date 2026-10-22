@@ -1,0 +1,1048 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<!--
+  PROTÓTIPO DO MÓDULO "RASPADINHA" DO saas.delivery
+  ATENÇÃO, DESENVOLVEDOR OU IA: antes de alterar qualquer coisa, leia o bloco
+  "DECISÕES DE PRODUTO (NÃO ALTERAR SEM AUTORIZAÇÃO DO DONO)" no início do <script> principal.
+  Cada decisão tem um código [Dxx], que aparece nos comentários do código onde ela se aplica.
+-->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Raspadinha saas.delivery</title>
+<style>
+:root{
+  --brand:#E62B1E; --brand2:#FF6A00; --gold:#FFC107;
+  --bg:#f6f4f1; --card:#ffffff; --text:#1a1a1a; --muted:#6b6b6b; --line:#e6e1da;
+  --ok:#1f9d55; --warn:#d97706; --err:#c0392b; --wa:#dcf8c6; --wa2:#ffffff;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){ --bg:#121212; --card:#1e1e1e; --text:#f1f1f1; --muted:#a3a3a3; --line:#333; --wa:#1f4d36; --wa2:#2a2a2a; }
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;font-size:15px}
+header{background:linear-gradient(135deg,var(--brand),var(--brand2));color:#fff;padding:12px 16px}
+header h1{margin:0;font-size:17px}
+header small{opacity:.9;font-size:12px}
+.views{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:10px;background:#0002;padding:4px;border-radius:12px}
+.views button{border:0;border-radius:9px;padding:9px;font-weight:700;font-size:14px;background:transparent;color:#fff;cursor:pointer}
+.views button.on{background:#fff;color:var(--brand)}
+nav{display:flex;gap:6px;overflow-x:auto;padding:10px 16px;background:var(--card);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5}
+nav button{flex:0 0 auto;border:1px solid var(--line);background:var(--bg);color:var(--text);padding:8px 12px;border-radius:20px;font-weight:600;cursor:pointer;font-size:14px}
+nav button.on{background:var(--brand);color:#fff;border-color:var(--brand)}
+main{max-width:780px;margin:0 auto;padding:16px}
+section{display:none}
+section.on{display:block}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:14px}
+h2{font-size:17px;margin:0 0 10px}
+h3{font-size:14px;margin:14px 0 6px}
+.btn{border:0;border-radius:10px;padding:11px 14px;font-weight:700;cursor:pointer;background:var(--brand);color:#fff;font-size:14px}
+.btn.alt{background:var(--bg);color:var(--text);border:1px solid var(--line)}
+.btn.sm{padding:7px 10px;font-size:13px}
+.btn.full{width:100%;display:block}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.mt{margin-top:8px}
+input,select,textarea{padding:9px 10px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--text);font-size:14px;max-width:100%;font-family:inherit}
+textarea{width:100%;min-height:90px}
+.muted{color:var(--muted);font-size:13px}
+.msg{padding:10px 12px;border-radius:10px;margin:10px 0;font-size:14px}
+.msg.ok{background:#1f9d5520;color:var(--ok)}
+.msg.warn{background:#d9770620;color:var(--warn)}
+.msg.err{background:#c0392b20;color:var(--err)}
+.msg.info{background:var(--bg);color:var(--text);border:1px solid var(--line)}
+.tg{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 0;border-bottom:1px solid var(--line)}
+.tg:last-child{border-bottom:0}
+input.sw{appearance:none;-webkit-appearance:none;width:44px;height:24px;border-radius:12px;background:#bbb;position:relative;cursor:pointer;transition:.2s;flex:0 0 auto;padding:0;border:0}
+input.sw::after{content:'';position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:.2s}
+input.sw:checked{background:var(--ok)}
+input.sw:checked::after{left:23px}
+.paper{background:#fff;padding:10px 0;border-radius:6px;display:flex;justify-content:center;box-shadow:inset 0 0 0 1px #ddd}
+.paper canvas{width:100%;max-width:290px;height:auto;image-rendering:pixelated}
+.pbar{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:6px}
+@media (max-width:420px){.pbar{grid-template-columns:repeat(2,1fr)}}
+.scratch-wrap{position:relative;width:100%;max-width:320px;aspect-ratio:3/2;margin:12px auto;border-radius:16px;overflow:hidden;box-shadow:0 6px 20px #0003}
+.prize{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--gold),#FFD64D);color:#222;text-align:center;padding:10px}
+.prize b{font-size:22px}
+.scratch-wrap canvas{position:absolute;inset:0;width:100%;height:100%;touch-action:none;cursor:pointer}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
+.kpi{background:var(--bg);border-radius:10px;padding:10px}
+.kpi b{display:block;font-size:20px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{padding:7px 5px;border-bottom:1px solid var(--line);text-align:left;vertical-align:middle}
+td input[type=number]{width:72px;padding:6px}
+td select{padding:6px;max-width:150px}
+.tbl{overflow-x:auto}
+.log{max-height:220px;overflow:auto;font-size:12px;font-family:ui-monospace,Menlo,monospace;background:var(--bg);border-radius:8px;padding:8px}
+.log div{padding:3px 0;border-bottom:1px dotted var(--line)}
+.tag{display:inline-block;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:700;background:var(--bg);border:1px solid var(--line)}
+.bar{height:14px;border-radius:7px;background:var(--bg);overflow:hidden;display:flex;border:1px solid var(--line)}
+.bar span{display:block;height:100%}
+.days{display:flex;gap:6px;flex-wrap:wrap}
+.days label{border:1px solid var(--line);border-radius:8px;padding:5px 8px;font-size:13px;cursor:pointer}
+.item{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:9px 0;border-bottom:1px solid var(--line)}
+.item:last-child{border-bottom:0}
+.qty{display:flex;align-items:center;gap:6px}
+.qty button{width:30px;height:30px;border-radius:50%;border:1px solid var(--line);background:var(--bg);color:var(--text);font-weight:700;cursor:pointer}
+.tl{display:flex;justify-content:space-between;gap:6px}
+.gift{border:2px solid var(--gold);background:#FFC10718;border-radius:12px;padding:10px;margin:8px 0}
+.gift label{display:flex;gap:8px;align-items:flex-start;cursor:pointer}
+.wa-box{background:var(--bg);border-radius:10px;padding:8px;max-height:480px;overflow:auto}
+.bub{background:var(--wa2);border-radius:10px;padding:8px 10px;margin:6px 0;font-size:14px;box-shadow:0 1px 2px #0002}
+.bub.c{background:var(--wa)}
+.bub small{display:block;color:var(--muted);font-size:11px;margin-bottom:3px}
+.qrlist{display:flex;gap:6px;flex-wrap:wrap}
+.opt{display:block;width:100%;text-align:left;border:2px solid var(--line);background:var(--card);color:var(--text);border-radius:12px;padding:12px;margin:8px 0;cursor:pointer;font-size:15px;font-family:inherit}
+.opt:not(:disabled):hover{border-color:var(--brand)}
+.opt:disabled{opacity:.55;cursor:not-allowed}
+ol,ul{padding-left:20px} li{margin:4px 0}
+#printArea{display:none}
+@media print{
+  @page{size:58mm auto;margin:0}
+  body{background:#fff}
+  header,nav,main{display:none!important}
+  #printArea{display:block}
+  #printArea img{width:48mm;display:block;margin:0 auto}
+}
+</style>
+</head>
+<body>
+<header>
+  <h1>saas.delivery · Raspadinha</h1>
+  <small>Protótipo · empresa: Recheadinha · dados salvos neste aparelho</small>
+  <div class="views">
+    <button data-v="loja" class="on">🏪 Loja</button>
+    <button data-v="cliente">📱 Cliente</button>
+  </div>
+</header>
+<nav id="navLoja">
+  <button data-t="pedidos" class="on">Pedidos e QR</button>
+  <button data-t="painel">Painel</button>
+  <button data-t="lwhats">WhatsApp</button>
+  <button data-t="impressora">Impressora</button>
+  <button data-t="legal">Antes de lançar</button>
+</nav>
+<nav id="navCliente" style="display:none">
+  <button data-t="raspa">Raspadinha</button>
+  <button data-t="cardapio">Cardápio</button>
+  <button data-t="cwhats">Meu WhatsApp</button>
+</nav>
+<main>
+
+<!-- ===================== LOJA ===================== -->
+<section id="pedidos" class="on">
+  <div class="card">
+    <h2>Gerar QR avulso <span class="tag">sem integração</span></h2>
+    <p class="muted">Pedidos do iFood, Keeta, 99Food, WhatsApp ou Instagram. Digite o código do pedido e imprima só o QR. O mesmo pedido nunca gera dois QR.</p>
+    <div class="row">
+      <select id="aCanal"><option>iFood</option><option>Keeta</option><option>99Food</option><option>WhatsApp</option><option>Instagram</option></select>
+      <input id="aCod" placeholder="Código do pedido" style="flex:1;min-width:140px">
+    </div>
+    <button class="btn full mt" onclick="gerarAvulso()">Gerar QR</button>
+  </div>
+
+  <div class="card">
+    <h2>Pedido do iFood <span class="tag">com integração · simulação</span></h2>
+    <p class="muted">Como vai ficar quando a integração existir: o pedido do iFood sai impresso e, logo abaixo, na mesma tira, a raspadinha.</p>
+    <div class="row">
+      <input id="iCod" placeholder="Código do pedido" style="flex:1;min-width:120px" value="7310">
+      <input id="iCli" placeholder="Nome do cliente" style="flex:1;min-width:120px" value="Maria S.">
+    </div>
+    <button class="btn alt full mt" onclick="gerarIfood()">Receber pedido do iFood</button>
+  </div>
+
+  <div class="card">
+    <h2>Pedido da plataforma própria <span class="tag">simulação</span></h2>
+    <p class="muted">Pedido feito no cardápio próprio. O QR sai no fim do cupom e o brinde vai direto para a conta do cliente. Você também pode fazer o pedido pela visão do Cliente, em Cardápio.</p>
+    <div class="row"><span class="muted">WhatsApp:</span><input id="pTel" value="11999990001" inputmode="numeric" style="width:150px"></div>
+    <div class="row mt"><span class="muted">Distância (km):</span><input id="pDist" type="number" step="0.1" min="0" value="3.2" style="width:90px"><span class="muted">vazio = endereço incompleto</span></div>
+    <div class="row mt"><span class="muted">Data e hora:</span><input id="pData" type="datetime-local"></div>
+    <button class="btn alt full mt" onclick="gerarProprio()">Receber pedido próprio</button>
+  </div>
+
+  <div id="pedMsg"></div>
+  <div class="card" id="tkCard" style="display:none">
+    <h2 id="tkTitulo">Cupom</h2>
+    <div class="paper"><canvas id="tkCv"></canvas></div>
+    <div id="tkBar"></div>
+    <button class="btn alt full mt" id="tkScan">📱 Simular o cliente escaneando</button>
+  </div>
+</section>
+
+<section id="painel">
+  <div class="card">
+    <h2>Visão geral</h2>
+    <div class="kpis" id="kpis"></div>
+    <p class="muted mt">Taxas: raspados ÷ QR gerados · usados ÷ brindes concedidos.</p>
+  </div>
+  <div class="card">
+    <h2>Teto de gasto (marketing)</h2>
+    <p class="muted">Serve para acompanhar e alertar. Não bloqueia nada: você decide se pausa.</p>
+    <div class="row">
+      <span class="muted">Teto mensal R$:</span><input id="cTeto" type="number" min="0" step="10" style="width:100px" onchange="S.cfg.teto=+this.value;S.alertasTeto={};audit('Teto mensal: R$ '+this.value);checarTeto();render()">
+      <span class="muted">Alertar em</span><input id="cAlerta" type="number" min="1" max="100" style="width:70px" onchange="S.cfg.alerta=+this.value;S.alertasTeto={};audit('Alerta do teto: '+this.value+'%');checarTeto();render()"><span class="muted">%</span>
+    </div>
+    <div class="bar mt" id="tetoBar"></div>
+    <div class="muted mt" id="tetoTxt"></div>
+  </div>
+  <div class="card">
+    <h2>Campanha</h2>
+    <input id="cNome" style="width:100%" onchange="S.cfg.nome=this.value;audit('Nome da campanha alterado')">
+    <div class="tg mt"><span>Campanha ligada</span><input type="checkbox" class="sw" id="cAtiva" onchange="S.cfg.ativa=this.checked;audit('Campanha '+(this.checked?'ligada':'desligada'))"></div>
+    <!-- [D01] Não existe opção "não foi dessa vez": todo pedido ganha e o cliente escolhe. Não recriar esse botão. -->
+    <div class="row mt">
+      <span class="muted">Validade do QR (dias):</span><input type="number" id="cValQr" min="1" style="width:70px" onchange="S.cfg.validadeQr=+this.value;audit('Validade do QR: '+this.value+' dias')">
+      <span class="muted">Validade do brinde (dias):</span><input type="number" id="cValPr" min="1" style="width:70px" onchange="S.cfg.validadePremio=+this.value;audit('Validade do brinde: '+this.value+' dias')">
+    </div>
+    <div class="row mt"><span class="muted">Máximo de raspadinhas por cliente por dia:</span><input type="number" min="1" id="rDia" style="width:60px" onchange="setRegra('limiteDia',+this.value)"></div>
+    <p class="muted">A validade do brinde começa quando ele entra na conta do cliente. Um QR já impresso continua valendo mesmo com a campanha pausada. Versão da configuração: <span class="tag" id="rVersao"></span> (cada escolha guarda a versão vigente).</p>
+  </div>
+  <div class="card">
+    <h2>Canais participantes</h2>
+    <div id="canaisBox"></div>
+  </div>
+  <div class="card">
+    <h2>Frete grátis</h2>
+    <div class="tg"><span>Frete grátis entre as opções</span><input type="checkbox" class="sw" id="fAtivo" onchange="S.cfg.freteAtivo=this.checked;audit('Frete grátis: '+(this.checked?'ligado':'desligado'));render()"></div>
+    <div class="row mt"><span class="muted">Raio máximo (km):</span><input type="number" id="fRaio" min="0" step="0.5" placeholder="definir" style="width:90px" onchange="S.cfg.raioKm=this.value===''?null:+this.value;audit('Raio do frete: '+(this.value||'não definido')+' km');render()"></div>
+    <p class="muted">Só pode ser escolhido em pedidos da plataforma própria com endereço dentro do raio. Nos outros casos, aparece para o cliente como "só no nosso cardápio", servindo de convite. Os 5 km são só exemplo.</p>
+    <div id="freteMsg"></div>
+  </div>
+  <div class="card">
+    <h2>Pausas programadas</h2>
+    <p class="muted">Nos dias e horários marcados, os pedidos saem sem QR.</p>
+    <div class="days" id="diasBox"></div>
+    <div class="row mt"><span class="muted">Pausar das</span><input type="time" id="pzIni" onchange="S.cfg.pausaIni=this.value;audit('Pausa início: '+(this.value||'—'))"><span class="muted">às</span><input type="time" id="pzFim" onchange="S.cfg.pausaFim=this.value;audit('Pausa fim: '+(this.value||'—'))"></div>
+  </div>
+  <div class="card">
+    <h2>Brindes</h2>
+    <div class="tbl"><table>
+      <thead><tr><th>Ativo</th><th>Brinde</th><th>Estoque</th><th>Custo R$</th><th>Pedido mín. R$</th><th>Ou com o produto</th></tr></thead>
+      <tbody id="tbPremios"></tbody>
+    </table></div>
+    <div id="probMsg"></div>
+    <div class="row mt">
+      <input id="novoPremio" placeholder="Novo brinde (ex: Pudim)" style="flex:1;min-width:160px">
+      <button class="btn alt" onclick="addPremio()">Adicionar</button>
+    </div>
+    <p class="muted">Condição de uso: pedido mínimo <b>ou</b> o produto escolhido; em branco, qualquer pedido. O brinde entra no pedido com valor zero e o custo vai para o gasto de marketing. Não há pesos nem chances: o cliente escolhe livremente entre os brindes disponíveis [D01].</p>
+  </div>
+  <!-- [D18] Card "Regras de repetição" removido de propósito: com a escolha livre, não há o que repetir ou bloquear. -->
+  <div class="card">
+    <h2>Lembrete pelo WhatsApp</h2>
+    <div class="tg"><span>Enviar lembrete de brinde guardado</span><input type="checkbox" class="sw" id="lAtivo" onchange="S.cfg.lembrete.ativo=this.checked;audit('Lembrete: '+(this.checked?'ligado':'desligado'))"></div>
+    <div class="row mt">
+      <span class="muted">Enviar faltando</span><input type="number" min="1" id="lDias" style="width:60px" onchange="S.cfg.lembrete.diasAntes=+this.value;audit('Lembrete: '+this.value+' dias antes')"><span class="muted">dias · máximo</span>
+      <select id="lMax" onchange="S.cfg.lembrete.max=+this.value;audit('Lembretes por brinde: '+this.value)"><option value="1">1</option><option value="2">2</option></select><span class="muted">por brinde</span>
+    </div>
+    <h3>Texto <span class="muted">(variáveis: {brinde} {condicao} {validade})</span></h3>
+    <textarea id="lTexto" oninput="S.cfg.lembrete.texto=this.value;previewLembrete();salvar()" onchange="audit('Texto do lembrete alterado')"></textarea>
+    <p class="muted">Prévia:</p>
+    <div class="bub c" id="lPrev"></div>
+    <p class="muted">No WhatsApp não dá para diminuir a letra. Por isso a validade vai na última linha, em itálico (_assim_).</p>
+  </div>
+  <div class="card">
+    <h2>Histórico de participações</h2>
+    <div class="tbl"><table>
+      <thead><tr><th>Pedido</th><th>Canal</th><th>Brinde</th><th>Status</th><th>Cliente</th></tr></thead>
+      <tbody id="tbHist"></tbody>
+    </table></div>
+  </div>
+  <div class="card">
+    <h2>Auditoria e eventos</h2>
+    <div class="log" id="log"></div>
+  </div>
+  <div class="card">
+    <h2>Dados de teste</h2>
+    <p class="muted">Configurações e testes ficam salvos neste aparelho, no navegador. Para começar do zero:</p>
+    <button class="btn alt" onclick="resetar()">Apagar dados de teste e voltar ao padrão</button>
+  </div>
+</section>
+
+<section id="lwhats">
+  <div class="card">
+    <h2>WhatsApp da loja</h2>
+    <p class="muted">Avisos que a loja recebe. Relógio de teste: <b id="relogio"></b>.</p>
+    <div class="row">
+      <input id="avDias" type="number" min="1" value="1" style="width:70px"><span class="muted">dia(s)</span>
+      <button class="btn" onclick="avancarDias()">Avançar e rodar lembretes</button>
+    </div>
+    <p class="muted">Use para ver os lembretes chegando aos clientes e os brindes expirando.</p>
+  </div>
+  <div class="card"><div class="wa-box" id="waLoja"></div></div>
+</section>
+
+<section id="impressora">
+  <div class="card">
+    <h2>Impressora</h2>
+    <div class="row"><span class="muted">Nome:</span><input id="imNome" style="flex:1" onchange="S.cfg.imp.nome=this.value;audit('Impressora: '+this.value)"></div>
+    <div class="row mt"><span class="muted">Botão "Imprimir" usa:</span>
+      <select id="imMetodo" onchange="S.cfg.imp.metodo=this.value;audit('Método de impressão: '+this.value);atualizarBarras()">
+        <option value="rawbt">App RawBT (recomendado)</option>
+        <option value="ble">Bluetooth direto do navegador</option>
+        <option value="menu">Menu de impressão do celular</option>
+      </select>
+    </div>
+    <div class="tg mt"><span>Linha "corte aqui" antes da raspadinha</span><input type="checkbox" class="sw" id="imCorte" onchange="S.cfg.imp.corte=this.checked;audit('Linha de corte: '+this.checked);redesenhar()"></div>
+    <h3>Texto impresso</h3>
+    <div class="row"><span class="muted">Nome da loja:</span><input id="imLoja" style="flex:1" onchange="S.cfg.imp.loja=this.value;redesenhar()"></div>
+    <div class="row mt"><span class="muted">Site do cardápio:</span><input id="imSite" style="flex:1" onchange="S.cfg.imp.site=this.value;redesenhar()"></div>
+    <div class="row mt"><span class="muted">Link do QR:</span><input id="imBase" style="flex:1" onchange="S.cfg.imp.base=this.value;redesenhar()"></div>
+    <p class="muted">O QR leva para link + código. Esse endereço ainda não existe: ao escanear agora, vai abrir uma página de erro.</p>
+  </div>
+  <div class="card">
+    <h2>Teste de impressão</h2>
+    <div class="paper"><canvas id="testCv"></canvas></div>
+    <div id="testBar"></div>
+  </div>
+  <div class="card">
+    <h2>Como imprimir pelo celular</h2>
+    <ol>
+      <li><b>RawBT (Android, recomendado).</b> Impressoras como a “BlueTooth Printer” normalmente usam Bluetooth clássico, que o navegador não acessa sozinho. Instale o app gratuito <b>RawBT</b> na Play Store, escolha a impressora nas configurações dele e toque em Imprimir.</li>
+      <li><b>Bluetooth direto.</b> Só no Chrome do Android, com a página aberta por https, e se a impressora tiver Bluetooth BLE.</li>
+      <li><b>Menu do celular.</b> Precisa de um serviço de impressão instalado (o RawBT oferece um). Use papel 58mm e margem zero.</li>
+      <li><b>PNG.</b> Baixa a imagem para imprimir pelo app da impressora.</li>
+    </ol>
+    <p class="muted">No iPhone, o navegador não imprime em impressora Bluetooth: use o PNG e o app da impressora.</p>
+  </div>
+</section>
+
+<section id="legal">
+  <div class="card">
+    <h2>Antes de lançar</h2>
+    <p class="muted">Isto não é parecer jurídico. É um resumo para levar ao advogado e ao gerente de conta dos marketplaces.</p>
+  </div>
+  <div class="card">
+    <h2>⚖️ Lei das promoções</h2>
+    <p>A <b>Lei 5.768/1971</b> exige <b>autorização prévia</b> da Secretaria de Prêmios e Apostas do Ministério da Fazenda (SPA/MF) para distribuir prêmios grátis com fim de propaganda por <b>sorteio, vale-brinde, concurso ou operação assemelhada</b>, o que pode alcançar campanhas "compre e ganhe".</p>
+    <p><b>Mecânica atual, desenhada para não ter sorte:</b> todo pedido ganha, e a raspadinha só revela “você ganhou, escolha seu brinde”. Quem decide o brinde é o próprio cliente, entre os disponíveis. Não há sorteio, peso ou chance.</p>
+    <p>Sem fator sorte, a campanha tende a ser vista como uma oferta comercial comum (“compre e ganhe um brinde à sua escolha”), e não como sorteio ou vale-brinde. Isso <b>reduz muito o risco, mas não é garantia</b>: confirme com o advogado antes de lançar.</p>
+    <p><b>Cuidado com as palavras:</b> nada de “sorteio”, “sorte”, “sortudo” ou “concorra” no papel, na página e no WhatsApp. A comunicação também conta para a fiscalização.</p>
+    <p>Desde 29/06/2026, a Portaria SPA/MF nº 1.818/2026 detalha a fiscalização. As penalidades incluem multa de até 100% do valor dos prêmios prometidos, suspensão da campanha e proibição de novas promoções por até 2 anos.</p>
+    <h3>Caminhos para discutir com o advogado</h3>
+    <ol>
+      <li>Confirmar que a <b>escolha livre</b> (mecânica atual) fica fora da Lei 5.768/1971.</li>
+      <li>Validar o <b>regulamento curto</b> e os textos do papel, da página e do WhatsApp.</li>
+      <li>Se um dia quiser voltar a ter surpresa ou sorteio: só com <b>autorização da SPA/MF</b> ou por meio de uma empresa promotora.</li>
+    </ol>
+  </div>
+  <div class="card">
+    <h2>🛵 Termos dos marketplaces</h2>
+    <p>Não encontrei uma regra pública do iFood sobre material na embalagem, mas os contratos costumam restringir ações que levam o cliente a comprar fora. <b>Confirme por escrito com o gerente de conta antes</b> de usar o QR em pedidos do iFood, Keeta ou 99Food. WhatsApp e Instagram não têm essa restrição.</p>
+  </div>
+  <div class="card">
+    <h2>🧾 Consumidor, LGPD e WhatsApp</h2>
+    <ul>
+      <li>Condições claras no papel e na página: pedido mínimo ou produto, validade, só no cardápio próprio, 1 brinde por pedido, enquanto durar o estoque.</li>
+      <li>Publique um regulamento curto, com link na página da raspadinha.</li>
+      <li>O cliente escolhe o brinde. A escolha é validada no servidor (estoque e condições) e registrada.</li>
+      <li>O WhatsApp serve só para guardar o brinde e avisar sobre ele, e a tela diz isso. Os lembretes trazem "responda SAIR".</li>
+      <li>O QR não carrega dado pessoal. O cliente envia a primeira mensagem, o que confirma o número e reduz o risco de bloqueio da API não oficial.</li>
+    </ul>
+  </div>
+  <div class="card">
+    <h2>🧪 Piloto sugerido (2 a 3 semanas)</h2>
+    <p>Comece <b>só com os pedidos próprios</b> e meça: % de QR escaneados, % de brindes usados, % de clientes que voltam em até 15 e 30 dias, e o custo dos brindes por pedido de retorno. Com bons números e a questão legal resolvida, leve para o QR avulso.</p>
+  </div>
+</section>
+
+<!-- ===================== CLIENTE ===================== -->
+<section id="raspa">
+  <div class="card">
+    <h2>Raspadinha</h2>
+    <p class="muted">Simula o celular do cliente depois de escanear o QR. Toque num dos QR impressos ou digite o código.</p>
+    <div class="qrlist" id="qrList"></div>
+    <div class="row mt">
+      <input id="tokenIn" placeholder="Código do QR" style="flex:1;min-width:160px">
+      <button class="btn" onclick="abrirRaspadinha()">Abrir</button>
+    </div>
+    <div id="raspaMsg"></div>
+    <div id="raspaArea"></div>
+  </div>
+</section>
+
+<section id="cardapio">
+  <div class="card">
+    <h2>Cardápio Recheadinha</h2>
+    <div class="row">
+      <input id="cTel" placeholder="Seu WhatsApp (DDD+número)" inputmode="numeric" style="flex:1;min-width:160px">
+      <button class="btn" onclick="entrarCardapio()">Entrar</button>
+    </div>
+    <p class="muted">No sistema real, a entrada usa o login por WhatsApp (código) que já existe.</p>
+    <div class="row"><span class="muted">Distância do endereço (km):</span><input id="cDist" type="number" step="0.1" min="0" value="3.2" style="width:90px" oninput="renderCardapio()"></div>
+    <div id="giftBox"></div>
+  </div>
+  <div class="card"><h3 style="margin-top:0">Produtos</h3><div id="menuBox"></div></div>
+  <div class="card">
+    <h3 style="margin-top:0">Seu pedido</h3>
+    <div id="resumoBox"></div>
+    <div id="cardMsg"></div>
+    <button class="btn full" onclick="finalizarPedido()">Finalizar pedido (pagamento simulado)</button>
+  </div>
+</section>
+
+<section id="cwhats">
+  <div class="card">
+    <h2>WhatsApp dos clientes</h2>
+    <p class="muted">Mensagens que os clientes recebem da loja.</p>
+    <div class="wa-box" id="waCli"></div>
+  </div>
+</section>
+</main>
+<div id="printArea"><img id="printImg" alt=""></div>
+
+<script>
+/* qrcode-generator 1.4.4 — (c) Kazuhiko Arase — MIT License */
+var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],f={},c=function(t,r){o=function(t){for(var r=new Array(t),e=0;e<t;e+=1){r[e]=new Array(t);for(var n=0;n<t;n+=1)r[e][n]=null}return r}(i=4*e+17),l(0,0),l(i-7,0),l(0,i-7),s(),h(),d(t,r),e>=7&&v(t),null==a&&(a=p(e,n,u)),w(a,r)},l=function(t,r){for(var e=-1;e<=7;e+=1)if(!(t+e<=-1||i<=t+e))for(var n=-1;n<=7;n+=1)r+n<=-1||i<=r+n||(o[t+e][r+n]=0<=e&&e<=6&&(0==n||6==n)||0<=n&&n<=6&&(0==e||6==e)||2<=e&&e<=4&&2<=n&&n<=4)},h=function(){for(var t=8;t<i-8;t+=1)null==o[t][6]&&(o[t][6]=t%2==0);for(var r=8;r<i-8;r+=1)null==o[6][r]&&(o[6][r]=r%2==0)},s=function(){for(var t=B.getPatternPosition(e),r=0;r<t.length;r+=1)for(var n=0;n<t.length;n+=1){var i=t[r],a=t[n];if(null==o[i][a])for(var u=-2;u<=2;u+=1)for(var f=-2;f<=2;f+=1)o[i+u][a+f]=-2==u||2==u||-2==f||2==f||0==u&&0==f}},v=function(t){for(var r=B.getBCHTypeNumber(e),n=0;n<18;n+=1){var a=!t&&1==(r>>n&1);o[Math.floor(n/3)][n%3+i-8-3]=a}for(n=0;n<18;n+=1){a=!t&&1==(r>>n&1);o[n%3+i-8-3][Math.floor(n/3)]=a}},d=function(t,r){for(var e=n<<3|r,a=B.getBCHTypeInfo(e),u=0;u<15;u+=1){var f=!t&&1==(a>>u&1);u<6?o[u][8]=f:u<8?o[u+1][8]=f:o[i-15+u][8]=f}for(u=0;u<15;u+=1){f=!t&&1==(a>>u&1);u<8?o[8][i-u-1]=f:u<9?o[8][15-u-1+1]=f:o[8][15-u-1]=f}o[i-8][8]=!t},w=function(t,r){for(var e=-1,n=i-1,a=7,u=0,f=B.getMaskFunction(r),c=i-1;c>0;c-=2)for(6==c&&(c-=1);;){for(var g=0;g<2;g+=1)if(null==o[n][c-g]){var l=!1;u<t.length&&(l=1==(t[u]>>>a&1)),f(n,c-g)&&(l=!l),o[n][c-g]=l,-1==(a-=1)&&(u+=1,a=7)}if((n+=e)<0||i<=n){n-=e,e=-e;break}}},p=function(t,r,e){for(var n=A.getRSBlocks(t,r),o=b(),i=0;i<e.length;i+=1){var a=e[i];o.put(a.getMode(),4),o.put(a.getLength(),B.getLengthInBits(a.getMode(),t)),a.write(o)}var u=0;for(i=0;i<n.length;i+=1)u+=n[i].dataCount;if(o.getLengthInBits()>8*u)throw"code length overflow. ("+o.getLengthInBits()+">"+8*u+")";for(o.getLengthInBits()+4<=8*u&&o.put(0,4);o.getLengthInBits()%8!=0;)o.putBit(!1);for(;!(o.getLengthInBits()>=8*u||(o.put(236,8),o.getLengthInBits()>=8*u));)o.put(17,8);return function(t,r){for(var e=0,n=0,o=0,i=new Array(r.length),a=new Array(r.length),u=0;u<r.length;u+=1){var f=r[u].dataCount,c=r[u].totalCount-f;n=Math.max(n,f),o=Math.max(o,c),i[u]=new Array(f);for(var g=0;g<i[u].length;g+=1)i[u][g]=255&t.getBuffer()[g+e];e+=f;var l=B.getErrorCorrectPolynomial(c),h=k(i[u],l.getLength()-1).mod(l);for(a[u]=new Array(l.getLength()-1),g=0;g<a[u].length;g+=1){var s=g+h.getLength()-a[u].length;a[u][g]=s>=0?h.getAt(s):0}}var v=0;for(g=0;g<r.length;g+=1)v+=r[g].totalCount;var d=new Array(v),w=0;for(g=0;g<n;g+=1)for(u=0;u<r.length;u+=1)g<i[u].length&&(d[w]=i[u][g],w+=1);for(g=0;g<o;g+=1)for(u=0;u<r.length;u+=1)g<a[u].length&&(d[w]=a[u][g],w+=1);return d}(o,n)};f.addData=function(t,r){var e=null;switch(r=r||"Byte"){case"Numeric":e=M(t);break;case"Alphanumeric":e=x(t);break;case"Byte":e=m(t);break;case"Kanji":e=L(t);break;default:throw"mode:"+r}u.push(e),a=null},f.isDark=function(t,r){if(t<0||i<=t||r<0||i<=r)throw t+","+r;return o[t][r]},f.getModuleCount=function(){return i},f.make=function(){if(e<1){for(var t=1;t<40;t++){for(var r=A.getRSBlocks(t,n),o=b(),i=0;i<u.length;i++){var a=u[i];o.put(a.getMode(),4),o.put(a.getLength(),B.getLengthInBits(a.getMode(),t)),a.write(o)}var g=0;for(i=0;i<r.length;i++)g+=r[i].dataCount;if(o.getLengthInBits()<=8*g)break}e=t}c(!1,function(){for(var t=0,r=0,e=0;e<8;e+=1){c(!0,e);var n=B.getLostPoint(f);(0==e||t>n)&&(t=n,r=e)}return r}())},f.createTableTag=function(t,r){t=t||2;var e="";e+='<table style="',e+=" border-width: 0px; border-style: none;",e+=" border-collapse: collapse;",e+=" padding: 0px; margin: "+(r=void 0===r?4*t:r)+"px;",e+='">',e+="<tbody>";for(var n=0;n<f.getModuleCount();n+=1){e+="<tr>";for(var o=0;o<f.getModuleCount();o+=1)e+='<td style="',e+=" border-width: 0px; border-style: none;",e+=" border-collapse: collapse;",e+=" padding: 0px; margin: 0px;",e+=" width: "+t+"px;",e+=" height: "+t+"px;",e+=" background-color: ",e+=f.isDark(n,o)?"#000000":"#ffffff",e+=";",e+='"/>';e+="</tr>"}return e+="</tbody>",e+="</table>"},f.createSvgTag=function(t,r,e,n){var o={};"object"==typeof arguments[0]&&(t=(o=arguments[0]).cellSize,r=o.margin,e=o.alt,n=o.title),t=t||2,r=void 0===r?4*t:r,(e="string"==typeof e?{text:e}:e||{}).text=e.text||null,e.id=e.text?e.id||"qrcode-description":null,(n="string"==typeof n?{text:n}:n||{}).text=n.text||null,n.id=n.text?n.id||"qrcode-title":null;var i,a,u,c,g=f.getModuleCount()*t+2*r,l="";for(c="l"+t+",0 0,"+t+" -"+t+",0 0,-"+t+"z ",l+='<svg version="1.1" xmlns="http://www.w3.org/2000/svg"',l+=o.scalable?"":' width="'+g+'px" height="'+g+'px"',l+=' viewBox="0 0 '+g+" "+g+'" ',l+=' preserveAspectRatio="xMinYMin meet"',l+=n.text||e.text?' role="img" aria-labelledby="'+y([n.id,e.id].join(" ").trim())+'"':"",l+=">",l+=n.text?'<title id="'+y(n.id)+'">'+y(n.text)+"</title>":"",l+=e.text?'<description id="'+y(e.id)+'">'+y(e.text)+"</description>":"",l+='<rect width="100%" height="100%" fill="white" cx="0" cy="0"/>',l+='<path d="',a=0;a<f.getModuleCount();a+=1)for(u=a*t+r,i=0;i<f.getModuleCount();i+=1)f.isDark(a,i)&&(l+="M"+(i*t+r)+","+u+c);return l+='" stroke="transparent" fill="black"/>',l+="</svg>"},f.createDataURL=function(t,r){t=t||2,r=void 0===r?4*t:r;var e=f.getModuleCount()*t+2*r,n=r,o=e-r;return I(e,e,(function(r,e){if(n<=r&&r<o&&n<=e&&e<o){var i=Math.floor((r-n)/t),a=Math.floor((e-n)/t);return f.isDark(a,i)?0:1}return 1}))},f.createImgTag=function(t,r,e){t=t||2,r=void 0===r?4*t:r;var n=f.getModuleCount()*t+2*r,o="";return o+="<img",o+=' src="',o+=f.createDataURL(t,r),o+='"',o+=' width="',o+=n,o+='"',o+=' height="',o+=n,o+='"',e&&(o+=' alt="',o+=y(e),o+='"'),o+="/>"};var y=function(t){for(var r="",e=0;e<t.length;e+=1){var n=t.charAt(e);switch(n){case"<":r+="&lt;";break;case">":r+="&gt;";break;case"&":r+="&amp;";break;case'"':r+="&quot;";break;default:r+=n}}return r};return f.createASCII=function(t,r){if((t=t||1)<2)return function(t){t=void 0===t?2:t;var r,e,n,o,i,a=1*f.getModuleCount()+2*t,u=t,c=a-t,g={"██":"█","█ ":"▀"," █":"▄","  ":" "},l={"██":"▀","█ ":"▀"," █":" ","  ":" "},h="";for(r=0;r<a;r+=2){for(n=Math.floor((r-u)/1),o=Math.floor((r+1-u)/1),e=0;e<a;e+=1)i="█",u<=e&&e<c&&u<=r&&r<c&&f.isDark(n,Math.floor((e-u)/1))&&(i=" "),u<=e&&e<c&&u<=r+1&&r+1<c&&f.isDark(o,Math.floor((e-u)/1))?i+=" ":i+="█",h+=t<1&&r+1>=c?l[i]:g[i];h+="\n"}return a%2&&t>0?h.substring(0,h.length-a-1)+Array(a+1).join("▀"):h.substring(0,h.length-1)}(r);t-=1,r=void 0===r?2*t:r;var e,n,o,i,a=f.getModuleCount()*t+2*r,u=r,c=a-r,g=Array(t+1).join("██"),l=Array(t+1).join("  "),h="",s="";for(e=0;e<a;e+=1){for(o=Math.floor((e-u)/t),s="",n=0;n<a;n+=1)i=1,u<=n&&n<c&&u<=e&&e<c&&f.isDark(o,Math.floor((n-u)/t))&&(i=0),s+=i?g:l;for(o=0;o<t;o+=1)h+=s+"\n"}return h.substring(0,h.length-1)},f.renderTo2dContext=function(t,r){r=r||2;for(var e=f.getModuleCount(),n=0;n<e;n++)for(var o=0;o<e;o++)t.fillStyle=f.isDark(n,o)?"black":"white",t.fillRect(n*r,o*r,r,r)},f};t.stringToBytes=(t.stringToBytesFuncs={default:function(t){for(var r=[],e=0;e<t.length;e+=1){var n=t.charCodeAt(e);r.push(255&n)}return r}}).default,t.createStringToBytes=function(t,r){var e=function(){for(var e=S(t),n=function(){var t=e.read();if(-1==t)throw"eof";return t},o=0,i={};;){var a=e.read();if(-1==a)break;var u=n(),f=n()<<8|n();i[String.fromCharCode(a<<8|u)]=f,o+=1}if(o!=r)throw o+" != "+r;return i}(),n="?".charCodeAt(0);return function(t){for(var r=[],o=0;o<t.length;o+=1){var i=t.charCodeAt(o);if(i<128)r.push(i);else{var a=e[t.charAt(o)];"number"==typeof a?(255&a)==a?r.push(a):(r.push(a>>>8),r.push(255&a)):r.push(n)}}return r}};var r,e,n,o,i,a=1,u=2,f=4,c=8,g={L:1,M:0,Q:3,H:2},l=0,h=1,s=2,v=3,d=4,w=5,p=6,y=7,B=(r=[[],[6,18],[6,22],[6,26],[6,30],[6,34],[6,22,38],[6,24,42],[6,26,46],[6,28,50],[6,30,54],[6,32,58],[6,34,62],[6,26,46,66],[6,26,48,70],[6,26,50,74],[6,30,54,78],[6,30,56,82],[6,30,58,86],[6,34,62,90],[6,28,50,72,94],[6,26,50,74,98],[6,30,54,78,102],[6,28,54,80,106],[6,32,58,84,110],[6,30,58,86,114],[6,34,62,90,118],[6,26,50,74,98,122],[6,30,54,78,102,126],[6,26,52,78,104,130],[6,30,56,82,108,134],[6,34,60,86,112,138],[6,30,58,86,114,142],[6,34,62,90,118,146],[6,30,54,78,102,126,150],[6,24,50,76,102,128,154],[6,28,54,80,106,132,158],[6,32,58,84,110,136,162],[6,26,54,82,110,138,166],[6,30,58,86,114,142,170]],e=1335,n=7973,i=function(t){for(var r=0;0!=t;)r+=1,t>>>=1;return r},(o={}).getBCHTypeInfo=function(t){for(var r=t<<10;i(r)-i(e)>=0;)r^=e<<i(r)-i(e);return 21522^(t<<10|r)},o.getBCHTypeNumber=function(t){for(var r=t<<12;i(r)-i(n)>=0;)r^=n<<i(r)-i(n);return t<<12|r},o.getPatternPosition=function(t){return r[t-1]},o.getMaskFunction=function(t){switch(t){case l:return function(t,r){return(t+r)%2==0};case h:return function(t,r){return t%2==0};case s:return function(t,r){return r%3==0};case v:return function(t,r){return(t+r)%3==0};case d:return function(t,r){return(Math.floor(t/2)+Math.floor(r/3))%2==0};case w:return function(t,r){return t*r%2+t*r%3==0};case p:return function(t,r){return(t*r%2+t*r%3)%2==0};case y:return function(t,r){return(t*r%3+(t+r)%2)%2==0};default:throw"bad maskPattern:"+t}},o.getErrorCorrectPolynomial=function(t){for(var r=k([1],0),e=0;e<t;e+=1)r=r.multiply(k([1,C.gexp(e)],0));return r},o.getLengthInBits=function(t,r){if(1<=r&&r<10)switch(t){case a:return 10;case u:return 9;case f:case c:return 8;default:throw"mode:"+t}else if(r<27)switch(t){case a:return 12;case u:return 11;case f:return 16;case c:return 10;default:throw"mode:"+t}else{if(!(r<41))throw"type:"+r;switch(t){case a:return 14;case u:return 13;case f:return 16;case c:return 12;default:throw"mode:"+t}}},o.getLostPoint=function(t){for(var r=t.getModuleCount(),e=0,n=0;n<r;n+=1)for(var o=0;o<r;o+=1){for(var i=0,a=t.isDark(n,o),u=-1;u<=1;u+=1)if(!(n+u<0||r<=n+u))for(var f=-1;f<=1;f+=1)o+f<0||r<=o+f||0==u&&0==f||a==t.isDark(n+u,o+f)&&(i+=1);i>5&&(e+=3+i-5)}for(n=0;n<r-1;n+=1)for(o=0;o<r-1;o+=1){var c=0;t.isDark(n,o)&&(c+=1),t.isDark(n+1,o)&&(c+=1),t.isDark(n,o+1)&&(c+=1),t.isDark(n+1,o+1)&&(c+=1),0!=c&&4!=c||(e+=3)}for(n=0;n<r;n+=1)for(o=0;o<r-6;o+=1)t.isDark(n,o)&&!t.isDark(n,o+1)&&t.isDark(n,o+2)&&t.isDark(n,o+3)&&t.isDark(n,o+4)&&!t.isDark(n,o+5)&&t.isDark(n,o+6)&&(e+=40);for(o=0;o<r;o+=1)for(n=0;n<r-6;n+=1)t.isDark(n,o)&&!t.isDark(n+1,o)&&t.isDark(n+2,o)&&t.isDark(n+3,o)&&t.isDark(n+4,o)&&!t.isDark(n+5,o)&&t.isDark(n+6,o)&&(e+=40);var g=0;for(o=0;o<r;o+=1)for(n=0;n<r;n+=1)t.isDark(n,o)&&(g+=1);return e+=Math.abs(100*g/r/r-50)/5*10},o),C=function(){for(var t=new Array(256),r=new Array(256),e=0;e<8;e+=1)t[e]=1<<e;for(e=8;e<256;e+=1)t[e]=t[e-4]^t[e-5]^t[e-6]^t[e-8];for(e=0;e<255;e+=1)r[t[e]]=e;var n={glog:function(t){if(t<1)throw"glog("+t+")";return r[t]},gexp:function(r){for(;r<0;)r+=255;for(;r>=256;)r-=255;return t[r]}};return n}();function k(t,r){if(void 0===t.length)throw t.length+"/"+r;var e=function(){for(var e=0;e<t.length&&0==t[e];)e+=1;for(var n=new Array(t.length-e+r),o=0;o<t.length-e;o+=1)n[o]=t[o+e];return n}(),n={getAt:function(t){return e[t]},getLength:function(){return e.length},multiply:function(t){for(var r=new Array(n.getLength()+t.getLength()-1),e=0;e<n.getLength();e+=1)for(var o=0;o<t.getLength();o+=1)r[e+o]^=C.gexp(C.glog(n.getAt(e))+C.glog(t.getAt(o)));return k(r,0)},mod:function(t){if(n.getLength()-t.getLength()<0)return n;for(var r=C.glog(n.getAt(0))-C.glog(t.getAt(0)),e=new Array(n.getLength()),o=0;o<n.getLength();o+=1)e[o]=n.getAt(o);for(o=0;o<t.getLength();o+=1)e[o]^=C.gexp(C.glog(t.getAt(o))+r);return k(e,0).mod(t)}};return n}var A=function(){var t=[[1,26,19],[1,26,16],[1,26,13],[1,26,9],[1,44,34],[1,44,28],[1,44,22],[1,44,16],[1,70,55],[1,70,44],[2,35,17],[2,35,13],[1,100,80],[2,50,32],[2,50,24],[4,25,9],[1,134,108],[2,67,43],[2,33,15,2,34,16],[2,33,11,2,34,12],[2,86,68],[4,43,27],[4,43,19],[4,43,15],[2,98,78],[4,49,31],[2,32,14,4,33,15],[4,39,13,1,40,14],[2,121,97],[2,60,38,2,61,39],[4,40,18,2,41,19],[4,40,14,2,41,15],[2,146,116],[3,58,36,2,59,37],[4,36,16,4,37,17],[4,36,12,4,37,13],[2,86,68,2,87,69],[4,69,43,1,70,44],[6,43,19,2,44,20],[6,43,15,2,44,16],[4,101,81],[1,80,50,4,81,51],[4,50,22,4,51,23],[3,36,12,8,37,13],[2,116,92,2,117,93],[6,58,36,2,59,37],[4,46,20,6,47,21],[7,42,14,4,43,15],[4,133,107],[8,59,37,1,60,38],[8,44,20,4,45,21],[12,33,11,4,34,12],[3,145,115,1,146,116],[4,64,40,5,65,41],[11,36,16,5,37,17],[11,36,12,5,37,13],[5,109,87,1,110,88],[5,65,41,5,66,42],[5,54,24,7,55,25],[11,36,12,7,37,13],[5,122,98,1,123,99],[7,73,45,3,74,46],[15,43,19,2,44,20],[3,45,15,13,46,16],[1,135,107,5,136,108],[10,74,46,1,75,47],[1,50,22,15,51,23],[2,42,14,17,43,15],[5,150,120,1,151,121],[9,69,43,4,70,44],[17,50,22,1,51,23],[2,42,14,19,43,15],[3,141,113,4,142,114],[3,70,44,11,71,45],[17,47,21,4,48,22],[9,39,13,16,40,14],[3,135,107,5,136,108],[3,67,41,13,68,42],[15,54,24,5,55,25],[15,43,15,10,44,16],[4,144,116,4,145,117],[17,68,42],[17,50,22,6,51,23],[19,46,16,6,47,17],[2,139,111,7,140,112],[17,74,46],[7,54,24,16,55,25],[34,37,13],[4,151,121,5,152,122],[4,75,47,14,76,48],[11,54,24,14,55,25],[16,45,15,14,46,16],[6,147,117,4,148,118],[6,73,45,14,74,46],[11,54,24,16,55,25],[30,46,16,2,47,17],[8,132,106,4,133,107],[8,75,47,13,76,48],[7,54,24,22,55,25],[22,45,15,13,46,16],[10,142,114,2,143,115],[19,74,46,4,75,47],[28,50,22,6,51,23],[33,46,16,4,47,17],[8,152,122,4,153,123],[22,73,45,3,74,46],[8,53,23,26,54,24],[12,45,15,28,46,16],[3,147,117,10,148,118],[3,73,45,23,74,46],[4,54,24,31,55,25],[11,45,15,31,46,16],[7,146,116,7,147,117],[21,73,45,7,74,46],[1,53,23,37,54,24],[19,45,15,26,46,16],[5,145,115,10,146,116],[19,75,47,10,76,48],[15,54,24,25,55,25],[23,45,15,25,46,16],[13,145,115,3,146,116],[2,74,46,29,75,47],[42,54,24,1,55,25],[23,45,15,28,46,16],[17,145,115],[10,74,46,23,75,47],[10,54,24,35,55,25],[19,45,15,35,46,16],[17,145,115,1,146,116],[14,74,46,21,75,47],[29,54,24,19,55,25],[11,45,15,46,46,16],[13,145,115,6,146,116],[14,74,46,23,75,47],[44,54,24,7,55,25],[59,46,16,1,47,17],[12,151,121,7,152,122],[12,75,47,26,76,48],[39,54,24,14,55,25],[22,45,15,41,46,16],[6,151,121,14,152,122],[6,75,47,34,76,48],[46,54,24,10,55,25],[2,45,15,64,46,16],[17,152,122,4,153,123],[29,74,46,14,75,47],[49,54,24,10,55,25],[24,45,15,46,46,16],[4,152,122,18,153,123],[13,74,46,32,75,47],[48,54,24,14,55,25],[42,45,15,32,46,16],[20,147,117,4,148,118],[40,75,47,7,76,48],[43,54,24,22,55,25],[10,45,15,67,46,16],[19,148,118,6,149,119],[18,75,47,31,76,48],[34,54,24,34,55,25],[20,45,15,61,46,16]],r=function(t,r){var e={};return e.totalCount=t,e.dataCount=r,e},e={};return e.getRSBlocks=function(e,n){var o=function(r,e){switch(e){case g.L:return t[4*(r-1)+0];case g.M:return t[4*(r-1)+1];case g.Q:return t[4*(r-1)+2];case g.H:return t[4*(r-1)+3];default:return}}(e,n);if(void 0===o)throw"bad rs block @ typeNumber:"+e+"/errorCorrectionLevel:"+n;for(var i=o.length/3,a=[],u=0;u<i;u+=1)for(var f=o[3*u+0],c=o[3*u+1],l=o[3*u+2],h=0;h<f;h+=1)a.push(r(c,l));return a},e}(),b=function(){var t=[],r=0,e={getBuffer:function(){return t},getAt:function(r){var e=Math.floor(r/8);return 1==(t[e]>>>7-r%8&1)},put:function(t,r){for(var n=0;n<r;n+=1)e.putBit(1==(t>>>r-n-1&1))},getLengthInBits:function(){return r},putBit:function(e){var n=Math.floor(r/8);t.length<=n&&t.push(0),e&&(t[n]|=128>>>r%8),r+=1}};return e},M=function(t){var r=a,e=t,n={getMode:function(){return r},getLength:function(t){return e.length},write:function(t){for(var r=e,n=0;n+2<r.length;)t.put(o(r.substring(n,n+3)),10),n+=3;n<r.length&&(r.length-n==1?t.put(o(r.substring(n,n+1)),4):r.length-n==2&&t.put(o(r.substring(n,n+2)),7))}},o=function(t){for(var r=0,e=0;e<t.length;e+=1)r=10*r+i(t.charAt(e));return r},i=function(t){if("0"<=t&&t<="9")return t.charCodeAt(0)-"0".charCodeAt(0);throw"illegal char :"+t};return n},x=function(t){var r=u,e=t,n={getMode:function(){return r},getLength:function(t){return e.length},write:function(t){for(var r=e,n=0;n+1<r.length;)t.put(45*o(r.charAt(n))+o(r.charAt(n+1)),11),n+=2;n<r.length&&t.put(o(r.charAt(n)),6)}},o=function(t){if("0"<=t&&t<="9")return t.charCodeAt(0)-"0".charCodeAt(0);if("A"<=t&&t<="Z")return t.charCodeAt(0)-"A".charCodeAt(0)+10;switch(t){case" ":return 36;case"$":return 37;case"%":return 38;case"*":return 39;case"+":return 40;case"-":return 41;case".":return 42;case"/":return 43;case":":return 44;default:throw"illegal char :"+t}};return n},m=function(r){var e=f,n=t.stringToBytes(r),o={getMode:function(){return e},getLength:function(t){return n.length},write:function(t){for(var r=0;r<n.length;r+=1)t.put(n[r],8)}};return o},L=function(r){var e=c,n=t.stringToBytesFuncs.SJIS;if(!n)throw"sjis not supported.";!function(t,r){var e=n("友");if(2!=e.length||38726!=(e[0]<<8|e[1]))throw"sjis not supported."}();var o=n(r),i={getMode:function(){return e},getLength:function(t){return~~(o.length/2)},write:function(t){for(var r=o,e=0;e+1<r.length;){var n=(255&r[e])<<8|255&r[e+1];if(33088<=n&&n<=40956)n-=33088;else{if(!(57408<=n&&n<=60351))throw"illegal char at "+(e+1)+"/"+n;n-=49472}n=192*(n>>>8&255)+(255&n),t.put(n,13),e+=2}if(e<r.length)throw"illegal char at "+(e+1)}};return i},D=function(){var t=[],r={writeByte:function(r){t.push(255&r)},writeShort:function(t){r.writeByte(t),r.writeByte(t>>>8)},writeBytes:function(t,e,n){e=e||0,n=n||t.length;for(var o=0;o<n;o+=1)r.writeByte(t[o+e])},writeString:function(t){for(var e=0;e<t.length;e+=1)r.writeByte(t.charCodeAt(e))},toByteArray:function(){return t},toString:function(){var r="";r+="[";for(var e=0;e<t.length;e+=1)e>0&&(r+=","),r+=t[e];return r+="]"}};return r},S=function(t){var r=t,e=0,n=0,o=0,i={read:function(){for(;o<8;){if(e>=r.length){if(0==o)return-1;throw"unexpected end of file./"+o}var t=r.charAt(e);if(e+=1,"="==t)return o=0,-1;t.match(/^\s$/)||(n=n<<6|a(t.charCodeAt(0)),o+=6)}var i=n>>>o-8&255;return o-=8,i}},a=function(t){if(65<=t&&t<=90)return t-65;if(97<=t&&t<=122)return t-97+26;if(48<=t&&t<=57)return t-48+52;if(43==t)return 62;if(47==t)return 63;throw"c:"+t};return i},I=function(t,r,e){for(var n=function(t,r){var e=t,n=r,o=new Array(t*r),i={setPixel:function(t,r,n){o[r*e+t]=n},write:function(t){t.writeString("GIF87a"),t.writeShort(e),t.writeShort(n),t.writeByte(128),t.writeByte(0),t.writeByte(0),t.writeByte(0),t.writeByte(0),t.writeByte(0),t.writeByte(255),t.writeByte(255),t.writeByte(255),t.writeString(","),t.writeShort(0),t.writeShort(0),t.writeShort(e),t.writeShort(n),t.writeByte(0);var r=a(2);t.writeByte(2);for(var o=0;r.length-o>255;)t.writeByte(255),t.writeBytes(r,o,255),o+=255;t.writeByte(r.length-o),t.writeBytes(r,o,r.length-o),t.writeByte(0),t.writeString(";")}},a=function(t){for(var r=1<<t,e=1+(1<<t),n=t+1,i=u(),a=0;a<r;a+=1)i.add(String.fromCharCode(a));i.add(String.fromCharCode(r)),i.add(String.fromCharCode(e));var f,c,g,l=D(),h=(f=l,c=0,g=0,{write:function(t,r){if(t>>>r!=0)throw"length over";for(;c+r>=8;)f.writeByte(255&(t<<c|g)),r-=8-c,t>>>=8-c,g=0,c=0;g|=t<<c,c+=r},flush:function(){c>0&&f.writeByte(g)}});h.write(r,n);var s=0,v=String.fromCharCode(o[s]);for(s+=1;s<o.length;){var d=String.fromCharCode(o[s]);s+=1,i.contains(v+d)?v+=d:(h.write(i.indexOf(v),n),i.size()<4095&&(i.size()==1<<n&&(n+=1),i.add(v+d)),v=d)}return h.write(i.indexOf(v),n),h.write(e,n),h.flush(),l.toByteArray()},u=function(){var t={},r=0,e={add:function(n){if(e.contains(n))throw"dup key:"+n;t[n]=r,r+=1},size:function(){return r},indexOf:function(r){return t[r]},contains:function(r){return void 0!==t[r]}};return e};return i}(t,r),o=0;o<r;o+=1)for(var i=0;i<t;i+=1)n.setPixel(i,o,e(i,o));var a=D();n.write(a);for(var u=function(){var t=0,r=0,e=0,n="",o={},i=function(t){n+=String.fromCharCode(a(63&t))},a=function(t){if(t<0);else{if(t<26)return 65+t;if(t<52)return t-26+97;if(t<62)return t-52+48;if(62==t)return 43;if(63==t)return 47}throw"n:"+t};return o.writeByte=function(n){for(t=t<<8|255&n,r+=8,e+=1;r>=6;)i(t>>>r-6),r-=6},o.flush=function(){if(r>0&&(i(t<<6-r),t=0,r=0),e%3!=0)for(var o=3-e%3,a=0;a<o;a+=1)n+="="},o.toString=function(){return n},o}(),f=a.toByteArray(),c=0;c<f.length;c+=1)u.writeByte(f[c]);return u.flush(),"data:image/gif;base64,"+u};return t}();qrcode.stringToBytesFuncs["UTF-8"]=function(t){return function(t){for(var r=[],e=0;e<t.length;e++){var n=t.charCodeAt(e);n<128?r.push(n):n<2048?r.push(192|n>>6,128|63&n):n<55296||n>=57344?r.push(224|n>>12,128|n>>6&63,128|63&n):(e++,n=65536+((1023&n)<<10|1023&t.charCodeAt(e)),r.push(240|n>>18,128|n>>12&63,128|n>>6&63,128|63&n))}return r}(t)},function(t){"function"==typeof define&&define.amd?define([],t):"object"==typeof exports&&(module.exports=t())}((function(){return qrcode}));
+</script>
+<script>
+/* =====================================================================================
+   DECISÕES DE PRODUTO (NÃO ALTERAR SEM AUTORIZAÇÃO DO DONO)
+   Definidas com o dono da Recheadinha em 19 e 20/10/2026. Se você é uma IA ou um
+   desenvolvedor mexendo neste código: NÃO desfaça nenhuma destas decisões, mesmo que
+   pareça "melhoria". Em caso de dúvida, pergunte ao dono antes.
+
+   [D01] SEM SORTEIO. Todo pedido ganha e o CLIENTE ESCOLHE o brinde. Proibido reintroduzir
+         sorteio, pesos, probabilidade, "não foi dessa vez" ou qualquer fator sorte.
+         Motivo: Lei 5.768/1971 (promoções comerciais exigem autorização da SPA/MF quando há sorte).
+   [D02] A raspadinha é só animação. Ela revela "Você ganhou! Escolha seu brinde"; a raspagem
+         não decide nada.
+   [D03] A escolha é validada no "servidor" (estoque, ativo, condições, frete). O navegador
+         nunca decide nem altera o brinde. O estoque é reservado no momento da escolha.
+   [D04] Frete grátis: só pode ser escolhido em pedido do canal Próprio E com endereço dentro do
+         raio (km) configurável no painel. Fora disso aparece desabilitado, como convite.
+   [D05] Um QR por pedido. Idempotente por canal + código do pedido (repetir = reimprimir o mesmo).
+         Token aleatório (crypto), nunca o ID do pedido, sem dados pessoais.
+   [D06] QR avulso para canais sem integração: iFood, Keeta, 99Food, WhatsApp e Instagram.
+         Com integração, o QR sai automático no fim do cupom (iFood: abaixo do pedido).
+   [D07] Cliente de canal externo confirma o WhatsApp ENVIANDO uma mensagem pronta (wa.me para
+         o número da loja). Sem código de verificação (OTP). Pedido próprio: o cliente já é
+         conhecido e o brinde vai direto para a conta dele após a escolha.
+   [D08] A validade do brinde começa quando ele entra na conta do cliente.
+   [D09] No pedido, o brinde entra com R$ 0,00, NÃO soma no total, sai destacado no cupom, no KDS
+         e na tela do entregador. O custo vai para o gasto de marketing e há baixa no estoque.
+   [D10] Condição de uso POR BRINDE: pedido mínimo (R$) OU um produto específico. 1 brinde por pedido.
+   [D11] Teto de gasto mensal: só alerta (WhatsApp da loja), NUNCA bloqueia.
+   [D12] Pausas por dia da semana e por horário: os pedidos saem sem QR. Um QR já impresso continua valendo.
+   [D13] Lembretes: tom animado e sem pressão; validade na última linha, em itálico; no máximo
+         1 ou 2 por brinde; o cliente pode responder SAIR.
+   [D14] Cada canal tem liga/desliga no painel.
+   [D15] Impressão 58mm: imagem de 384 pontos enviada como raster ESC/POS (GS v 0). Método
+         recomendado no Android: app RawBT. Impressora padrão: "BlueTooth Printer".
+   [D16] Sistema real: módulo DENTRO do núcleo do saas.delivery (FastAPI + PostgreSQL, RLS por
+         empresa, plugin pago por empresa). Este HTML é só protótipo: as funções marcadas
+         "SERVIDOR" representam endpoints do backend.
+   [D17] Limite de raspadinhas por cliente por dia (antiabuso), configurável.
+   [D18] Sem regras de repetição: o cliente pode escolher o mesmo brinde de antes.
+   [D19] Comunicação sem termos de sorte: não usar "sorteio", "sorte", "sortudo" ou "concorra".
+   ===================================================================================== */
+// ================= base =================
+const W=384, DIA=864e5, CHAVE='saasdelivery_raspadinha_v2';   // v2 = mecânica de escolha [D01]; dados da v1 (sorteio) são ignorados
+const DIAS=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+const CANAIS=['Próprio','iFood','Keeta','99Food','WhatsApp','Instagram'];
+const WA_LOJA='5511940426722';
+const FRETE_BASE=5, FRETE_KM=1.5;
+const cardapio=[
+  {nome:'Batata recheada de frango',preco:32.9},{nome:'Batata recheada de costela',preco:36.9},
+  {nome:'Sopa de mandioquinha',preco:24.9},{nome:'Refrigerante lata',preco:6},{nome:'Mousse de maracujá',preco:9.9}];
+const $=id=>document.getElementById(id);
+const brl=v=>'R$ '+(+v).toFixed(2).replace('.',',');
+const num=v=>(+v).toFixed(2).replace('.',',');
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fim4=t=>'...'+String(t).slice(-4);
+const freteTaxa=d=>FRETE_BASE+FRETE_KM*d;
+const agora=()=>Date.now()+S.offsetDias*DIA;
+const addDias=(n,base)=>(base??agora())+n*DIA;
+const dataBR=ms=>new Date(ms).toLocaleDateString('pt-BR');
+const dataHora=ms=>new Date(ms).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
+const diaStr=ms=>new Date(ms).toLocaleDateString('sv-SE');
+function localISO(d){ const z=new Date(d.getTime()-d.getTimezoneOffset()*6e4); return z.toISOString().slice(0,16); }
+function tokenSeguro(n=6){ const a=new Uint8Array(n); crypto.getRandomValues(a); return Array.from(a,b=>'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'[b%32]).join(''); }
+
+function estadoInicial(){
+  return { v:2,
+    cfg:{ nome:'Na Recheadinha eu sempre ganho!', ativa:true,   // [D01] sem opção "todos ganham": sempre ganham
+      canais:{'Próprio':true,iFood:true,Keeta:true,'99Food':true,WhatsApp:true,Instagram:true},
+      freteAtivo:true, raioKm:5, validadeQr:7, validadePremio:15, teto:500, alerta:80,
+      pausaDias:[false,false,false,false,false,false,false], pausaIni:'', pausaFim:'',
+      lembrete:{ativo:true, diasAntes:2, max:1,
+        texto:'Ei! 🍟 Tem um(a) *{brinde}* com o seu nome aqui na Recheadinha. Quando bater aquela vontade, é só pedir que ele vai junto! 😋\n\n_Vale para {condicao}, até {validade}. Para não receber lembretes, responda SAIR._'},
+      imp:{ nome:'BlueTooth Printer', metodo:'rawbt', corte:true, loja:'RECHEADINHA', site:'recheadinha.delivery', base:'https://recheadinha.delivery/r/' } },
+    regras:{versao:1, limiteDia:2},   // [D17] limite diário; [D18] sem regras de repetição; versao = versão da configuração
+    premios:[
+      {id:1,nome:'Batata frita 150g',tipo:'produto',estoque:50,custo:4.5,ativo:true,minimo:30,produtoReq:''},
+      {id:2,nome:'Mousse de maracujá',tipo:'produto',estoque:40,custo:3.5,ativo:true,minimo:35,produtoReq:''},
+      {id:3,nome:'Refrigerante lata',tipo:'produto',estoque:60,custo:3,ativo:true,minimo:0,produtoReq:'Batata recheada de costela'},
+      // [D01] brindes NÃO têm peso/probabilidade: o cliente escolhe. [D10] minimo OU produtoReq.
+      {id:4,nome:'Frete grátis',tipo:'frete',estoque:null,custo:8,ativo:true,minimo:40,produtoReq:''}],
+    participacoes:{}, historico:{}, carteira:{}, qrPorPedido:{}, msgs:[], logs:[],
+    seqPedido:1040, nextId:5, alertasTeto:{}, offsetDias:0, ticket:null,
+    ui:{view:'loja', tab:'pedidos'} };
+}
+function carregar(){ try{ const j=localStorage.getItem(CHAVE); if(j){ const o=JSON.parse(j); if(o&&o.v===2) return o; } }catch(e){} return null; }
+function salvar(){ try{ localStorage.setItem(CHAVE,JSON.stringify(S)); }catch(e){} }
+let S=carregar()||estadoInicial();
+let clienteTel=null, carrinho={}, brindeSel=null, bleDev=null;
+
+function audit(t){ S.logs.unshift(dataHora(agora())+' · '+t); if(S.logs.length>300) S.logs.length=300; renderLog(); salvar(); }
+function msgCliente(tel,texto){ S.msgs.push({para:'cliente',tel,texto,quando:agora()}); renderWhats(); salvar(); }
+function msgLoja(texto){ S.msgs.push({para:'loja',texto,quando:agora()}); renderWhats(); salvar(); }
+
+// ================= regras do negócio ("servidor") =================
+function condicaoTxt(b){
+  const p=[]; if(b.minimo>0) p.push('pedidos a partir de '+brl(b.minimo)); if(b.produtoReq) p.push('pedidos com '+b.produtoReq);
+  let t=p.length?p.join(' ou '):'qualquer pedido';
+  if(b.tipo==='frete') t+=' (entrega até '+(S.cfg.raioKm||'?')+' km)';
+  return t;
+}
+function aplicarTemplate(txt,b){ return txt.replace(/\{brinde\}/g,b.nome).replace(/\{condicao\}/g,condicaoTxt(b)).replace(/\{validade\}/g,dataBR(b.validade)); }
+function motivoPausa(ms){
+  const c=S.cfg, dt=new Date(ms);
+  if(!c.ativa) return 'campanha desligada';
+  if(c.pausaDias[dt.getDay()]) return 'campanha pausada às '+DIAS[dt.getDay()].toLowerCase()+'s';
+  if(c.pausaIni&&c.pausaFim){
+    const m=dt.getHours()*60+dt.getMinutes(), [a,b]=[c.pausaIni,c.pausaFim].map(t=>{const[h,mi]=t.split(':');return +h*60+ +mi;});
+    if(a<b?(m>=a&&m<b):(m>=a||m<b)) return 'pausa de horário de pico ('+c.pausaIni+'–'+c.pausaFim+')';
+  }
+  return null;
+}
+// cria a participação (token) — idempotente por canal + código do pedido
+// SERVIDOR — [D05][D12][D14]
+function criarParticipacao(canal,codigo,tel,dist,ms,numero){
+  const chave=canal+'|'+codigo;
+  if(S.qrPorPedido[chave]) return {token:S.qrPorPedido[chave],repetido:true};
+  if(!S.cfg.canais[canal]) return {motivo:'canal '+canal+' desligado'};
+  const mp=motivoPausa(ms); if(mp) return {motivo:mp};
+  const token=tokenSeguro();
+  S.participacoes[token]={token,pedido:numero,canal,cliente:tel||null,distancia:dist,status:'gerado',
+    expira:addDias(S.cfg.validadeQr,ms),premio:null,regrasVersao:null,criado:ms};
+  S.qrPorPedido[chave]=token;
+  audit('Pedido '+numero+' → QR '+token+' gerado');
+  return {token};
+}
+// SERVIDOR — GET /raspadinha/{token}/opcoes
+// [D01][D03][D04] Lista os brindes que o cliente pode escolher. Indisponíveis vêm com o motivo
+// (o cliente vê, mas não consegue escolher). NÃO existe peso nem sorteio aqui.
+function opcoesBrinde(p){
+  const c=S.cfg;
+  return S.premios.filter(x=>x.ativo&&!(x.tipo==='frete'&&!c.freteAtivo)).map(x=>{
+    let motivo=null;
+    if(x.estoque!==null&&x.estoque<=0) motivo='esgotado no momento';
+    else if(x.tipo==='frete'){                                   // [D04]
+      if(p.canal!=='Próprio') motivo='só em pedidos pelo nosso cardápio';
+      else if(!(c.raioKm>0)) motivo='indisponível no momento';
+      else if(p.distancia==null||p.distancia>c.raioKm) motivo='só para endereços até '+c.raioKm+' km';
+    }
+    return {premio:x,motivo};
+  });
+}
+// SERVIDOR — POST /raspadinha/{token}/raspar
+// [D02] A raspagem NÃO decide nada: só marca que o cliente abriu e raspou (sinal de cliente ativo).
+function participar(token){
+  const p=S.participacoes[token];
+  if(!p) return {erro:'Código inválido. Confira o QR do seu pedido.'};
+  if(p.status!=='gerado') return {ok:true,p,repetido:true};          // idempotente [D05]
+  if(agora()>p.expira){ p.status='QR expirado'; render(); return {erro:'Este código expirou.'}; }
+  if(p.cliente){                                                      // [D17]
+    const n=(S.historico[p.cliente]||[]).filter(x=>x.data===diaStr(agora())).length;
+    if(n>=S.regras.limiteDia) return {erro:'Você já usou o máximo de raspadinhas de hoje. Guarde este código e volte amanhã!'};
+  }
+  p.status='escolhendo'; p.raspadoEm=agora();
+  audit(p.pedido+' → QR escaneado e raspado; aguardando a escolha do cliente');
+  msgLoja('📲 Cliente do pedido '+p.pedido+' escaneou o QR e está escolhendo o brinde. Cliente ativo!');
+  render();
+  return {ok:true,p};
+}
+// SERVIDOR — POST /raspadinha/{token}/escolher {brinde_id}
+// [D01][D03] O cliente escolhe; o servidor valida tudo de novo e reserva o estoque (no real: transação
+// com SELECT ... FOR UPDATE no PostgreSQL). Escolha feita não muda mais (idempotente).
+function escolherBrinde(token,id){
+  const p=S.participacoes[token];
+  if(!p) return {erro:'Código inválido.'};
+  if(p.status!=='escolhendo') return {erro:'O brinde deste código já foi escolhido.'};
+  const o=opcoesBrinde(p).find(o=>o.premio.id===id);
+  if(!o) return {erro:'Este brinde não existe mais. Escolha outro.'};
+  if(o.motivo) return {erro:'Este brinde não pode ser escolhido: '+o.motivo+'.'};
+  const x=o.premio;
+  if(x.estoque!==null) x.estoque--;                                   // reserva do estoque [D03]
+  p.premio={id:x.id,nome:x.nome,tipo:x.tipo,custo:x.custo,minimo:x.minimo,produtoReq:x.produtoReq};
+  p.regrasVersao=S.regras.versao; p.escolhidoEm=agora(); p.status='aguardando WhatsApp';
+  if(p.cliente) (S.historico[p.cliente]||=[]).push({premioId:x.id,data:diaStr(agora())});
+  audit(p.pedido+' → cliente escolheu '+x.nome+' (configuração v'+S.regras.versao+')');
+  msgLoja('🎁 Cliente do pedido '+p.pedido+' escolheu: '+x.nome+'.');
+  if(p.cliente) creditar(p,p.cliente);                                // [D07] pedido próprio: direto na conta
+  render();
+  return {ok:true,p};
+}
+// SERVIDOR — guarda o brinde na conta do telefone. [D08] a validade começa agora.
+function creditar(p,tel){
+  const b={id:tokenSeguro(8),token:p.token,premioId:p.premio.id,nome:p.premio.nome,tipo:p.premio.tipo,custo:p.premio.custo,
+    minimo:p.premio.minimo,produtoReq:p.premio.produtoReq,validade:addDias(S.cfg.validadePremio),status:'disponivel',lembretes:0};
+  (S.carteira[tel]||=[]).push(b);
+  p.cliente=tel; p.status='na conta';
+  msgCliente(tel,'🎉 Prontinho! Seu brinde *'+b.nome+'* da raspadinha da Recheadinha está guardado.\nNo próximo pedido pelo nosso cardápio, ele vai junto, sem cupom. 🧡\n\n_Vale para '+condicaoTxt(b)+', até '+dataBR(b.validade)+'._');
+  audit('Brinde '+b.nome+' guardado na conta '+fim4(tel)+' (válido até '+dataBR(b.validade)+')');
+  checarTeto();
+}
+function gastos(){ let real=0,comp=0; Object.values(S.carteira).flat().forEach(b=>{ if(b.status==='usado') real+=b.custoReal; else if(b.status==='disponivel') comp+=b.custo; }); return {real,comp}; }
+// [D11] só alerta, nunca bloqueia
+function checarTeto(){
+  const t=S.cfg.teto; if(!(t>0)) return;
+  const {real}=gastos(), pct=real/t*100;
+  [S.cfg.alerta,100].forEach(l=>{ if(pct>=l&&!S.alertasTeto[l]){ S.alertasTeto[l]=true;
+    msgLoja('⚠️ O gasto da raspadinha chegou a '+Math.floor(pct)+'% do teto do mês ('+brl(real)+' de '+brl(t)+'). Nada foi bloqueado: você decide se pausa.');
+    audit('Alerta de teto: '+Math.floor(pct)+'%'); } });
+}
+// SERVIDOR (job) — [D13] lembretes e [D08] expiração
+function rodarLembretes(){
+  let n=0,x=0; const L=S.cfg.lembrete;
+  Object.entries(S.carteira).forEach(([tel,lista])=>lista.forEach(b=>{
+    if(b.status!=='disponivel') return;
+    if(agora()>b.validade){ b.status='expirado'; x++; const p=S.participacoes[b.token]; if(p) p.status='brinde expirado'; return; }
+    if(!L.ativo) return;
+    const dias=Math.ceil((b.validade-agora())/DIA);
+    if(dias<=L.diasAntes&&b.lembretes<L.max){ b.lembretes++; n++; msgCliente(tel,aplicarTemplate(L.texto,b)); }
+  }));
+  audit('Rotina de lembretes: '+n+' enviado(s), '+x+' brinde(s) expirado(s)');
+  render();
+}
+function avancarDias(){ const n=Math.max(1,+$('avDias').value||1); S.offsetDias+=n; audit('Relógio de teste avançou '+n+' dia(s)'); rodarLembretes(); }
+
+// ================= Loja: pedidos =================
+function aviso(tipo,t){ $('pedMsg').innerHTML='<div class="msg '+tipo+'">'+t+'</div>'; }
+function mostrarTicket(t,titulo){
+  S.ticket=t; S.ticket.titulo=titulo; salvar();
+  $('tkCard').style.display=''; $('tkTitulo').textContent=titulo;
+  desenhar('tkCv',c=>cupomPedido(c,t));
+  $('tkBar').innerHTML=printBar('tkCv');
+  const p=t.token&&S.participacoes[t.token];
+  $('tkScan').style.display=p?'':'none';
+  $('tkScan').onclick=()=>{ irView('cliente','raspa'); abrirRaspadinha(t.token); };
+  $('tkCard').scrollIntoView({behavior:'smooth',block:'start'});
+}
+// [D06] QR avulso (sem integração)
+function gerarAvulso(){
+  const canal=$('aCanal').value, cod=$('aCod').value.trim().toUpperCase().replace(/[^A-Z0-9-]/g,'');
+  if(!cod) return aviso('err','Digite o código do pedido.');
+  const r=criarParticipacao(canal,cod,null,null,agora(),canal+' #'+cod);
+  if(r.motivo) return aviso('err','QR não gerado: '+esc(r.motivo)+'.');
+  $('aCod').value='';
+  if(r.repetido){ aviso('warn','Este pedido já tem QR (código '+r.token+'). Nenhum QR novo foi criado: abaixo está a reimpressão do mesmo.'); audit('Reimpressão do QR do pedido '+canal+' #'+cod); }
+  else aviso('ok','QR gerado. Toque em Imprimir.');
+  mostrarTicket({tipo:'avulso',numero:canal+' #'+cod,canal,token:r.token},'QR avulso · '+canal+' #'+cod);
+  render();
+}
+function gerarIfood(){
+  const cod=$('iCod').value.trim().toUpperCase().replace(/[^A-Z0-9-]/g,'')||String(7000+Math.floor(Math.random()*999));
+  const cli=$('iCli').value.trim()||'Cliente iFood';
+  const r=criarParticipacao('iFood',cod,null,null,agora(),'iFood #'+cod);
+  const itens=[{nome:'Batata recheada de frango',preco:32.9,qtd:1,obs:'sem cebola'},{nome:'Refrigerante lata',preco:6,qtd:1}];
+  const t={tipo:'ifood',numero:'#'+cod,canal:'iFood',cliente:cli,itens,frete:5.99,total:44.89,quando:agora(),token:r.token||null,semQr:r.motivo||null};
+  if(r.motivo) aviso('warn','Pedido impresso sem raspadinha: '+esc(r.motivo)+'.');
+  else if(r.repetido) aviso('warn','Este pedido já tinha QR: reimpressão do mesmo código.');
+  else aviso('ok','Pedido do iFood recebido, com a raspadinha no final.');
+  $('iCod').value=String(+cod+1||'');
+  mostrarTicket(t,'Pedido iFood #'+cod);
+  render();
+}
+function gerarProprio(){
+  const ms=$('pData').value?new Date($('pData').value).getTime():agora();
+  const tel=$('pTel').value.replace(/\D/g,''); if(tel.length<10) return aviso('err','Informe um WhatsApp válido com DDD.');
+  const dist=$('pDist').value===''?null:+$('pDist').value;
+  const numero='#'+(++S.seqPedido);
+  const itens=[{nome:'Batata recheada de costela',preco:36.9,qtd:1},{nome:'Sopa de mandioquinha',preco:24.9,qtd:1}];
+  const frete=dist!=null?freteTaxa(dist):null, sub=61.8;
+  const r=criarParticipacao('Próprio',numero,tel,dist,ms,numero);
+  const t={tipo:'proprio',numero,canal:'Próprio',cliente:tel,itens,frete,dist,brinde:null,total:sub+(frete||0),pagamento:'Pix (pago)',quando:ms,token:r.token||null,semQr:r.motivo||null};
+  if(r.motivo) aviso('warn','Pedido impresso sem QR: '+esc(r.motivo)+'.'); else aviso('ok','Pedido próprio recebido, com o QR no fim do cupom.');
+  mostrarTicket(t,'Pedido próprio '+numero);
+  render();
+}
+
+// ================= motor de desenho do cupom (384 pontos = 58mm) =================
+function Cupom(ctx){
+  let y=12, M=8;
+  const font=(s,b)=>ctx.font=(b?'bold ':'')+s+'px Arial, "DejaVu Sans", sans-serif';
+  const wrap=(t,max)=>{ const ws=String(t).split(' '), ls=[]; let l=''; ws.forEach(w=>{ const tst=l?l+' '+w:w; if(ctx.measureText(tst).width>max&&l){ls.push(l);l=w;} else l=tst; }); if(l) ls.push(l); return ls; };
+  return {
+    get y(){return y},
+    text(t,{s=22,b=false,a='left',inv=false}={}){
+      font(s,b); const ls=wrap(t,W-2*M-(inv?16:0)), lh=Math.round(s*1.3);
+      ls.forEach(l=>{
+        if(inv){ ctx.fillStyle='#000'; ctx.fillRect(M,y-2,W-2*M,lh+4); ctx.fillStyle='#fff'; } else ctx.fillStyle='#000';
+        ctx.textAlign=a; ctx.textBaseline='top';
+        ctx.fillText(l,a==='center'?W/2:a==='right'?W-M:M,y+Math.round(s*0.12)); y+=lh+(inv?4:0);
+      }); ctx.fillStyle='#000';
+    },
+    row(l,r,{s=22,b=false}={}){ font(s,b); ctx.fillStyle='#000'; ctx.textBaseline='top';
+      ctx.textAlign='right'; ctx.fillText(r,W-M,y+2); const rw=ctx.measureText(r).width;
+      ctx.textAlign='left'; wrap(l,W-2*M-rw-10).forEach(t=>{ctx.fillText(t,M,y+2); y+=Math.round(s*1.3);}); },
+    dash(){ ctx.fillStyle='#000'; for(let x=M;x<W-M;x+=12) ctx.fillRect(x,y+6,7,2); y+=16; },
+    corte(){ y+=4; font(16,false); ctx.textAlign='center'; ctx.textBaseline='top'; ctx.fillStyle='#000'; ctx.fillText('- - - - - - - corte aqui - - - - - - -',W/2,y); y+=26; },
+    gap(n=8){ y+=n; },
+    box(fn){ const y0=y; y+=8; M+=12; fn(); M-=12; y+=6; ctx.strokeStyle='#000'; ctx.lineWidth=3; ctx.setLineDash([10,6]); ctx.strokeRect(M+1,y0,W-2*M-2,y-y0); ctx.setLineDash([]); y+=8; },
+    qr(txt,size=232){
+      const q=qrcode(0,'M'); q.addData(txt); q.make(); const n=q.getModuleCount(), cell=Math.floor(size/(n+4)), tot=cell*(n+4), x0=Math.round((W-tot)/2);
+      ctx.fillStyle='#fff'; ctx.fillRect(x0,y,tot,tot); ctx.fillStyle='#000';
+      for(let r=0;r<n;r++) for(let c=0;c<n;c++) if(q.isDark(r,c)) ctx.fillRect(x0+(c+2)*cell,y+(r+2)*cell,cell,cell);
+      y+=tot+4;
+    }
+  };
+}
+function desenhar(id,fn){
+  const cv=$(id), tmp=document.createElement('canvas'); tmp.width=W; tmp.height=3000;
+  const t=tmp.getContext('2d'); t.fillStyle='#fff'; t.fillRect(0,0,W,3000);
+  const c=Cupom(t); fn(c); c.gap(30);
+  const h=Math.ceil(c.y); cv.width=W; cv.height=h;
+  const ctx=cv.getContext('2d'); ctx.drawImage(tmp,0,0);
+  const img=ctx.getImageData(0,0,W,h), p=img.data;              // preto e branco puro, como a térmica imprime
+  for(let i=0;i<p.length;i+=4){ const v=(p[i]*.3+p[i+1]*.59+p[i+2]*.11)<150?0:255; p[i]=p[i+1]=p[i+2]=v; p[i+3]=255; }
+  ctx.putImageData(img,0,0);
+}
+function blocoRaspadinha(c,p,proprio){
+  // [D01][D19] O papel lista as opções que ESTE cliente poderá escolher. Sem palavras de sorte.
+  const imp=S.cfg.imp, lista=opcoesBrinde(p).filter(o=>!o.motivo).map(o=>o.premio.nome);
+  c.text('RASPE E GANHE!',{s:30,b:true,a:'center',inv:true});
+  c.gap(6);
+  c.text(proprio?'Escolha seu próximo brinde:':'Todo pedido ganha um brinde à sua escolha:',{s:21,b:true,a:'center'});
+  lista.forEach(b=>c.text('• '+b,{s:21,a:'center'}));
+  c.gap(4);
+  c.qr(imp.base+p.token);
+  c.text('Código: '+p.token,{s:24,b:true,a:'center'});
+  c.text('Escaneie até '+dataBR(p.expira),{s:19,a:'center'});
+  c.dash();
+  if(proprio) c.text('O brinde fica guardado na sua conta e vai junto no próximo pedido.',{s:19,a:'center'});
+  else { c.text('Use o brinde nos pedidos pelo nosso cardápio:',{s:19,a:'center'}); c.text(imp.site,{s:22,b:true,a:'center'}); }
+  c.text('Regras na página da raspadinha.',{s:17,a:'center'});
+}
+function cupomPedido(c,t){
+  const imp=S.cfg.imp, p=t.token?S.participacoes[t.token]:null;
+  if(t.tipo==='avulso'){
+    c.text(imp.loja,{s:32,b:true,a:'center'}); c.text('Pedido '+t.numero,{s:22,a:'center'}); c.dash();
+    if(p) blocoRaspadinha(c,p,false); return;
+  }
+  if(t.tipo==='ifood'){
+    c.text('PEDIDO IFOOD',{s:30,b:true,a:'center'}); c.text(t.numero+' · '+dataHora(t.quando),{s:20,a:'center'}); c.dash();
+    c.text('Cliente: '+t.cliente,{s:21,b:true}); c.text('Entrega pelo iFood',{s:20}); c.dash();
+    t.itens.forEach(i=>{ c.row(i.qtd+'x '+i.nome,num(i.preco*i.qtd)); if(i.obs) c.text('  Obs: '+i.obs,{s:18}); });
+    c.dash(); c.row('Subtotal',num(t.total-t.frete)); c.row('Taxa de entrega',num(t.frete)); c.row('TOTAL',num(t.total),{s:24,b:true});
+    c.text('PAGO NO APP · não cobrar na entrega',{s:20,b:true,a:'center'});
+  } else {
+    c.text(imp.loja,{s:32,b:true,a:'center'}); c.text('Pedido '+t.numero+' · Cardápio próprio',{s:20,a:'center'}); c.text(dataHora(t.quando),{s:19,a:'center'}); c.dash();
+    c.text('Cliente: WhatsApp '+fim4(t.cliente),{s:21,b:true}); c.dash();
+    t.itens.forEach(i=>c.row(i.qtd+'x '+i.nome,num(i.preco*i.qtd)));
+    if(t.brinde) c.box(()=>{ c.text('BRINDE DA RASPADINHA',{s:22,b:true,a:'center'});
+      if(t.brinde.tipo==='frete') c.text('FRETE GRÁTIS',{s:22,b:true,a:'center'}); else c.row('1x '+t.brinde.nome,'0,00',{s:21,b:true});
+      c.text('CONFERIR NA ENTREGA',{s:19,b:true,a:'center'}); });
+    c.dash(); const sub=t.itens.reduce((s,i)=>s+i.preco*i.qtd,0); c.row('Subtotal',num(sub));
+    if(t.frete!=null) c.row('Frete ('+String(t.dist).replace('.',',')+' km)',t.brinde&&t.brinde.tipo==='frete'?'0,00':num(t.frete));
+    c.row('TOTAL',num(t.total),{s:24,b:true}); c.text('Pagamento: '+t.pagamento,{s:20});
+  }
+  if(p){ c.gap(4); imp.corte?c.corte():c.dash(); blocoRaspadinha(c,p,t.tipo==='proprio'); }
+  else { c.dash(); c.text('Obrigado pela preferência!',{s:20,a:'center'}); }
+}
+function desenharTeste(){
+  desenhar('testCv',c=>{
+    c.text('TESTE DE IMPRESSÃO',{s:28,b:true,a:'center',inv:true}); c.gap(6);
+    c.text(S.cfg.imp.nome,{s:22,b:true,a:'center'}); c.text(dataHora(Date.now()),{s:19,a:'center'}); c.dash();
+    c.text('Acentos: ação, pão, você, ç',{s:20}); c.row('Coluna à esquerda','0,00'); c.text('Letra pequena para conferir',{s:16});
+    c.text('Letra grande',{s:32,b:true}); c.dash();
+    c.qr(S.cfg.imp.base+'TESTE',200); c.text('Aponte a câmera para o QR',{s:19,a:'center'});
+  });
+}
+function redesenhar(){ salvar(); desenharTeste(); if(S.ticket&&$('tkCard').style.display!=='none') { desenhar('tkCv',c=>cupomPedido(c,S.ticket)); } }
+
+// ================= impressão =================
+function printBar(cv){
+  const m={rawbt:'RawBT',ble:'Bluetooth',menu:'menu do celular'}[S.cfg.imp.metodo];
+  return '<button class="btn full mt" onclick="imprimir(\''+cv+'\')">🖨️ Imprimir <span style="font-weight:400">(via '+m+')</span></button>'+
+    '<div class="pbar"><button class="btn alt sm" onclick="imprimir(\''+cv+'\',\'rawbt\')">RawBT</button><button class="btn alt sm" onclick="imprimir(\''+cv+'\',\'ble\')">Bluetooth</button>'+
+    '<button class="btn alt sm" onclick="imprimir(\''+cv+'\',\'menu\')">Menu</button><button class="btn alt sm" onclick="baixarPNG(\''+cv+'\')">PNG</button></div><div id="'+cv+'St"></div>';
+}
+function atualizarBarras(){ $('testBar').innerHTML=printBar('testCv'); if($('tkCard').style.display!=='none') $('tkBar').innerHTML=printBar('tkCv'); }
+function pst(cv,t,c='info'){ const el=$(cv+'St'); if(el) el.innerHTML='<div class="msg '+c+'">'+t+'</div>'; }
+// [D15] raster ESC/POS em faixas de 24 linhas
+function escpos(cvId){
+  const cv=$(cvId), h=cv.height, bpr=W/8, px=cv.getContext('2d').getImageData(0,0,W,h).data, out=[0x1B,0x40];
+  for(let y0=0;y0<h;y0+=24){
+    const band=Math.min(24,h-y0); out.push(0x1D,0x76,0x30,0x00,bpr,0,band&255,band>>8);
+    for(let y=y0;y<y0+band;y++) for(let xb=0;xb<bpr;xb++){ let byte=0; for(let k=0;k<8;k++){ if(px[(y*W+xb*8+k)*4]===0) byte|=0x80>>k; } out.push(byte); }
+  }
+  out.push(0x1B,0x64,0x04);
+  return new Uint8Array(out);
+}
+function b64(u8){ let s=''; for(let i=0;i<u8.length;i+=8192) s+=String.fromCharCode.apply(null,u8.subarray(i,i+8192)); return btoa(s); }
+function imprimir(cv,metodo){
+  metodo=metodo||S.cfg.imp.metodo;
+  if(metodo==='rawbt'){
+    if(!/Android/i.test(navigator.userAgent)) pst(cv,'O RawBT só existe no Android. Em outro aparelho, use o PNG.','err');
+    else pst(cv,'Abrindo o RawBT… Se o app não estiver instalado, o Android abre a Play Store.','ok');
+    location.href='intent:base64,'+b64(escpos(cv))+'#Intent;scheme=rawbt;package=ru.a402d.rawbtprinter;end;';
+  } else if(metodo==='ble') imprimirBLE(cv,false);
+  else { $('printImg').src=$(cv).toDataURL('image/png'); setTimeout(()=>window.print(),200); }
+}
+const SVCS=['000018f0-0000-1000-8000-00805f9b34fb','e7810a71-73ae-499d-8c15-faa9aef0c3f2','49535343-fe7d-4ae5-8fa9-9fafd205e455','0000ff00-0000-1000-8000-00805f9b34fb','0000fee7-0000-1000-8000-00805f9b34fb','0000ae30-0000-1000-8000-00805f9b34fb'];
+async function imprimirBLE(cv,todos){
+  const nome=S.cfg.imp.nome;
+  try{
+    if(!navigator.bluetooth) return pst(cv,'Este navegador não tem Bluetooth web. Use o Chrome no Android, com a página aberta por https, ou o RawBT.','err');
+    if(!bleDev){
+      pst(cv,'Escolha “'+esc(nome)+'” na lista…');
+      bleDev=await navigator.bluetooth.requestDevice(todos?{acceptAllDevices:true,optionalServices:SVCS}:
+        {filters:[{name:nome},{namePrefix:nome.split(' ')[0]},{services:[SVCS[0]]}],optionalServices:SVCS});
+    }
+    pst(cv,'Conectando em '+esc(bleDev.name||'impressora')+'…');
+    const gatt=bleDev.gatt.connected?bleDev.gatt:await bleDev.gatt.connect();
+    let ch=null;
+    for(const s of await gatt.getPrimaryServices()){ for(const c of await s.getCharacteristics()){ if(c.properties.writeWithoutResponse||c.properties.write){ ch=c; break; } } if(ch) break; }
+    if(!ch) return pst(cv,'Conectou, mas não achei um canal de escrita. Use o RawBT.','err');
+    const data=escpos(cv);
+    for(let i=0;i<data.length;i+=100){
+      const part=data.slice(i,i+100);
+      if(ch.properties.writeWithoutResponse) await ch.writeValueWithoutResponse(part); else await ch.writeValue(part);
+      await new Promise(r=>setTimeout(r,15));
+      if(i%3000===0) pst(cv,'Enviando… '+Math.round(i/data.length*100)+'%');
+    }
+    pst(cv,'Enviado para '+esc(bleDev.name||'a impressora')+'! ✅','ok');
+  }catch(e){
+    bleDev=null;
+    if(e.name==='NotFoundError') pst(cv,'A impressora não apareceu ou a busca foi cancelada. Ela provavelmente usa Bluetooth clássico: use o RawBT. <button class="btn alt sm" onclick="imprimirBLE(\''+cv+'\',true)">Mostrar todos os aparelhos</button>','err');
+    else if(e.name==='SecurityError') pst(cv,'O navegador bloqueou o Bluetooth nesta página (precisa de https e do Chrome). Use o RawBT.','err');
+    else pst(cv,'Não consegui imprimir: '+esc(e.message)+'. Tente o RawBT.','err');
+  }
+}
+function baixarPNG(cv){ const a=document.createElement('a'); a.href=$(cv).toDataURL('image/png'); a.download='cupom-'+Date.now()+'.png'; a.click(); pst(cv,'Imagem baixada.','ok'); }
+
+// ================= Cliente: raspadinha =================
+function abrirRaspadinha(tok){
+  const token=(tok||$('tokenIn').value).trim().toUpperCase();
+  $('tokenIn').value=token; $('raspaMsg').innerHTML=''; $('raspaArea').innerHTML='';
+  if(!token) return show('raspaMsg','err','Digite o código do QR.');
+  const r=participar(token);
+  if(r.erro) return show('raspaMsg','err',r.erro);
+  const p=r.p;
+  if(r.repetido){ show('raspaMsg','info',p.status==='escolhendo'?'Você já raspou: agora é só escolher seu brinde.':'Este código já foi usado. O brinde escolhido continua o mesmo.');
+    $('raspaArea').innerHTML='<div class="prize" style="position:relative;border-radius:14px;min-height:120px">'+premioCard(p)+'</div><div id="posRaspa">'+resultadoHtml(p)+'</div>'; return; }
+  $('raspaArea').innerHTML='<p style="text-align:center;margin:4px 0"><b>'+esc(S.cfg.nome)+'</b><br><span class="muted">Raspe com o dedo para revelar seu presente</span></p>'+
+    '<div class="scratch-wrap"><div class="prize">'+premioCard(p)+'</div><canvas id="scv"></canvas></div><div id="posRaspa"></div>';
+  iniciarRaspagem(()=>{ $('posRaspa').innerHTML=resultadoHtml(p); });
+}
+// [D02] Embaixo da raspagem há sempre a mesma mensagem: ganhou e vai escolher. Sem "não foi dessa vez" [D01].
+function premioCard(p){ return p.premio?'<span>Seu brinde</span><b>🎁 '+esc(p.premio.nome)+'</b>':'<span>Parabéns, você ganhou!</span><b>🎁 Escolha seu brinde</b>'; }
+function atualizarRaspa(p){ const pr=document.querySelector('#raspaArea .prize'); if(pr) pr.innerHTML=premioCard(p); $('posRaspa').innerHTML=resultadoHtml(p); }
+function escolher(token,id){
+  const r=escolherBrinde(token,id);
+  if(r.erro){ show('escMsg','err',r.erro); return; }
+  atualizarRaspa(r.p);
+}
+function resultadoHtml(p){
+  if(p.status==='escolhendo'){                                        // [D01] escolha livre entre os disponíveis
+    return '<h3>Escolha seu brinde 🎁</h3>'+opcoesBrinde(p).map(o=>'<button class="opt" '+(o.motivo?'disabled':'')+' onclick="escolher(\''+p.token+'\','+o.premio.id+')"><b>'+esc(o.premio.nome)+'</b><br><span class="muted">Vale para '+esc(condicaoTxt(o.premio))+'</span>'+(o.motivo?'<br><span style="color:var(--warn)">'+esc(o.motivo)+'</span>':'')+'</button>').join('')+
+      '<p class="muted">Pode escolher qualquer brinde disponível, inclusive um que já ganhou antes. Depois de escolher, não dá para trocar.</p><div id="escMsg"></div>';
+  }
+  if(p.status!=='aguardando WhatsApp'){
+    const b=(S.carteira[p.cliente]||[]).find(x=>x.token===p.token);
+    if(b&&b.status==='usado') return '<div class="msg info">Este brinde já foi usado no pedido '+b.pedido+'. 🧡</div>';
+    if(b&&b.status==='expirado') return '<div class="msg warn">Este brinde expirou.</div>';
+    return '<div class="msg ok">Seu brinde já está guardado na sua conta ('+fim4(p.cliente)+') e chegou no seu WhatsApp. No próximo pedido pelo cardápio, ele vai junto!'+(b?'<br><span class="muted">Vale para '+esc(condicaoTxt(b))+'.</span>':'')+'</div><button class="btn full" onclick="irCardapio(\''+p.cliente+'\')">Pedir agora pelo cardápio</button>';
+  }
+  const texto=textoWa(p), link='https://wa.me/'+WA_LOJA+'?text='+encodeURIComponent(texto);
+  return '<div class="msg ok"><b>Vale para '+esc(condicaoTxt(p.premio))+'</b>, no nosso cardápio. Na próxima compra, ele vai junto!</div>'+
+    '<p>Para guardar o brinde na sua conta, toque no botão e envie a mensagem pronta pelo seu WhatsApp. Seu número fica salvo só para guardar o brinde e avisar você sobre ele.</p>'+
+    '<div class="bub c" style="margin:8px 0">'+waFmt(texto)+'</div>'+
+    '<p class="muted" style="word-break:break-all">No sistema real, o botão abre o WhatsApp com essa mensagem: '+esc(link)+'</p>'+
+    '<div class="row"><input id="wTel" placeholder="Seu WhatsApp (só na simulação)" inputmode="numeric" style="flex:1;min-width:150px"><button class="btn" onclick="enviarWa(\''+p.token+'\')">📲 Enviar pelo WhatsApp</button></div><div id="wMsg"></div>';
+}
+function textoWa(p){ return 'Oi, Recheadinha! Escolhi *'+p.premio.nome+'* na raspadinha 🎉\nCódigo: '+p.token; }
+// [D07] SERVIDOR (whatsapp-service): recebe a mensagem, lê o código e liga o brinde ao número que ENVIOU. Sem OTP.
+function enviarWa(token){
+  const p=S.participacoes[token], tel=$('wTel').value.replace(/\D/g,'');
+  if(tel.length<10) return show('wMsg','err','Informe um WhatsApp válido com DDD.');
+  if(p.status!=='aguardando WhatsApp') return show('wMsg','warn','Este brinde já foi guardado.');
+  msgLoja('💬 Mensagem de '+fim4(tel)+': "'+textoWa(p)+'". Brinde guardado automaticamente.');
+  (S.historico[tel]||=[]).push({premioId:p.premio.id,data:diaStr(agora())});
+  creditar(p,tel); render();
+  $('posRaspa').innerHTML=resultadoHtml(p);
+}
+function iniciarRaspagem(onDone){
+  const cv=$('scv'), ctx=cv.getContext('2d'), rect=cv.getBoundingClientRect();
+  cv.width=rect.width||300; cv.height=rect.height||200;
+  const g=ctx.createLinearGradient(0,0,cv.width,cv.height); g.addColorStop(0,'#9e9e9e'); g.addColorStop(1,'#cfcfcf');
+  ctx.fillStyle=g; ctx.fillRect(0,0,cv.width,cv.height);
+  ctx.fillStyle='#fff'; ctx.font='bold 20px system-ui'; ctx.textAlign='center'; ctx.fillText('RASPE AQUI',cv.width/2,cv.height/2+7);
+  ctx.globalCompositeOperation='destination-out';
+  let down=false,done=false,moves=0;
+  const pos=e=>{const b=cv.getBoundingClientRect();return[e.clientX-b.left,e.clientY-b.top]};
+  const limpo=()=>{ const d=ctx.getImageData(0,0,cv.width,cv.height).data; let t=0,c=0; for(let i=3;i<d.length;i+=64){t++; if(d[i]===0)c++;} return c/t; };
+  const risca=e=>{ if(!down||done) return; const[x,y]=pos(e); ctx.beginPath(); ctx.arc(x,y,20,0,Math.PI*2); ctx.fill();
+    if(++moves%8===0&&limpo()>0.5){ done=true; cv.style.transition='opacity .4s'; cv.style.opacity=0; setTimeout(()=>cv.remove(),400); onDone(); } };
+  cv.addEventListener('pointerdown',e=>{down=true;cv.setPointerCapture(e.pointerId);risca(e)});
+  cv.addEventListener('pointermove',risca);
+  cv.addEventListener('pointerup',()=>down=false);
+}
+function renderQrList(){
+  const ps=Object.values(S.participacoes).filter(p=>(p.status==='gerado'||p.status==='escolhendo')&&agora()<=p.expira).slice(-6).reverse();
+  $('qrList').innerHTML=ps.length?ps.map(p=>'<button class="btn alt sm" onclick="abrirRaspadinha(\''+p.token+'\')">'+esc(p.pedido)+' · '+p.token+'</button>').join(''):'<span class="muted">Nenhum QR novo. Gere um na visão da Loja.</span>';
+}
+
+// ================= Cliente: cardápio =================
+function irCardapio(tel){ $('cTel').value=tel; irView('cliente','cardapio'); entrarCardapio(); }
+function entrarCardapio(){
+  const tel=$('cTel').value.replace(/\D/g,''); if(tel.length<10) return show('cardMsg','err','Informe um WhatsApp válido com DDD.');
+  clienteTel=tel; brindeSel=null; $('cardMsg').innerHTML=''; renderCardapio();
+}
+function mudaQtd(i,d){ carrinho[i]=Math.max(0,(carrinho[i]||0)+d); renderCardapio(); }
+function ctxPedido(){
+  const itens=cardapio.map((c,i)=>({...c,qtd:carrinho[i]||0})).filter(x=>x.qtd>0);
+  const sub=itens.reduce((s,x)=>s+x.preco*x.qtd,0);
+  return {itens,sub,nomes:itens.map(x=>x.nome),dist:$('cDist').value===''?null:+$('cDist').value};
+}
+function condOk(b,c){
+  if(c.sub<=0) return {ok:false,falta:'Adicione produtos ao pedido.'};
+  const temCond=b.minimo>0||b.produtoReq;
+  let ok=!temCond||(b.minimo>0&&c.sub>=b.minimo)||(b.produtoReq&&c.nomes.includes(b.produtoReq)), falta='';
+  if(!ok){ const p=[]; if(b.minimo>0) p.push('faltam '+brl(b.minimo-c.sub)); if(b.produtoReq) p.push('adicione '+b.produtoReq); falta=p.join(' ou '); }
+  if(ok&&b.tipo==='frete'&&!(S.cfg.raioKm>0&&c.dist!=null&&c.dist<=S.cfg.raioKm)){ ok=false; falta='endereço fora do raio do frete grátis ('+(S.cfg.raioKm||'?')+' km)'; }
+  return {ok,falta};
+}
+function brindesDisp(){ return clienteTel?(S.carteira[clienteTel]||[]).filter(b=>b.status==='disponivel'&&agora()<=b.validade):[]; }
+function renderCardapio(){
+  const c=ctxPedido(), disp=brindesDisp();
+  if(brindeSel&&!disp.find(b=>b.id===brindeSel)) brindeSel=null;
+  if(!brindeSel&&disp.length) brindeSel=disp[0].id;
+  let g='';
+  if(!clienteTel) g='<div class="msg info">Entre com seu WhatsApp para ver seus brindes.</div>';
+  else if(!disp.length) g='<div class="msg info">Olá, '+fim4(clienteTel)+'! Nenhum brinde guardado agora.</div>';
+  else { g='<div class="gift"><b>🎁 Você tem '+(disp.length>1?disp.length+' brindes':'um brinde')+' para retirar!</b><span class="muted"> (1 por pedido)</span>';
+    disp.forEach(b=>{ const k=condOk(b,c);
+      g+='<label class="mt"><input type="radio" name="bsel" '+(brindeSel===b.id?'checked':'')+' onchange="brindeSel=\''+b.id+'\';renderCardapio()"><span><b>'+esc(b.nome)+'</b><br><span class="muted">Vale para '+esc(condicaoTxt(b))+' · até '+dataBR(b.validade)+'</span><br>'+
+        (k.ok?'<span style="color:var(--ok);font-weight:700">✅ Vai junto neste pedido!</span>':'<span style="color:var(--warn)">'+esc(k.falta)+'</span>')+'</span></label>'; });
+    g+='</div>'; }
+  $('giftBox').innerHTML=g;
+  $('menuBox').innerHTML=cardapio.map((x,i)=>'<div class="item"><span>'+esc(x.nome)+'<br><span class="muted">'+brl(x.preco)+'</span></span><span class="qty"><button onclick="mudaQtd('+i+',-1)">−</button><b>'+(carrinho[i]||0)+'</b><button onclick="mudaQtd('+i+',1)">+</button></span></div>').join('');
+  const b=disp.find(x=>x.id===brindeSel), ap=b&&condOk(b,c).ok?b:null;
+  const frete=c.dist!=null?freteTaxa(c.dist):null, freteCob=ap&&ap.tipo==='frete'?0:(frete||0);
+  let r=c.itens.map(x=>'<div class="tl"><span>'+x.qtd+'x '+esc(x.nome)+'</span><span>'+brl(x.preco*x.qtd)+'</span></div>').join('')||'<span class="muted">Carrinho vazio.</span>';
+  if(ap&&ap.tipo!=='frete') r+='<div class="gift" style="margin:6px 0"><div class="tl"><span>🎁 '+esc(ap.nome)+' <span class="muted">(brinde da raspadinha)</span></span><span>R$ 0,00</span></div></div>';
+  r+='<div class="mt"><div class="tl"><span>Subtotal</span><span>'+brl(c.sub)+'</span></div><div class="tl"><span>Frete ('+(c.dist??'?')+' km)</span><span>'+(frete==null?'informe a distância':(ap&&ap.tipo==='frete'?'<s>'+brl(frete)+'</s> <b style="color:var(--ok)">GRÁTIS 🎁</b>':brl(frete)))+'</span></div></div>';
+  r+='<div class="mt tl" style="font-size:17px"><b>Total</b><b>'+brl(c.sub+freteCob)+'</b></div>';
+  $('resumoBox').innerHTML=r;
+}
+// SERVIDOR (checkout) — [D09][D10] brinde R$ 0,00, condição revalidada, custo no marketing
+function finalizarPedido(){
+  if(!clienteTel) return show('cardMsg','err','Entre com seu WhatsApp primeiro.');
+  const c=ctxPedido(); if(!c.itens.length) return show('cardMsg','err','Adicione produtos ao pedido.');
+  if(c.dist==null) return show('cardMsg','err','Informe a distância do endereço.');
+  const disp=brindesDisp(), b=disp.find(x=>x.id===brindeSel), ap=b&&condOk(b,c).ok?b:null;   // condição checada de novo no "servidor"
+  const numero='#'+(++S.seqPedido), frete=freteTaxa(c.dist);
+  if(ap){ ap.status='usado'; ap.pedido=numero; ap.custoReal=ap.tipo==='frete'?frete:ap.custo;
+    const p=S.participacoes[ap.token]; if(p) p.status='brinde usado';
+    audit('Pedido '+numero+': brinde '+ap.nome+' aplicado (R$ 0,00 no pedido; custo '+brl(ap.custoReal)+' lançado no marketing'+(ap.tipo==='frete'?'':'; baixa no estoque')+')');
+    msgLoja('🧾 Pedido '+numero+' com brinde da raspadinha: '+ap.nome+'. Conferir na entrega!'); checarTeto(); }
+  const r=criarParticipacao('Próprio',numero,clienteTel,c.dist,agora(),numero);
+  const t={tipo:'proprio',numero,canal:'Próprio',cliente:clienteTel,itens:c.itens,frete,dist:c.dist,brinde:ap?{nome:ap.nome,tipo:ap.tipo}:null,
+    total:c.sub+(ap&&ap.tipo==='frete'?0:frete),pagamento:'Pix (pago)',quando:agora(),token:r.token||null,semQr:r.motivo||null};
+  carrinho={}; brindeSel=null;
+  mostrarTicket(t,'Pedido próprio '+numero);
+  show('cardMsg','ok','Pedido '+numero+' confirmado!'+(ap?' Brinde incluído. 🎁':'')+' <button class="btn alt sm" onclick="irView(\'loja\',\'pedidos\')">Ver o cupom na loja</button>');
+  render();
+}
+
+// ================= Painel =================
+// [D17] único parâmetro de regra que sobrou: limite por dia.
+function setRegra(k,v){ S.regras={...S.regras,[k]:v,versao:S.regras.versao+1}; audit('Regra "'+k+'" = '+v+' → regras v'+S.regras.versao); render(); }
+function addPremio(){
+  const n=$('novoPremio').value.trim(); if(!n) return;
+  S.premios.push({id:S.nextId++,nome:n,tipo:'produto',estoque:20,custo:3,ativo:true,minimo:0,produtoReq:''});
+  $('novoPremio').value=''; audit('Brinde criado: '+n); render();
+}
+function editPremio(id,k,v){
+  const p=S.premios.find(x=>x.id===id);
+  if(k==='ativo') p.ativo=v; else if(k==='estoque') p.estoque=v===''?null:Math.max(0,+v); else if(k==='produtoReq') p.produtoReq=v; else p[k]=Math.max(0,+v||0);
+  if(k!=='estoque') S.regras.versao++;                                // brindes já escolhidos não mudam
+  audit('Brinde "'+p.nome+'": '+k+' = '+(v===''?'vazio':v)+(k!=='estoque'?' → configuração v'+S.regras.versao:'')); render();
+}
+function resetar(){
+  if(!confirm('Apagar todos os pedidos, brindes e configurações de teste deste aparelho?')) return;
+  try{ localStorage.removeItem(CHAVE); }catch(e){}
+  S=estadoInicial(); clienteTel=null; carrinho={}; $('tkCard').style.display='none'; $('pedMsg').innerHTML=''; $('raspaArea').innerHTML='';
+  initForm(); audit('Dados de teste apagados'); render();
+}
+function render(){
+  const ps=Object.values(S.participacoes), rasp=ps.filter(p=>p.raspadoEm), conc=ps.filter(p=>p.premio);
+  const cont={}; conc.forEach(p=>cont[p.premio.nome]=(cont[p.premio.nome]||0)+1);
+  const top=Object.entries(cont).sort((a,b)=>b[1]-a[1])[0];
+  const usados=Object.values(S.carteira).flat().filter(b=>b.status==='usado'), g=gastos();
+  const pct=(a,b)=>b?Math.round(a/b*100)+'%':'—';
+  $('kpis').innerHTML=[
+    ['QR gerados',ps.length],['Raspados',rasp.length+' <small class="muted">'+pct(rasp.length,ps.length)+'</small>'],
+    ['Brindes escolhidos',conc.length],['Usados em pedidos',usados.length+' <small class="muted">'+pct(usados.length,conc.length)+'</small>'],
+    ['Gasto realizado',brl(g.real)],['Mais escolhido',top?esc(top[0])+' <small class="muted">'+top[1]+'x</small>':'—']
+  ].map(k=>'<div class="kpi"><span class="muted">'+k[0]+'</span><b>'+k[1]+'</b></div>').join('');
+  const t=S.cfg.teto||0, pr=t?Math.min(100,g.real/t*100):0, pc=t?Math.min(100-pr,g.comp/t*100):0;
+  $('tetoBar').innerHTML='<span style="width:'+pr+'%;background:'+(pr>=S.cfg.alerta?'var(--err)':'var(--brand2)')+'"></span><span style="width:'+pc+'%;background:var(--gold);opacity:.6"></span>';
+  $('tetoTxt').innerHTML='Realizado (brindes usados): <b>'+brl(g.real)+'</b> · Comprometido (guardados nas contas): <b>'+brl(g.comp)+'</b> · Teto: <b>'+brl(t)+'</b>';
+  $('canaisBox').innerHTML=CANAIS.map(c=>'<div class="tg"><span>'+c+(c==='Próprio'?' <span class="muted">(QR automático)</span>':' <span class="muted">(QR avulso)</span>')+'</span><input type="checkbox" class="sw" '+(S.cfg.canais[c]?'checked':'')+' onchange="S.cfg.canais[\''+c+'\']=this.checked;audit(\'Canal '+c+': \'+(this.checked?\'ligado\':\'desligado\'))"></div>').join('');
+  $('freteMsg').innerHTML=S.cfg.freteAtivo&&!(S.cfg.raioKm>0)?'<div class="msg warn">Defina o raio: sem ele, o frete grátis nunca pode ser escolhido.</div>':S.cfg.freteAtivo&&!S.cfg.canais['Próprio']?'<div class="msg warn">O canal Próprio está desligado, então o frete grátis nunca pode ser escolhido.</div>':'';
+  $('diasBox').innerHTML=DIAS.map((d,i)=>'<label><input type="checkbox" '+(S.cfg.pausaDias[i]?'checked':'')+' onchange="S.cfg.pausaDias['+i+']=this.checked;audit(\'Pausa '+d+': \'+this.checked)"> '+d+'</label>').join('');
+  const linhas=S.premios;
+  const opts=v=>'<option value="">—</option>'+cardapio.map(c=>'<option'+(c.nome===v?' selected':'')+'>'+esc(c.nome)+'</option>').join('');
+  $('tbPremios').innerHTML=linhas.map(p=>{ const n=p.id===0, f=p.tipo==='frete';
+    return '<tr><td><input type="checkbox" '+(p.ativo?'checked':'')+(n?' disabled':'')+' onchange="editPremio('+p.id+',\'ativo\',this.checked)"></td>'+
+    '<td>'+esc(p.nome)+(f?' <span class="tag">só próprio · raio</span>':'')+(p.estoque===0?' <span class="tag">esgotado</span>':'')+'</td>'+
+    '<td>'+(n||f?'—':'<input type="number" min="0" placeholder="∞" value="'+(p.estoque??'')+'" onchange="editPremio('+p.id+',\'estoque\',this.value)">')+'</td>'+
+    '<td>'+(n?'—':'<input type="number" min="0" step="0.5" value="'+p.custo+'" onchange="editPremio('+p.id+',\'custo\',this.value)">')+'</td>'+
+    '<td>'+(n?'—':'<input type="number" min="0" step="1" value="'+(p.minimo||'')+'" placeholder="—" onchange="editPremio('+p.id+',\'minimo\',this.value)">')+'</td>'+
+    '<td>'+(n?'—':'<select onchange="editPremio('+p.id+',\'produtoReq\',this.value)">'+opts(p.produtoReq)+'</select>')+'</td></tr>'; }).join('');
+  // [D01] Sem pesos: o painel só confere se há opções para o cliente escolher.
+  const disp=linhas.filter(p=>p.ativo&&p.tipo!=='frete'&&(p.estoque===null||p.estoque>0));
+  $('probMsg').innerHTML=!disp.length?'<div class="msg err">Nenhum brinde de produto disponível: clientes de marketplace não terão o que escolher. Não deixe a campanha ligada assim.</div>'
+    :'<div class="msg ok">'+disp.length+' brinde(s) de produto disponível(is) para escolha'+(S.cfg.freteAtivo?', mais o frete grátis nos pedidos próprios dentro do raio':'')+'.</div>';
+  $('tbHist').innerHTML=ps.slice().reverse().map(p=>'<tr><td>'+esc(p.pedido)+'</td><td>'+esc(p.canal)+'</td><td>'+(p.premio?esc(p.premio.nome)+' <span class="tag">v'+p.regrasVersao+'</span>':'—')+'</td><td>'+esc(p.status)+'</td><td>'+(p.cliente?fim4(p.cliente):'não identificado')+'</td></tr>').join('')||'<tr><td colspan="5" class="muted">Nenhuma participação ainda.</td></tr>';
+  $('rVersao').textContent='v'+S.regras.versao;
+  $('relogio').textContent=new Date(agora()).toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'2-digit',year:'numeric'});
+  renderCardapio(); renderWhats(); renderQrList(); renderLog(); salvar();
+}
+function waFmt(t){ return esc(t).replace(/\*([^*\n]+)\*/g,'<b>$1</b>').replace(/_([^_\n]+)_/g,'<i>$1</i>').replace(/\n/g,'<br>'); }
+function renderWhats(){
+  const cli=S.msgs.filter(m=>m.para==='cliente').slice().reverse(), lj=S.msgs.filter(m=>m.para==='loja').slice().reverse();
+  $('waCli').innerHTML=cli.map(m=>'<div class="bub c"><small>Para '+fim4(m.tel)+' · '+dataHora(m.quando)+'</small>'+waFmt(m.texto)+'</div>').join('')||'<span class="muted">Nenhuma mensagem.</span>';
+  $('waLoja').innerHTML=lj.map(m=>'<div class="bub"><small>'+dataHora(m.quando)+'</small>'+waFmt(m.texto)+'</div>').join('')||'<span class="muted">Nenhuma mensagem.</span>';
+}
+function previewLembrete(){ $('lPrev').innerHTML=waFmt(aplicarTemplate(S.cfg.lembrete.texto,{nome:'Mousse de maracujá',tipo:'produto',minimo:35,produtoReq:'',validade:addDias(2)})); }
+function renderLog(){ $('log').innerHTML=S.logs.map(l=>'<div>'+esc(l)+'</div>').join('')||'<div class="muted">Sem eventos.</div>'; }
+
+// ================= navegação =================
+function show(id,tipo,t){ $(id).innerHTML='<div class="msg '+tipo+'">'+t+'</div>'; }
+function irView(v,t){
+  S.ui.view=v; t=t||(v==='loja'?'pedidos':'raspa'); S.ui.tab=t;
+  document.querySelectorAll('.views button').forEach(b=>b.classList.toggle('on',b.dataset.v===v));
+  $('navLoja').style.display=v==='loja'?'':'none'; $('navCliente').style.display=v==='cliente'?'':'none';
+  document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.t===t));
+  document.querySelectorAll('section').forEach(s=>s.classList.toggle('on',s.id===t));
+  if(t==='raspa') renderQrList();
+  if(t==='impressora') desenharTeste();
+  salvar(); window.scrollTo(0,0);
+}
+document.querySelectorAll('.views button').forEach(b=>b.onclick=()=>irView(b.dataset.v));
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>irView(S.ui.view,b.dataset.t));
+function initForm(){
+  const c=S.cfg;
+  $('pData').value=localISO(new Date());
+  $('cNome').value=c.nome; $('cAtiva').checked=c.ativa;
+  $('cValQr').value=c.validadeQr; $('cValPr').value=c.validadePremio;
+  $('fAtivo').checked=c.freteAtivo; $('fRaio').value=c.raioKm??'';
+  $('pzIni').value=c.pausaIni; $('pzFim').value=c.pausaFim;
+  $('cTeto').value=c.teto; $('cAlerta').value=c.alerta;
+  $('rDia').value=S.regras.limiteDia;
+  $('lAtivo').checked=c.lembrete.ativo; $('lDias').value=c.lembrete.diasAntes; $('lMax').value=c.lembrete.max; $('lTexto').value=c.lembrete.texto;
+  $('imNome').value=c.imp.nome; $('imMetodo').value=c.imp.metodo; $('imCorte').checked=c.imp.corte; $('imLoja').value=c.imp.loja; $('imSite').value=c.imp.site; $('imBase').value=c.imp.base;
+  previewLembrete(); desenharTeste(); $('testBar').innerHTML=printBar('testCv');
+}
+initForm();
+if(!S.logs.length) audit('Campanha "'+S.cfg.nome+'" carregada (regras v1)');
+render();
+if(S.ticket) mostrarTicket(S.ticket,S.ticket.titulo||'Último cupom');
+irView(S.ui.view||'loja',S.ui.tab);
+</script>
+</body>
+</html>
