@@ -130,6 +130,27 @@ body.cli main{padding-bottom:110px}
 #toast.on{opacity:1;transform:translate(-50%,0)}
 body.cli #toast{bottom:96px}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;animation:none!important;scroll-behavior:auto!important}}
+/* ===== operação: vender, clientes, produtos ===== */
+.lbl{display:block;font-size:13px;color:var(--muted);margin:10px 0 4px}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{border:1px solid var(--line);background:var(--card);color:var(--text);border-radius:20px;padding:8px 12px;font-size:13px;font-weight:600;cursor:pointer;min-height:40px;font-family:inherit}
+.chip.on{background:var(--brand);border-color:var(--brand);color:#fff} .chip.on .muted{color:#fffc}
+#subLoja{position:static;background:var(--bg);border-bottom:0;padding:8px 16px 0;flex-wrap:wrap}
+#navLoja{display:grid;grid-template-columns:repeat(5,1fr);gap:4px;padding:8px}
+#navLoja button{display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 2px;font-size:12px;border-radius:12px;min-height:54px}
+#navLoja button .ic{font-size:20px;line-height:1}
+.prow input:not(.sw){min-width:0;width:100%}
+.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px}
+.tile{position:relative;display:flex;flex-direction:column;gap:4px;text-align:left;border:2px solid var(--line);background:var(--card);color:var(--text);border-radius:12px;padding:10px;min-height:72px;cursor:pointer;font-family:inherit;font-size:14px;transition:transform .08s}
+.tile:active{transform:scale(.96)} .tile.on{border-color:var(--brand);background:#E62B1E0d}
+.tile .qn{position:absolute;top:-8px;right:-8px;background:var(--brand);color:#fff;border-radius:12px;min-width:26px;height:26px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;padding:0 6px}
+.cli-row{display:flex;justify-content:space-between;gap:8px;align-items:center;width:100%;text-align:left;border:0;border-bottom:1px solid var(--line);background:transparent;color:var(--text);padding:10px 2px;cursor:pointer;font:inherit;min-height:56px}
+.cli-row:last-child{border-bottom:0}
+.prog{height:10px;border-radius:5px;background:var(--bg);border:1px solid var(--line);overflow:hidden} .prog span{display:block;height:100%;background:linear-gradient(90deg,var(--brand2),var(--gold))}
+.prow{display:grid;grid-template-columns:1fr 96px 48px;gap:6px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
+.prow.off>input:not(.sw){opacity:.55}
+.faq{border-bottom:1px solid var(--line);padding:4px 0} .faq summary{cursor:pointer;font-weight:700;padding:10px 0;min-height:24px} .faq[open] summary{color:var(--brand)}
+summary.btn{list-style:none} summary.btn::-webkit-details-marker{display:none}
 #printArea{display:none}
 @media print{
   @page{size:58mm auto;margin:0}
@@ -149,14 +170,14 @@ body.cli #toast{bottom:96px}
     <button data-v="cliente">📱 Cliente</button>
   </div>
 </header>
-<nav id="navLoja">
-  <button data-t="pedidos" class="on">Pedidos e QR</button>
-  <button data-t="painel">Painel</button>
-  <button data-t="lwhats">WhatsApp</button>
-  <button data-t="linsta">Instagram</button>
-  <button data-t="impressora">Impressora</button>
-  <button data-t="legal">Antes de lançar</button>
+<nav id="navLoja" aria-label="Navegação da loja">
+  <button data-g="vender"><span class="ic" aria-hidden="true">🧾</span>Vender</button>
+  <button data-g="clientes"><span class="ic" aria-hidden="true">👥</span>Clientes</button>
+  <button data-g="produtos"><span class="ic" aria-hidden="true">🍟</span>Produtos</button>
+  <button data-g="campanhas"><span class="ic" aria-hidden="true">🎁</span>Campanhas</button>
+  <button data-g="mais"><span class="ic" aria-hidden="true">⚙️</span>Mais</button>
 </nav>
+<nav id="subLoja" aria-label="Seções"></nav>
 <nav id="navCliente" style="display:none" aria-label="Navegação do cliente">
   <button data-t="raspa"><span class="ic" aria-hidden="true">🎟️</span>Raspadinha</button>
   <button data-t="cardapio"><span class="ic" aria-hidden="true">🍟</span>Cardápio</button>
@@ -165,8 +186,163 @@ body.cli #toast{bottom:96px}
 </nav>
 <main>
 
+<!-- ===================== LOJA: operação do dia a dia [D32–D35] ===================== -->
+<section id="venda">
+  <div class="card">
+    <h2>Lançar venda</h2>
+    <p class="muted" id="vResumoDia" style="margin-top:0"></p>
+    <div id="vAvisoBackup"></div>
+    <label class="lbl" for="vTel">Cliente: WhatsApp ou nome</label>
+    <input id="vTel" list="vTelList" autocomplete="off" placeholder="Ex.: 11 99999-0001 ou Maria" style="width:100%" oninput="vCliente()">
+    <datalist id="vTelList"></datalist>
+    <div id="vCliInfo"></div>
+    <h3>Produtos <span class="muted">(toque para somar)</span></h3>
+    <div class="tiles" id="vTiles"></div>
+    <div id="vItens"></div>
+    <h3>Por onde comprou</h3>
+    <div class="chips" id="vCanais"></div>
+    <details class="mt"><summary class="muted">Mais detalhes (data, pagamento, observação)</summary>
+      <div class="row mt"><span class="muted">Data e hora:</span><input id="vData" type="datetime-local"><span class="muted">vazio = agora</span></div>
+      <div class="row mt"><span class="muted">Pagamento:</span><select id="vPag"><option value="">—</option><option>Pix</option><option>Dinheiro</option><option>Cartão</option><option>Pago no app</option></select></div>
+      <input id="vObs" class="mt" placeholder="Observação (opcional)" style="width:100%">
+    </details>
+    <label class="muted mt" style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="vQr"> Imprimir cupom com raspadinha</label>
+    <button class="btn full mt" onclick="lancarVenda()">Salvar venda</button>
+    <div id="vMsg"></div>
+  </div>
+</section>
+
+<section id="clientes">
+  <div class="card" id="cliListaCard">
+    <h2>Clientes <span class="tag" id="cliCount"></span></h2>
+    <input id="cliBusca" type="search" placeholder="🔎 Buscar por nome ou WhatsApp" oninput="renderClientes()" style="width:100%">
+    <div class="chips mt" id="cliFiltros"></div>
+    <div class="row mt"><span class="muted">Ordenar:</span><select id="cliOrdem" onchange="cliOrdem=this.value;renderClientes()"><option value="recentes">Compraram por último</option><option value="compras">Quem mais gasta</option><option value="pedidos">Mais pedidos</option><option value="nome">Nome (A-Z)</option></select></div>
+    <div id="cliLista" class="mt"></div>
+    <details class="mt" id="cliNovoBox"><summary class="btn alt full">+ Cadastrar cliente</summary>
+      <div class="row mt"><input id="ncTel" inputmode="tel" placeholder="WhatsApp com DDD" style="flex:1;min-width:150px"><input id="ncNome" placeholder="Nome" style="flex:1;min-width:150px"></div>
+      <button class="btn full mt" onclick="novoCliente()">Salvar cliente</button><div id="ncMsg"></div>
+    </details>
+  </div>
+  <div class="card" id="cliFicha" style="display:none"></div>
+  <div class="card">
+    <h2>⭐ Brinde de fidelidade</h2>
+    <div class="tg"><span>Dar brinde automático por meta</span><input type="checkbox" class="sw" id="fidAtivo" onchange="setFid('ativo',this.checked)"></div>
+    <div class="row mt"><span class="muted">A cada</span><input type="number" min="1" id="fidMeta" style="width:80px" onchange="setFid('meta',Math.max(1,+this.value||1))">
+      <select id="fidTipo" onchange="setFid('tipo',this.value)"><option value="pedidos">pedidos</option><option value="valor">reais em produtos</option></select></div>
+    <div class="row mt"><span class="muted">o cliente ganha:</span><select id="fidPremio" onchange="setFid('premioId',+this.value)"></select></div>
+    <p class="muted">Conta a partir do último brinde de fidelidade. É uma meta fixa, sem sorte [D01][D32]: todo mundo que chega lá ganha. O brinde vai para a conta do cliente e ele é avisado no WhatsApp.</p>
+    <h3>Perto de ganhar</h3>
+    <div id="fidPerto"></div>
+  </div>
+</section>
+
+<section id="produtos">
+  <div class="card">
+    <h2>Novo produto</h2>
+    <div class="row"><input id="npNome" placeholder="Nome (ex.: Batata de calabresa)" style="flex:2;min-width:180px">
+      <input id="npPreco" inputmode="decimal" placeholder="Preço (ex.: 34,90)" style="flex:1;min-width:110px">
+      <input id="npCat" list="catList" placeholder="Categoria (ex.: Batatas)" style="flex:1;min-width:120px"></div>
+    <datalist id="catList"></datalist>
+    <button class="btn full mt" onclick="addProduto()">Adicionar produto</button>
+    <div id="npMsg"></div>
+  </div>
+  <div class="card">
+    <h2>Produtos <span class="tag" id="prodCount"></span></h2>
+    <input id="prodBusca" type="search" placeholder="🔎 Buscar produto" oninput="renderProdutos()" style="width:100%">
+    <div id="prodLista" class="mt"></div>
+    <p class="muted">Para mudar, é só tocar no nome, no preço ou na categoria e digitar: salva sozinho. Produto que saiu do cardápio: <b>desligue</b> em vez de apagar, assim o histórico das vendas continua certo [D35].</p>
+  </div>
+</section>
+
+<section id="dados">
+  <div class="card">
+    <h2>📥 Trazer da planilha do Google</h2>
+    <ol>
+      <li>Na planilha, selecione as linhas <b>junto com a primeira linha</b> (a dos títulos).</li>
+      <li>Copie (Ctrl+C, ou segure e toque em Copiar no celular).</li>
+      <li>Escolha o que é, cole abaixo e toque em <b>Conferir</b>. Nada é gravado antes de você confirmar.</li>
+    </ol>
+    <div class="row"><span class="muted">Isto é:</span><select id="impTipo"><option value="clientes">Clientes</option><option value="produtos">Produtos</option><option value="vendas">Vendas</option></select></div>
+    <textarea id="impTxt" class="mt" placeholder="Cole aqui as linhas da planilha"></textarea>
+    <div class="row mt"><label class="btn alt sm">Ou escolher arquivo .csv<input type="file" accept=".csv,.tsv,.txt" style="display:none" onchange="impArquivo(this)"></label></div>
+    <button class="btn full mt" onclick="importar()">Conferir</button>
+    <div id="impMsg"></div>
+    <details class="mt"><summary class="muted">Quais títulos de coluna eu uso?</summary>
+      <p class="muted"><b>Clientes:</b> nome · whatsapp · aniversario · bairro · obs<br>
+      <b>Produtos:</b> nome · preco · categoria · ativo<br>
+      <b>Vendas</b> (uma linha por produto vendido): data · whatsapp · nome · produto · quantidade · preco · canal<br>
+      Acentos e maiúsculas não importam ("Preço" ou "preco"). "Telefone" e "celular" também valem como WhatsApp.</p>
+    </details>
+  </div>
+  <div class="card">
+    <h2>📤 Levar para a planilha</h2>
+    <p class="muted">Baixa um arquivo .csv. No Google Sheets: <b>Arquivo → Importar → Fazer upload</b>.</p>
+    <div class="pbar" style="grid-template-columns:repeat(3,1fr)">
+      <button class="btn alt sm" onclick="exportar('clientes')">Clientes</button>
+      <button class="btn alt sm" onclick="exportar('produtos')">Produtos</button>
+      <button class="btn alt sm" onclick="exportar('vendas')">Vendas</button>
+    </div>
+  </div>
+  <div class="card">
+    <h2>💾 Cópia de segurança</h2>
+    <p class="muted">Os dados ficam guardados <b>neste aparelho</b>. Se trocar de celular ou limpar o navegador, eles somem. Baixe uma cópia <b>toda semana</b> e guarde no Google Drive.</p>
+    <p id="bkUltimo"></p>
+    <button class="btn full" onclick="backupBaixar()">Baixar cópia de segurança</button>
+    <label class="btn alt full mt">Restaurar de uma cópia<input type="file" accept=".json" style="display:none" onchange="backupRestaurar(this)"></label>
+    <div id="bkMsg"></div>
+  </div>
+</section>
+
+<section id="ajuda">
+  <div class="card">
+    <h2>❓ Manual rápido</h2>
+    <p class="muted">Toque numa pergunta para ver o passo a passo.</p>
+    <details class="faq" open><summary>Como lanço uma venda?</summary><ol>
+      <li>Toque em <b>🧾 Vender</b>.</li>
+      <li>Digite o <b>WhatsApp</b> do cliente (ou comece a digitar o nome e escolha na lista). Cliente novo: o sistema pede o nome.</li>
+      <li>Toque nos <b>produtos</b>. Cada toque soma 1. Errou? Use o <b>−</b> na lista abaixo.</li>
+      <li>Escolha <b>por onde comprou</b> (balcão, WhatsApp, iFood...).</li>
+      <li>Toque em <b>Salvar venda</b>. Pronto: o histórico do cliente e o brinde de fidelidade se atualizam sozinhos.</li></ol>
+      <p class="muted">Venda de outro dia? Abra "Mais detalhes" e mude a data.</p></details>
+    <details class="faq"><summary>Como cadastro ou corrijo um cliente?</summary><ol>
+      <li>Toque em <b>👥 Clientes</b>.</li>
+      <li>Para um novo: <b>+ Cadastrar cliente</b>, informe WhatsApp e nome e salve. (Ao lançar uma venda para um número novo, ele também é cadastrado.)</li>
+      <li>Para corrigir: busque pelo nome ou número, toque nele, mude o campo. Salva sozinho.</li></ol></details>
+    <details class="faq"><summary>Como vejo o que um cliente mais compra?</summary><ol>
+      <li>Em <b>👥 Clientes</b>, toque no cliente.</li>
+      <li>A ficha mostra: quantos pedidos, quanto já gastou, de quantos em quantos dias compra, <b>os produtos que ele mais compra</b> e todas as compras.</li></ol>
+      <p class="muted">Use os filtros: <b>⭐ Frequentes</b> (3+ pedidos em 30 dias), <b>🎯 Perto do brinde</b>, <b>💤 Sumidos</b> (30+ dias sem comprar, bom para mandar um oi) e <b>🎂 Aniversário no mês</b>.</p></details>
+    <details class="faq"><summary>Como funciona o brinde de fidelidade?</summary><ol>
+      <li>Em <b>👥 Clientes</b>, no cartão <b>⭐ Brinde de fidelidade</b>, escolha a meta: "a cada 5 pedidos" ou "a cada R$ 200 em produtos", e qual brinde ele ganha.</li>
+      <li>Quando o cliente chega na meta, o sistema guarda o brinde na conta dele e avisa no WhatsApp. Você não precisa fazer nada.</li>
+      <li>Quer dar um presente fora da meta? Abra a ficha do cliente e use <b>🎁 Dar brinde agora</b>.</li></ol></details>
+    <details class="faq"><summary>Como cadastro um produto ou mudo o preço?</summary><ol>
+      <li>Toque em <b>🍟 Produtos</b>.</li>
+      <li>Novo: preencha nome, preço e categoria e toque em <b>Adicionar</b>.</li>
+      <li>Mudar preço ou nome: toque no campo e digite. Salva sozinho.</li>
+      <li>Saiu do cardápio: <b>desligue a chave</b> (não apague).</li></ol></details>
+    <details class="faq"><summary>Tenho tudo numa planilha do Google. Como trago?</summary><ol>
+      <li>Toque em <b>⚙️ Mais → Planilha e backup</b>.</li>
+      <li>Na planilha, selecione as linhas com os títulos, copie, cole no campo e toque em <b>Conferir</b>.</li>
+      <li>Confira o resumo (quantos novos, quantos atualizados, linhas com problema) e toque em <b>Importar</b>.</li></ol>
+      <p class="muted">Pode importar de novo depois: quem já existe é atualizado, não duplicado.</p></details>
+    <details class="faq"><summary>Como faço a cópia de segurança?</summary><ol>
+      <li><b>⚙️ Mais → Planilha e backup → Baixar cópia de segurança</b>.</li>
+      <li>Guarde o arquivo no Google Drive. Faça <b>toda semana</b>. O sistema avisa quando passar de 7 dias.</li>
+      <li>Para voltar: <b>Restaurar de uma cópia</b> e escolha o arquivo.</li></ol></details>
+    <details class="faq"><summary>E a raspadinha e o Poste e ganhe?</summary>
+      <p>Ficam em <b>🎁 Campanhas</b>. O <b>Painel</b> mostra "Pronto para lançar?", com o que falta. Em <b>Pedidos e QR</b> você imprime o QR de pedidos de outros apps. Em <b>Instagram</b> está o Poste e ganhe.</p></details>
+    <details class="faq"><summary>Deu algo errado</summary><ul>
+      <li><b>Sumiram os dados:</b> restaure a última cópia de segurança.</li>
+      <li><b>Não acho o cliente:</b> busque só pelos últimos números do WhatsApp.</li>
+      <li><b>Não imprime:</b> veja <b>⚙️ Mais → Impressora</b>.</li>
+      <li><b>Lancei errado:</b> abra a ficha do cliente e toque em <b>Apagar</b> na venda.</li></ul></details>
+  </div>
+</section>
+
 <!-- ===================== LOJA ===================== -->
-<section id="pedidos" class="on">
+<section id="pedidos">
   <div class="card">
     <h2>Gerar QR avulso <span class="tag">sem integração</span></h2>
     <p class="muted">Pedidos do iFood, Keeta, 99Food, WhatsApp ou Instagram. Digite o código do pedido e imprima só o QR. O mesmo pedido nunca gera dois QR.</p>
@@ -610,6 +786,16 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
    [D30] Por padrão, só pedidos do cardápio próprio participam (contratos dos marketplaces).
    [D31] Sistema real: WhatsApp pela API OFICIAL (Business Platform). Lembretes fora da janela de 24 h
          só com modelo aprovado e opt-in. API não oficial = risco de banimento do número.
+
+   Operação do dia a dia, definido em 26/10/2026 (o foco é ser fácil, não escalar):
+   [D32] Fidelidade por META FIXA: a cada N pedidos ou R$ X em produtos, o cliente ganha o brinde que a
+         loja escolheu. Sem sorte [D01]. Conta a partir do último brinde de fidelidade. Histórico importado
+         conta, mas o brinde só sai numa venda nova (importar não dispara brindes em massa).
+   [D33] A loja pode dar brinde de cortesia a qualquer cliente. Fica na auditoria e no custo de marketing.
+   [D34] Cadastro do cliente: só nome e WhatsApp; aniversário, bairro e observação são opcionais (LGPD:
+         o mínimo necessário). "Excluir cadastro" apaga os dados pessoais e deixa as vendas anônimas.
+   [D35] A planilha do Google entra por copiar/colar ou CSV, sempre com conferência antes de gravar, e sai
+         por CSV. Cópia de segurança em arquivo, com aviso a cada 7 dias. Produto não se apaga: se desliga.
    ===================================================================================== */
 // ================= base =================
 const W=384, DIA=864e5, CHAVE='saasdelivery_raspadinha_v2';   // v2 = mecânica de escolha [D01]; dados da v1 (sorteio) são ignorados
@@ -617,9 +803,10 @@ const DIAS=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
 const CANAIS=['Próprio','iFood','Keeta','99Food','WhatsApp','Instagram'];
 const WA_LOJA='5511940426722';
 const FRETE_BASE=5, FRETE_KM=1.5;
-const cardapio=[
-  {nome:'Batata recheada de frango',preco:32.9},{nome:'Batata recheada de costela',preco:36.9},
-  {nome:'Sopa de mandioquinha',preco:24.9},{nome:'Refrigerante lata',preco:6},{nome:'Mousse de maracujá',preco:9.9}];
+const CARDAPIO_INICIAL=[   // [D35] só o ponto de partida: os produtos ficam em S.produtos e são editados na aba Produtos
+  {nome:'Batata recheada de frango',preco:32.9,categoria:'Batatas'},{nome:'Batata recheada de costela',preco:36.9,categoria:'Batatas'},
+  {nome:'Sopa de mandioquinha',preco:24.9,categoria:'Sopas'},{nome:'Refrigerante lata',preco:6,categoria:'Bebidas'},{nome:'Mousse de maracujá',preco:9.9,categoria:'Sobremesas'}];
+const produtosIniciais=()=>CARDAPIO_INICIAL.map((c,i)=>({id:i+1,...c,ativo:true}));
 const $=id=>document.getElementById(id);
 const brl=v=>'R$ '+(+v).toFixed(2).replace('.',',');
 const num=v=>(+v).toFixed(2).replace('.',',');
@@ -647,6 +834,7 @@ function estadoInicial(){
         faixas:[{min:1000,pct:2},{min:5000,pct:3}], maxPct:20, maxReais:15, minimo:30, validade:15,
         janelaPedidoDias:7, intervaloDias:7, hashtag:'#publi', acumula:true, marketplace:false,   // [D30]
         moldura:true, molduraTexto:'Ganhei desconto da @{perfil} por este post #publi' },        // [D29]
+      fid:{ ativo:true, tipo:'pedidos', meta:5, premioId:2 },          // [D32] meta fixa, sem sorte
       imp:{ nome:'BlueTooth Printer', metodo:'rawbt', corte:true, loja:'RECHEADINHA', site:'recheadinha.delivery', base:'https://recheadinha.delivery/r/' } },
     regras:{versao:1, limiteDia:2},   // [D17] limite diário; [D18] sem regras de repetição; versao = versão da configuração
     premios:[
@@ -655,19 +843,20 @@ function estadoInicial(){
       {id:3,nome:'Refrigerante lata',tipo:'produto',estoque:60,custo:3,ativo:true,minimo:0,produtoReq:'Batata recheada de costela'},
       // [D01] brindes NÃO têm peso/probabilidade: o cliente escolhe. [D10] minimo OU produtoReq.
       {id:4,nome:'Frete grátis',tipo:'frete',estoque:null,custo:8,ativo:true,minimo:40,produtoReq:''}],
-    participacoes:{}, historico:{}, carteira:{}, qrPorPedido:{}, pedidosProprios:{}, msgs:[], logs:[],
+    participacoes:{}, historico:{}, carteira:{}, qrPorPedido:{}, pedidosProprios:{}, msgs:[], logs:[],   // pedidosProprios = todas as vendas com cliente identificado
+    produtos:produtosIniciais(), nextProd:CARDAPIO_INICIAL.length+1, clientes:{},                     // [D34][D35]
     insta:{contas:{}, parts:{}, pendentes:[], eventos:[], mundo:{}, midias:{}, janela:{}},   // [D20–D27]
     seqPedido:1040, nextId:5, alertasTeto:{}, offsetDias:0, ticket:null,
-    ui:{view:'loja', tab:'pedidos'} };
+    ui:{view:'loja', tab:'venda'} };
 }
 function carregar(){ try{ const j=localStorage.getItem(CHAVE); if(j){ const o=JSON.parse(j); if(o&&o.v===2) return migrar(o); } }catch(e){} return null; }
 function migrar(o){ const b=estadoInicial(); o.cfg.insta||=b.cfg.insta; o.insta||=b.insta; o.pedidosProprios||={};
   if(o.cfg.insta.acoes.seguir) o.cfg.insta.acoes=b.cfg.insta.acoes;            // [D23] versão antiga pagava por seguir
   for(const k in b.cfg.insta) if(!(k in o.cfg.insta)) o.cfg.insta[k]=b.cfg.insta[k];
-  o.insta.janela||={}; return o; }   // dados salvos antes do Poste e ganhe
+  o.insta.janela||={}; o.produtos||=b.produtos; o.nextProd||=b.nextProd; o.clientes||={}; o.cfg.fid||=b.cfg.fid; return o; }   // dados salvos antes do Poste e ganhe
 function salvar(){ try{ localStorage.setItem(CHAVE,JSON.stringify(S)); }catch(e){} }
 let S=carregar()||estadoInicial();
-let clienteTel=null, carrinho={}, brindeSel=null, bleDev=null;
+let clienteTel=null, carrinho={}, brindeSel=null, bleDev=null, cardapio=[];
 
 function audit(t){ S.logs.unshift(dataHora(agora())+' · '+t); if(S.logs.length>300) S.logs.length=300; renderLog(); salvar(); }
 function msgCliente(tel,texto){ S.msgs.push({para:'cliente',tel,texto,quando:agora()}); renderWhats(); salvar(); }
@@ -842,7 +1031,8 @@ function gerarProprio(){
   const itens=[{nome:'Batata recheada de costela',preco:36.9,qtd:1},{nome:'Sopa de mandioquinha',preco:24.9,qtd:1}];
   const frete=dist!=null?freteTaxa(dist):null, sub=61.8;
   const r=criarParticipacao('Próprio',numero,tel,dist,ms,numero);
-  S.pedidosProprios[numero]={tel,quando:ms};                          // [D21] pedido que dá direito ao Poste e ganhe
+  S.pedidosProprios[numero]={numero,tel,quando:ms,itens:itens.map(i=>({nome:i.nome,preco:i.preco,qtd:i.qtd})),sub,total:sub+(frete||0),canal:'Cardápio'};   // [D21]
+  garantirCliente(tel); fidChecar(tel);
   const t={tipo:'proprio',numero,canal:'Próprio',cliente:tel,itens,frete,dist,brinde:null,total:sub+(frete||0),pagamento:'Pix (pago)',quando:ms,token:r.token||null,semQr:r.motivo||null};
   if(r.motivo) aviso('warn','Pedido impresso sem QR: '+esc(r.motivo)+'.'); else aviso('ok','Pedido próprio recebido, com o QR no fim do cupom.');
   mostrarTicket(t,'Pedido próprio '+numero);
@@ -1056,7 +1246,7 @@ function enviarWa(token){
   if(p.status!=='aguardando WhatsApp') return show('wMsg','warn','Este brinde já foi guardado.');
   msgLoja('💬 Mensagem de '+fim4(tel)+': "'+textoWa(p)+'". Brinde guardado automaticamente.');
   (S.historico[tel]||=[]).push({premioId:p.premio.id,data:diaStr(agora())});
-  creditar(p,tel); render();
+  garantirCliente(tel); creditar(p,tel); render();
   $('posRaspa').innerHTML=resultadoHtml(p);
 }
 function iniciarRaspagem(onDone){
@@ -1131,9 +1321,13 @@ function renderCardapio(){
       '<span style="color:var(--warn)">'+(c.sub<=0?'Adicione produtos ao pedido.':c.sub<d.minimo?'faltam '+brl(d.minimo-c.sub)+' para usar':'não acumula com o brinde da raspadinha')+'</span>')+'</div>';
   // UX: atalho de recompra (o que mais traz pedido de volta), só com o carrinho vazio
   const ult=clienteTel&&!c.itens.length&&Object.values(S.pedidosProprios).filter(x=>x.tel===clienteTel&&x.itens&&x.itens.length).sort((a,b)=>b.quando-a.quando)[0];
-  if(ult) g='<button class="btn alt full" onclick="repetirPedido()">🔁 Pedir de novo: '+esc(ult.itens.map(x=>x.qtd+'x '+x.nome).join(', '))+'</button>'+g;
+  const fp=fidPremio(); if(clienteTel&&S.cfg.fid.ativo&&fp){ const pr=fidProgresso(clienteTel);
+    g+='<div class="mt"><span class="muted">⭐ '+(pr.falta>0?fidFaltaTxt(pr):'Meta batida')+' para ganhar <b>'+esc(fp.nome)+'</b></span><div class="prog mt"><span style="width:'+pr.pct+'%"></span></div></div>'; }
+  const ultOk=ult?ult.itens.filter(x=>cardapio.some(p=>p.nome===x.nome)):[];   // só o que ainda está no cardápio
+  if(ultOk.length) g='<button class="btn alt full" onclick="repetirPedido()">🔁 Pedir de novo: '+esc(ultOk.map(x=>x.qtd+'x '+x.nome).join(', '))+'</button>'+g;
   $('giftBox').innerHTML=g;
-  $('menuBox').innerHTML=cardapio.map((x,i)=>'<div class="item"><span>'+esc(x.nome)+'<br><span class="muted">'+brl(x.preco)+'</span></span><span class="qty"><button onclick="mudaQtd('+i+',-1)">−</button><b>'+(carrinho[i]||0)+'</b><button onclick="mudaQtd('+i+',1)">+</button></span></div>').join('');
+  let catAnt=null;
+  $('menuBox').innerHTML=cardapio.map((x,i)=>[x,i]).sort((a,b)=>norm(a[0].categoria).localeCompare(norm(b[0].categoria))).map(([x,i])=>(x.categoria!==catAnt?(catAnt=x.categoria,'<h3>'+esc(x.categoria||'Outros')+'</h3>'):'')+'<div class="item"><span>'+esc(x.nome)+'<br><span class="muted">'+brl(x.preco)+'</span></span><span class="qty"><button onclick="mudaQtd('+i+',-1)">−</button><b>'+(carrinho[i]||0)+'</b><button onclick="mudaQtd('+i+',1)">+</button></span></div>').join('');
   const b=disp.find(x=>x.id===brindeSel), ap=b&&condOk(b,c).ok?b:null;
   const frete=c.dist!=null?freteTaxa(c.dist):null, freteCob=ap&&ap.tipo==='frete'?0:(frete||0);
   let r=c.itens.map(x=>'<div class="tl"><span>'+x.qtd+'x '+esc(x.nome)+'</span><span>'+brl(x.preco*x.qtd)+'</span></div>').join('')||'<span class="muted">Carrinho vazio.</span>';
@@ -1160,7 +1354,9 @@ function finalizarPedido(){
     msgLoja('🧾 Pedido '+numero+' com brinde da raspadinha: '+ap.nome+'. Conferir na entrega!'); }
   if(dv>0||ap) checarTeto();
   const r=criarParticipacao('Próprio',numero,clienteTel,c.dist,agora(),numero);
-  S.pedidosProprios[numero]={tel:clienteTel,quando:agora(),itens:c.itens.map(x=>({nome:x.nome,qtd:x.qtd}))};   // [D21] + "pedir de novo"
+  S.pedidosProprios[numero]={numero,tel:clienteTel,quando:agora(),itens:c.itens.map(x=>({nome:x.nome,preco:x.preco,qtd:x.qtd})),sub:c.sub,
+    total:c.sub-dv+(ap&&ap.tipo==='frete'?0:frete),canal:'Cardápio'};   // [D21] + histórico do cliente
+  garantirCliente(clienteTel); fidChecar(clienteTel);
   const t={tipo:'proprio',numero,canal:'Próprio',cliente:clienteTel,itens:c.itens,frete,dist:c.dist,brinde:ap?{nome:ap.nome,tipo:ap.tipo}:null,
     desconto:dv>0?{pct:d.pct,valor:dv}:null,total:c.sub-dv+(ap&&ap.tipo==='frete'?0:frete),pagamento:'Pix (pago)',quando:agora(),token:r.token||null,semQr:r.motivo||null};
   carrinho={}; brindeSel=null;
@@ -1217,6 +1413,7 @@ function igPedido(ref,tel){
     return {chave:p.canal+'|'+p.pedido,txt:p.pedido}; }
   const n='#'+r.replace(/^#/,''), pp=S.pedidosProprios[n];
   if(pp){ if(pp.tel!==tel) return {erro:'Este pedido está ligado a outro WhatsApp.'};
+    if(MARKET.includes(pp.canal)&&!S.cfg.insta.marketplace) return {erro:'O Poste e ganhe vale para pedidos feitos no nosso cardápio ('+S.cfg.imp.site+').'};
     if(velho(pp.quando)) return {erro:'Este pedido tem mais de '+jan+' dias. Vale para pedidos recentes.'};
     return {chave:'Próprio|'+n,txt:n}; }
   return {erro:'Não achei esse pedido. Use o código impresso abaixo do QR ou o número do pedido do cardápio.'};
@@ -1236,7 +1433,7 @@ function igInscrever(tel,user,ref){
   const aberta=igAberta(user); if(aberta&&aberta.status==='aguardando story') return {erro:'Você já tem uma participação aberta (pedido '+aberta.pedidoTxt+'). É só postar o story: o sistema confere sozinho.'};
   const ult=Object.values(I.parts).filter(p=>p.tel===tel&&p.liberadoEm).map(p=>p.liberadoEm).sort((a,b)=>b-a)[0];
   if(ult&&agora()-ult<c.intervaloDias*DIA) return {erro:'Você ganhou um desconto do Instagram há pouco. Dá para participar de novo a partir de '+dataBR(ult+c.intervaloDias*DIA)+'.'};
-  I.contas[tel]||={user,igsid:null,desde:agora()};
+  I.contas[tel]||={user,igsid:null,desde:agora()}; garantirCliente(tel);
   const pt={id:tokenSeguro(6),tel,user,pedido:ped.chave,pedidoTxt:ped.txt,acoes:{story:false,feed:false},segue:null,
     seguidores:0,igsid:I.contas[tel].igsid,status:'aguardando story',pct:0,cupomId:null,criado:agora(),provas:[],avisado:false};
   I.parts[pt.id]=pt;
@@ -1424,6 +1621,286 @@ function renderIgCli(){
   $('igDm').innerHTML=dm.map(m=>'<div class="bub'+(m.de==='loja'?'':' c')+'"><small>'+(m.de==='loja'?'@'+esc(c.perfil)+' → @'+esc(m.user):'@'+esc(m.user))+' · '+dataHora(m.quando)+'</small>'+waFmt(m.texto)+'</div>').join('')||'<span class="muted">Nenhuma mensagem.</span>';
 }
 
+// ================= Operação: vendas, clientes, produtos, fidelidade, planilha [D32–D35] =================
+// Feito para quem nunca usou sistema: tudo salva sozinho, nada some sem confirmação.
+const norm=s=>String(s??'').trim().toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
+const parseBR=v=>{ let s=String(v??'').trim().replace(/R\$|\s/g,''); if(!s) return NaN; if(s.includes(',')) s=s.replace(/\./g,'').replace(',','.'); const n=+s; return isFinite(n)?n:NaN; };
+const soTel=v=>String(v??'').replace(/\D/g,'').replace(/^55(?=\d{10,11}$)/,'');
+const telOk=t=>t.length>=10&&t.length<=11;
+const isoBR=s=>s?s.split('-').reverse().join('/'):'';
+const MARKET=['iFood','Keeta','99Food'];
+const VCANAIS=['Balcão','WhatsApp','Instagram','iFood','Keeta','99Food'];
+function syncCardapio(){ cardapio=S.produtos.filter(p=>p.ativo); carrinho={}; }
+const vendasDe=tel=>Object.values(S.pedidosProprios).filter(v=>v.tel===tel).sort((a,b)=>b.quando-a.quando);
+function nomeCliente(tel){ const c=S.clientes[tel]; return c&&c.nome?c.nome:'Cliente '+fim4(tel); }
+function garantirCliente(tel,nome){ const c=(S.clientes[tel]||={tel,nome:'',nasc:'',bairro:'',obs:'',criado:agora()}); if(nome&&!c.nome) c.nome=nome; return c; }
+function resumoCliente(tel){
+  const vs=vendasDe(tel), total=vs.reduce((s,v)=>s+(v.total??v.sub??0),0), qt={};
+  vs.forEach(v=>(v.itens||[]).forEach(i=>qt[i.nome]=(qt[i.nome]||0)+i.qtd));
+  const ult=vs[0]?.quando, pri=vs[vs.length-1]?.quando;
+  return {vs,n:vs.length,total,ticket:vs.length?total/vs.length:0,top:Object.entries(qt).sort((a,b)=>b[1]-a[1]),ult,
+    dias:ult!=null?Math.max(0,Math.floor((agora()-ult)/DIA)):null, freq:vs.length>1?Math.round((ult-pri)/DIA/(vs.length-1)):null};
+}
+const haDias=d=>d==null?'nunca comprou':d===0?'hoje':d===1?'ontem':'há '+d+' dias';
+
+// ---- fidelidade: meta fixa, sem sorte [D32] ----
+function fidProgresso(tel){
+  const f=S.cfg.fid, desde=(S.clientes[tel]||{}).fidDesde||0, vs=vendasDe(tel).filter(v=>v.quando>desde);
+  const atual=f.tipo==='pedidos'?vs.length:vs.reduce((s,v)=>s+(v.sub||0),0);
+  return {atual,vs,meta:f.meta,falta:Math.max(0,f.meta-atual),pct:Math.min(100,f.meta>0?atual/f.meta*100:0)};
+}
+const fidPremio=()=>S.premios.find(p=>p.id===S.cfg.fid.premioId);
+const fidFaltaTxt=pr=>S.cfg.fid.tipo==='pedidos'?(pr.falta===1?'falta 1 pedido':'faltam '+pr.falta+' pedidos'):'faltam '+brl(pr.falta);
+// SERVIDOR — chamado a cada venda nova (não na importação: histórico conta, mas o brinde só sai numa venda nova)
+function fidChecar(tel){
+  const f=S.cfg.fid; if(!f.ativo||!(f.meta>0)) return null;
+  const pr=fidProgresso(tel); if(pr.atual<f.meta) return null;
+  const x=fidPremio();
+  if(!x||!x.ativo||(x.estoque!==null&&x.estoque<=0)){ msgLoja('⭐ '+nomeCliente(tel)+' chegou na meta de fidelidade, mas o brinde escolhido está indisponível. Troque o brinde em Clientes.'); return null; }
+  garantirCliente(tel).fidDesde=Math.max(...pr.vs.map(v=>v.quando));
+  return darBrinde(tel,x,'fidelidade');
+}
+// [D33] brinde por fidelidade ou cortesia: entra na conta como os da raspadinha (custo no marketing, baixa no estoque)
+function darBrinde(tel,x,origem){
+  if(x.estoque!==null) x.estoque--;
+  const b={id:tokenSeguro(8),token:null,origem,premioId:x.id,nome:x.nome,tipo:x.tipo,custo:x.custo,minimo:x.minimo,produtoReq:x.produtoReq,
+    validade:addDias(S.cfg.validadePremio),status:'disponivel',lembretes:0};
+  (S.carteira[tel]||=[]).push(b); garantirCliente(tel);
+  msgCliente(tel,(origem==='fidelidade'?'⭐ Obrigado por ser cliente fiel da Recheadinha! Você ganhou um(a) *':'🎁 Um presente da Recheadinha para você: *')+b.nome+'*. Ele vai junto no próximo pedido pelo cardápio. 🧡\n\n_Vale para '+condicaoTxt(b)+', até '+dataBR(b.validade)+'._');
+  msgLoja((origem==='fidelidade'?'⭐ ':'🎁 ')+nomeCliente(tel)+' ganhou '+b.nome+(origem==='fidelidade'?' (meta de fidelidade).':' (cortesia).'));
+  audit('Brinde '+b.nome+' para '+nomeCliente(tel)+' ('+origem+')');
+  checarTeto(); return b;
+}
+function setFid(k,v){ S.cfg.fid[k]=v; audit('Fidelidade: '+k+' = '+v); render(); }
+
+// ---- Vender ----
+let vCarrinho={}, vCanal=null;
+function vSoma(id,d){ vCarrinho[id]=Math.max(0,(vCarrinho[id]||0)+d); if(!vCarrinho[id]) delete vCarrinho[id]; renderVenda(); }
+function vCliente(){
+  const t=soTel($('vTel').value), box=$('vCliInfo');
+  if(!telOk(t)){ box.innerHTML=t.length>3&&!/\D/.test($('vTel').value.replace(/[\s()+-]/g,''))?'<p class="muted">Continue digitando o número com DDD.</p>':''; return; }
+  const c=S.clientes[t];
+  if(!c){ box.innerHTML='<div class="msg info">Cliente novo. Nome: <input id="vNome" placeholder="Nome do cliente" style="width:100%;margin-top:6px"></div>'; return; }
+  const r=resumoCliente(t), pr=fidProgresso(t), br=(S.carteira[t]||[]).filter(b=>b.status==='disponivel'&&agora()<=b.validade);
+  box.innerHTML='<div class="msg ok"><b>✓ '+esc(nomeCliente(t))+'</b> · '+r.n+' pedido(s) · '+haDias(r.dias)+
+    (r.top[0]?'<br>Mais compra: <b>'+esc(r.top[0][0])+'</b>':'')+
+    (S.cfg.fid.ativo&&fidPremio()?'<br>⭐ Fidelidade: '+fidFaltaTxt(pr)+' para '+esc(fidPremio().nome):'')+
+    (br.length?'<br>🎁 Tem '+br.length+' brinde(s) guardado(s): '+esc(br.map(b=>b.nome).join(', ')):'')+'</div>';
+}
+function renderVenda(){
+  const hoje=diaStr(agora()), vh=Object.values(S.pedidosProprios).filter(v=>diaStr(v.quando)===hoje);
+  $('vResumoDia').textContent='Hoje: '+vh.length+' venda(s) · '+brl(vh.reduce((s,v)=>s+(v.total??v.sub??0),0));
+  const ub=S.ui.ultimoBackup; $('vAvisoBackup').innerHTML=!ub||agora()-ub>7*DIA?'<div class="msg warn">💾 Faz '+(ub?Math.floor((agora()-ub)/DIA)+' dias':'tempo')+' sem cópia de segurança. <button class="btn alt sm" onclick="irView(\'loja\',\'dados\')">Fazer agora</button></div>':'';
+  $('vTelList').innerHTML=Object.values(S.clientes).map(c=>'<option value="'+esc(c.tel)+'">'+esc(nomeCliente(c.tel))+'</option>').join('');
+  vCanal||=S.ui.vCanal||'Balcão';
+  $('vTiles').innerHTML=cardapio.map(p=>'<button class="tile'+(vCarrinho[p.id]?' on':'')+'" onclick="vSoma('+p.id+',1)"><b>'+esc(p.nome)+'</b><span class="muted">'+brl(p.preco)+'</span>'+(vCarrinho[p.id]?'<span class="qn">'+vCarrinho[p.id]+'</span>':'')+'</button>').join('')||'<p class="muted">Nenhum produto ativo. Cadastre em 🍟 Produtos.</p>';
+  const its=vItensLista(), tot=its.reduce((s,i)=>s+i.preco*i.qtd,0);
+  $('vItens').innerHTML=its.length?'<div class="gift">'+its.map(i=>'<div class="item"><span>'+esc(i.nome)+'<br><span class="muted">'+brl(i.preco*i.qtd)+'</span></span><span class="qty"><button aria-label="Tirar um" onclick="vSoma('+i.id+',-1)">−</button><b>'+i.qtd+'</b><button aria-label="Somar um" onclick="vSoma('+i.id+',1)">+</button></span></div>').join('')+
+    '<div class="tl" style="font-size:17px;margin-top:8px"><b>Total</b><b>'+brl(tot)+'</b></div></div>':'';
+  $('vCanais').innerHTML=VCANAIS.map(c=>'<button class="chip'+(c===vCanal?' on':'')+'" aria-pressed="'+(c===vCanal)+'" onclick="vCanal=\''+c+'\';S.ui.vCanal=vCanal;renderVenda()">'+c+'</button>').join('');
+}
+function vItensLista(){ return Object.entries(vCarrinho).map(([id,q])=>{ const p=S.produtos.find(x=>x.id===+id); return p&&{id:p.id,nome:p.nome,preco:p.preco,qtd:q}; }).filter(Boolean); }
+// SERVIDOR — POST /vendas
+function lancarVenda(){
+  const tel=soTel($('vTel').value); if(!telOk(tel)) return show('vMsg','err','Informe o WhatsApp do cliente com DDD (ou escolha um nome da lista).');
+  const its=vItensLista(); if(!its.length) return show('vMsg','err','Toque nos produtos para colocar na venda.');
+  const novo=!S.clientes[tel], nome=$('vNome')?$('vNome').value.trim():'';
+  if(novo&&!nome) return show('vMsg','err','Cliente novo: escreva o nome dele.');
+  garantirCliente(tel,nome);
+  const quando=$('vData').value?new Date($('vData').value).getTime():agora(), sub=its.reduce((s,i)=>s+i.preco*i.qtd,0), numero='#'+(++S.seqPedido);
+  const itens=its.map(i=>({nome:i.nome,preco:i.preco,qtd:i.qtd}));
+  S.pedidosProprios[numero]={numero,tel,quando,itens,sub,total:sub,canal:vCanal,pagamento:$('vPag').value,obs:$('vObs').value.trim(),origem:'manual'};
+  audit('Venda '+numero+': '+nomeCliente(tel)+' · '+brl(sub)+' · '+vCanal);
+  const ganhou=fidChecar(tel);
+  vCarrinho={}; $('vTel').value=''; $('vData').value=''; $('vPag').value=''; $('vObs').value=''; $('vCliInfo').innerHTML='';
+  if($('vQr').checked){
+    const cq=MARKET.includes(vCanal)||vCanal==='WhatsApp'||vCanal==='Instagram'?vCanal:'Próprio', r=criarParticipacao(cq,numero,tel,null,quando,numero);
+    irView('loja','pedidos');
+    mostrarTicket({tipo:'proprio',numero,canal:cq,cliente:tel,itens,frete:null,dist:null,brinde:null,total:sub,pagamento:$('vPag').value||'—',quando,token:r.token||null,semQr:r.motivo||null},'Venda '+numero);
+  } else show('vMsg','ok','Venda '+numero+' salva para <b>'+esc(nomeCliente(tel))+'</b> ('+brl(sub)+').'+(ganhou?'<br>⭐ Bateu a meta de fidelidade: ganhou <b>'+esc(ganhou.nome)+'</b>!':'')+
+    ' <button class="btn alt sm" onclick="abrirCliente(\''+tel+'\')">Ver cliente</button>');
+  toast('Venda '+numero+' salva ✓'); if(ganhou) comemorar();
+  render();
+}
+function irVenda(tel){ irView('loja','venda'); $('vTel').value=tel; vCliente(); }
+
+// ---- Clientes ----
+let cliFiltro='todos', cliAberto=null, cliOrdem='recentes';
+const FILTROS_CLI=[['todos','Todos'],['frequentes','⭐ Frequentes'],['perto','🎯 Perto do brinde'],['sumidos','💤 Sumidos'],['niver','🎂 Aniversário no mês']];
+function cliPassa(k,x){
+  const mes=String(new Date(agora()).getMonth()+1).padStart(2,'0');
+  return k==='todos'||(k==='frequentes'&&x.r.vs.filter(v=>agora()-v.quando<=30*DIA).length>=3)||
+    (k==='perto'&&S.cfg.fid.ativo&&x.f.atual>0&&x.f.pct>=60)||(k==='sumidos'&&x.r.dias!=null&&x.r.dias>30)||(k==='niver'&&x.c.nasc&&x.c.nasc.slice(5,7)===mes);
+}
+function renderClientes(){
+  const todos=Object.values(S.clientes).map(c=>({c,r:resumoCliente(c.tel),f:fidProgresso(c.tel)}));
+  $('cliCount').textContent=todos.length;
+  $('cliFiltros').innerHTML=FILTROS_CLI.map(([k,n])=>'<button class="chip'+(k===cliFiltro?' on':'')+'" aria-pressed="'+(k===cliFiltro)+'" onclick="cliFiltro=\''+k+'\';renderClientes()">'+n+' <span class="muted">'+todos.filter(x=>cliPassa(k,x)).length+'</span></button>').join('');
+  const q=norm($('cliBusca').value), qd=q.replace(/\D/g,'');
+  const ord={recentes:(a,b)=>(b.r.ult??-1)-(a.r.ult??-1),compras:(a,b)=>b.r.total-a.r.total,pedidos:(a,b)=>b.r.n-a.r.n,nome:(a,b)=>norm(nomeCliente(a.c.tel)).localeCompare(norm(nomeCliente(b.c.tel)))}[cliOrdem];
+  const ls=todos.filter(x=>cliPassa(cliFiltro,x)&&(!q||norm(x.c.nome).includes(q)||(qd&&x.c.tel.includes(qd)))).sort(ord);
+  $('cliLista').innerHTML=ls.map(x=>'<button class="cli-row" onclick="abrirCliente(\''+x.c.tel+'\')"><span><b>'+esc(nomeCliente(x.c.tel))+'</b> <span class="muted">'+fim4(x.c.tel)+'</span><br><span class="muted">'+x.r.n+' pedido(s) · '+brl(x.r.total)+' · '+haDias(x.r.dias)+'</span></span><span aria-hidden="true">›</span></button>').join('')||
+    '<p class="muted">'+(todos.length?'Ninguém encontrado com esse filtro.':'Nenhum cliente ainda. Lance uma venda ou cadastre abaixo.')+'</p>';
+  // fidelidade
+  const f=S.cfg.fid; $('fidAtivo').checked=f.ativo; $('fidMeta').value=f.meta; $('fidTipo').value=f.tipo;
+  $('fidPremio').innerHTML=S.premios.filter(p=>p.ativo).map(p=>'<option value="'+p.id+'"'+(p.id===f.premioId?' selected':'')+'>'+esc(p.nome)+(p.estoque===0?' (esgotado)':'')+'</option>').join('');
+  const perto=todos.filter(x=>x.f.atual>0).sort((a,b)=>b.f.pct-a.f.pct).slice(0,5);
+  $('fidPerto').innerHTML=!f.ativo?'<p class="muted">Desligado.</p>':perto.map(x=>'<div class="ck"><span style="flex:1"><b>'+esc(nomeCliente(x.c.tel))+'</b> <span class="muted">'+(x.f.falta>0?fidFaltaTxt(x.f):'ganha na próxima venda')+'</span><div class="prog mt" role="progressbar" aria-valuenow="'+Math.round(x.f.pct)+'" aria-valuemin="0" aria-valuemax="100"><span style="width:'+x.f.pct+'%"></span></div></span></div>').join('')||'<p class="muted">Ninguém ainda.</p>';
+  renderFicha();
+}
+function abrirCliente(tel){ cliAberto=tel; if(S.ui.tab!=='clientes') irView('loja','clientes'); renderClientes(); window.scrollTo(0,0); }
+function fecharCliente(){ cliAberto=null; renderClientes(); }
+function renderFicha(){
+  const fc=$('cliFicha'), c=cliAberto&&S.clientes[cliAberto];
+  $('cliListaCard').style.display=c?'none':''; fc.style.display=c?'':'none'; if(!c) return;
+  const t=c.tel, r=resumoCliente(t), f=fidProgresso(t), fp=fidPremio(), mx=r.top[0]?r.top[0][1]:1;
+  const br=(S.carteira[t]||[]).slice().reverse(), prem=S.premios.filter(p=>p.ativo&&(p.estoque===null||p.estoque>0));
+  const campo=(k,lbl,tipo)=>'<label class="lbl">'+lbl+'</label><input '+(tipo?'type="'+tipo+'" ':'')+'value="'+esc(c[k]||'')+'" style="width:100%" onchange="editCliente(\''+k+'\',this.value)">';
+  fc.innerHTML='<button class="btn alt sm" onclick="fecharCliente()">‹ Voltar à lista</button>'+
+    '<h2 class="mt">'+esc(nomeCliente(t))+'</h2>'+
+    '<div class="row"><a class="btn sm" style="display:inline-flex;align-items:center" href="https://wa.me/55'+t+'" target="_blank" rel="noopener">💬 WhatsApp</a><button class="btn alt sm" onclick="irVenda(\''+t+'\')">🧾 Lançar venda</button></div>'+
+    '<div class="kpis mt">'+[['Pedidos',r.n],['Já gastou',brl(r.total)],['Ticket médio',brl(r.ticket)],['Última compra',haDias(r.dias)],['Compra a cada',r.freq!=null?'~'+r.freq+' dias':'—']].map(k=>'<div class="kpi"><span class="muted">'+k[0]+'</span><b>'+k[1]+'</b></div>').join('')+'</div>'+
+    (S.cfg.fid.ativo&&fp?'<h3>⭐ Fidelidade</h3><p class="muted" style="margin:0 0 6px">'+(f.falta>0?fidFaltaTxt(f):'Bateu a meta: ganha na próxima venda')+' para ganhar <b>'+esc(fp.nome)+'</b></p><div class="prog"><span style="width:'+f.pct+'%"></span></div>':'')+
+    '<h3>Mais compra</h3>'+(r.top.slice(0,5).map(([n,q])=>'<div class="tl"><span>'+esc(n)+'</span><b>'+q+'x</b></div><div class="bar" style="height:8px;margin:2px 0 8px"><span style="width:'+(q/mx*100)+'%;background:var(--brand2)"></span></div>').join('')||'<p class="muted">Sem compras ainda.</p>')+
+    '<h3>🎁 Brindes</h3>'+(br.map(b=>'<div class="tl"><span>'+esc(b.nome)+' <span class="muted">('+esc(b.origem||'raspadinha')+')</span></span><span class="muted">'+esc(b.status)+(b.status==='disponivel'?' até '+dataBR(b.validade):'')+'</span></div>').join('')||'<p class="muted">Nenhum.</p>')+
+    (prem.length?'<div class="row mt"><select id="fcBrinde">'+prem.map(p=>'<option value="'+p.id+'">'+esc(p.nome)+'</option>').join('')+'</select><button class="btn alt sm" onclick="darBrindeManual(\''+t+'\')">🎁 Dar brinde agora</button></div>':'')+
+    '<h3>Dados</h3>'+campo('nome','Nome')+'<label class="lbl">WhatsApp</label><input value="'+esc(t)+'" disabled style="width:100%">'+campo('nasc','Aniversário','date')+campo('bairro','Bairro')+
+    '<label class="lbl">Observações</label><textarea onchange="editCliente(\'obs\',this.value)">'+esc(c.obs||'')+'</textarea>'+
+    '<h3>Compras</h3>'+(r.vs.map(v=>'<div class="item"><span><b>'+dataHora(v.quando)+'</b> <span class="tag">'+esc(v.canal||'Cardápio')+'</span><br><span class="muted">'+esc((v.itens||[]).map(i=>i.qtd+'x '+i.nome).join(', ')||'—')+'</span></span><span style="text-align:right">'+brl(v.total??v.sub??0)+'<br><button class="btn alt sm" style="min-height:32px;padding:4px 8px" onclick="apagarVenda(\''+v.numero+'\')">Apagar</button></span></div>').join('')||'<p class="muted">Nenhuma compra.</p>')+
+    '<details class="mt"><summary class="muted">Excluir cadastro (LGPD)</summary><p class="muted">Apaga nome, WhatsApp e dados pessoais. As vendas continuam no total da loja, sem identificação.</p><button class="btn alt sm" style="color:var(--err)" onclick="excluirCliente(\''+t+'\')">Excluir dados deste cliente</button></details>';
+}
+function editCliente(k,v){ const c=S.clientes[cliAberto]; if(!c) return; c[k]=String(v).trim(); audit('Cliente '+fim4(cliAberto)+': '+k+' alterado'); toast('Salvo ✓'); render(); }
+function novoCliente(){
+  const t=soTel($('ncTel').value), n=$('ncNome').value.trim();
+  if(!telOk(t)) return show('ncMsg','err','Informe o WhatsApp com DDD.');
+  if(S.clientes[t]) return show('ncMsg','warn','Este WhatsApp já é de '+esc(nomeCliente(t))+'. <button class="btn alt sm" onclick="abrirCliente(\''+t+'\')">Abrir</button>');
+  if(!n) return show('ncMsg','err','Escreva o nome.');
+  garantirCliente(t,n); audit('Cliente cadastrado: '+n); $('ncTel').value=''; $('ncNome').value=''; $('ncMsg').innerHTML=''; $('cliNovoBox').open=false; toast('Cliente salvo ✓'); abrirCliente(t);
+}
+function darBrindeManual(t){ const x=S.premios.find(p=>p.id===+$('fcBrinde').value); if(!x) return; if(!confirm('Dar '+x.nome+' para '+nomeCliente(t)+'?')) return; darBrinde(t,x,'cortesia'); toast('Brinde guardado na conta ✓'); render(); }
+function apagarVenda(n){ const v=S.pedidosProprios[n]; if(!v||!confirm('Apagar a venda '+n+' de '+dataHora(v.quando)+' ('+brl(v.total??v.sub??0)+')?')) return; delete S.pedidosProprios[n]; audit('Venda '+n+' apagada'); toast('Venda apagada'); render(); }
+// [D34] LGPD: apaga dados pessoais e deixa as vendas anônimas
+function excluirCliente(t){
+  if(!confirm('Excluir os dados de '+nomeCliente(t)+'? Isso não pode ser desfeito.')) return;
+  const anon='anon-'+tokenSeguro(6);
+  Object.values(S.pedidosProprios).forEach(v=>{ if(v.tel===t) v.tel=anon; });
+  Object.values(S.insta.parts).forEach(p=>{ if(p.tel===t){ p.tel=anon; p.user='(excluído)'; } });
+  delete S.clientes[t]; delete S.carteira[t]; delete S.historico[t]; delete S.insta.contas[t];
+  S.msgs=S.msgs.filter(m=>m.tel!==t);
+  audit('Cadastro de cliente excluído a pedido (LGPD)'); cliAberto=null; toast('Dados excluídos'); render();
+}
+
+// ---- Produtos ----
+function addProduto(){
+  const nome=$('npNome').value.trim(), preco=parseBR($('npPreco').value), cat=$('npCat').value.trim();
+  if(!nome) return show('npMsg','err','Escreva o nome do produto.');
+  if(!(preco>=0)) return show('npMsg','err','Preço inválido. Exemplo: 34,90');
+  if(S.produtos.some(p=>norm(p.nome)===norm(nome))) return show('npMsg','warn','Já existe um produto com esse nome.');
+  S.produtos.push({id:S.nextProd++,nome,preco,categoria:cat,ativo:true}); syncCardapio();
+  $('npNome').value=''; $('npPreco').value=''; $('npMsg').innerHTML=''; audit('Produto criado: '+nome+' '+brl(preco)); toast('Produto adicionado ✓'); render();
+}
+function editProduto(id,k,v){
+  const p=S.produtos.find(x=>x.id===id); if(!p) return;
+  if(k==='preco'){ const n=parseBR(v); if(!(n>=0)){ toast('Preço inválido. Exemplo: 34,90'); return render(); } v=n; }
+  if(k==='nome'){ v=String(v).trim(); if(!v) return render(); S.premios.forEach(b=>{ if(b.produtoReq===p.nome) b.produtoReq=v; }); }
+  if(k==='categoria') v=String(v).trim();
+  const ant=p[k]; p[k]=v; syncCardapio();
+  audit('Produto "'+p.nome+'": '+k+' '+(k==='preco'?brl(ant)+' → '+brl(v):'= '+v)); toast('Salvo ✓'); render();
+}
+function renderProdutos(){
+  const q=norm($('prodBusca').value), vend={};
+  Object.values(S.pedidosProprios).filter(v=>agora()-v.quando<=30*DIA).forEach(v=>(v.itens||[]).forEach(i=>vend[i.nome]=(vend[i.nome]||0)+i.qtd));
+  const cats=[...new Set(S.produtos.map(p=>p.categoria).filter(Boolean))];
+  $('catList').innerHTML=cats.map(c=>'<option value="'+esc(c)+'">').join('');
+  $('prodCount').textContent=S.produtos.filter(p=>p.ativo).length+' no cardápio';
+  const ls=S.produtos.filter(p=>!q||norm(p.nome).includes(q)||norm(p.categoria).includes(q)).sort((a,b)=>(b.ativo-a.ativo)||norm(a.categoria).localeCompare(norm(b.categoria))||norm(a.nome).localeCompare(norm(b.nome)));
+  $('prodLista').innerHTML=ls.map(p=>'<div class="prow'+(p.ativo?'':' off')+'">'+
+    '<input aria-label="Nome" value="'+esc(p.nome)+'" onchange="editProduto('+p.id+',\'nome\',this.value)">'+
+    '<input aria-label="Preço" inputmode="decimal" value="'+num(p.preco)+'" onchange="editProduto('+p.id+',\'preco\',this.value)">'+
+    '<input type="checkbox" class="sw" aria-label="No cardápio" '+(p.ativo?'checked':'')+' onchange="editProduto('+p.id+',\'ativo\',this.checked)">'+
+    '<span class="muted" style="grid-column:1/-1;display:flex;gap:6px;align-items:center;flex-wrap:wrap">Categoria: <input list="catList" aria-label="Categoria" value="'+esc(p.categoria||'')+'" style="min-height:34px;padding:4px 8px;width:140px" onchange="editProduto('+p.id+',\'categoria\',this.value)"> · vendidos em 30 dias: <b>'+(vend[p.nome]||0)+'</b>'+(p.ativo?'':' · <b>fora do cardápio</b>')+'</span></div>').join('')||'<p class="muted">Nada encontrado.</p>';
+}
+
+// ---- Planilha (copiar/colar ou CSV) e cópia de segurança [D35] ----
+function lerTabela(txt){
+  txt=String(txt||'').replace(/^﻿/,'').replace(/\r\n?/g,'\n').replace(/\n+$/,''); if(!txt.trim()) return [];
+  const l1=txt.split('\n')[0], d=l1.includes('\t')?'\t':(l1.split(';').length>=l1.split(',').length?';':',');
+  const rows=[]; let row=[], f='', q=false;
+  for(let i=0;i<txt.length;i++){ const ch=txt[i];
+    if(q){ if(ch==='"'){ if(txt[i+1]==='"'){ f+='"'; i++; } else q=false; } else f+=ch; }
+    else if(ch==='"'&&f==='') q=true;
+    else if(ch===d){ row.push(f); f=''; }
+    else if(ch==='\n'){ row.push(f); rows.push(row); row=[]; f=''; }
+    else f+=ch; }
+  row.push(f); rows.push(row);
+  return rows.filter(r=>r.some(c=>c.trim()));
+}
+const COLS={nome:['nome','cliente','nome do cliente'],tel:['whatsapp','whats','telefone','celular','tel','fone','numero'],nasc:['aniversario','nascimento','niver','data de nascimento'],
+  bairro:['bairro','regiao'],obs:['obs','observacao','observacoes','nota','notas'],preco:['preco','valor','preco unitario','valor unitario'],categoria:['categoria','tipo','grupo'],
+  ativo:['ativo','no cardapio','disponivel'],produto:['produto','item'],qtd:['quantidade','qtd','qtde','quant'],data:['data','dia','data do pedido','data da venda'],canal:['canal','origem']};
+const NOMES_COL={nome:'nome',tel:'whatsapp',preco:'preco',produto:'produto',data:'data'};
+function mapaCab(cab){ const n=cab.map(norm), m={}; for(const [k,al] of Object.entries(COLS)){ const i=n.findIndex(h=>al.includes(h)); if(i>=0) m[k]=i; } return m; }
+function dataDeBR(s){ const m=String(s).trim().match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})(?:[,\sT]+(\d{1,2}):(\d{2}))?/); if(!m){ const t=Date.parse(s); return isFinite(t)?t:NaN; }
+  let y=+m[3]; if(y<100) y+=2000; const t=new Date(y,m[2]-1,m[1],m[4]!=null?+m[4]:12,m[5]!=null?+m[5]:0).getTime(); return t; }
+function nascISO(s){ const m=String(s||'').trim().match(/^(\d{1,2})\/(\d{1,2})(?:\/(\d{2,4}))?$/); if(!m) return /^\d{4}-\d{2}-\d{2}$/.test(s)?s:''; let y=m[3]?+m[3]:2000; if(y<100) y+=1900; return y+'-'+String(m[2]).padStart(2,'0')+'-'+String(m[1]).padStart(2,'0'); }
+function impArquivo(inp){ const f=inp.files[0]; if(!f) return; f.text().then(t=>{ $('impTxt').value=t; importar(); }); inp.value=''; }
+let impPendente=null;
+function importar(){
+  const tipo=$('impTipo').value, rows=lerTabela($('impTxt').value); impPendente=null;
+  if(rows.length<2) return show('impMsg','err','Cole as linhas da planilha <b>junto com a primeira linha</b> (a dos títulos das colunas).');
+  const m=mapaCab(rows[0]), need={clientes:['tel'],produtos:['nome','preco'],vendas:['data','tel','produto']}[tipo];
+  const falta=need.filter(k=>m[k]==null); if(falta.length) return show('impMsg','err','Não achei a coluna: <b>'+falta.map(k=>NOMES_COL[k]).join(', ')+'</b>. Confira os títulos na primeira linha.');
+  const g=(r,k)=>m[k]==null?'':String(r[m[k]]??'').trim(), erros=[], itens=[];
+  rows.slice(1).forEach((r,i)=>{ const ln='linha '+(i+2)+': ';
+    if(tipo==='clientes'){ const tel=soTel(g(r,'tel')); if(!telOk(tel)) return erros.push(ln+'WhatsApp inválido'); itens.push({tel,nome:g(r,'nome'),nasc:nascISO(g(r,'nasc')),bairro:g(r,'bairro'),obs:g(r,'obs')}); }
+    else if(tipo==='produtos'){ const nome=g(r,'nome'), preco=parseBR(g(r,'preco')); if(!nome) return erros.push(ln+'sem nome'); if(!(preco>=0)) return erros.push(ln+'preço inválido');
+      itens.push({nome,preco,categoria:g(r,'categoria'),ativo:m.ativo==null||!['nao','n','0','false','inativo','fora'].includes(norm(g(r,'ativo')))}); }
+    else { const tel=soTel(g(r,'tel')), quando=dataDeBR(g(r,'data')), prod=g(r,'produto'), qtd=parseBR(g(r,'qtd'))||1, pr=S.produtos.find(p=>norm(p.nome)===norm(prod));
+      const pc=parseBR(g(r,'preco')), preco=isFinite(pc)?pc:(pr?pr.preco:NaN);
+      if(!telOk(tel)) return erros.push(ln+'WhatsApp inválido'); if(!isFinite(quando)) return erros.push(ln+'data inválida (use dd/mm/aaaa)');
+      if(!prod) return erros.push(ln+'sem produto'); if(!isFinite(preco)) return erros.push(ln+'sem preço e produto não cadastrado');
+      itens.push({tel,nome:g(r,'nome'),quando,produto:pr?pr.nome:prod,qtd,preco,canal:g(r,'canal')||'Planilha'}); }
+  });
+  let resumo;
+  if(tipo==='clientes'){ const nv=itens.filter(x=>!S.clientes[x.tel]).length; resumo=nv+' cliente(s) novo(s) e '+(itens.length-nv)+' atualizado(s)'; }
+  else if(tipo==='produtos'){ const nv=itens.filter(x=>!S.produtos.some(p=>norm(p.nome)===norm(x.nome))).length; resumo=nv+' produto(s) novo(s) e '+(itens.length-nv)+' atualizado(s)'; }
+  else { const ped=new Set(itens.map(x=>x.tel+'|'+x.quando)); resumo=ped.size+' venda(s) com '+itens.length+' item(ns). O histórico conta para a fidelidade; brindes saem a partir da próxima venda'; }
+  impPendente={tipo,itens};
+  show('impMsg',erros.length?'warn':'ok','<b>Conferido:</b> '+resumo+'.'+(erros.length?'<br>'+erros.length+' linha(s) com problema serão puladas:<br>'+erros.slice(0,5).map(esc).join('<br>')+(erros.length>5?'<br>…':''):'')+
+    (itens.length?'<button class="btn full mt" onclick="importarConfirmar()">Importar agora</button>':''));
+}
+function importarConfirmar(){
+  const P=impPendente; if(!P) return; impPendente=null;
+  if(P.tipo==='clientes') P.itens.forEach(x=>{ const c=garantirCliente(x.tel); ['nome','nasc','bairro','obs'].forEach(k=>{ if(x[k]) c[k]=x[k]; }); });
+  if(P.tipo==='produtos'){ P.itens.forEach(x=>{ const p=S.produtos.find(p=>norm(p.nome)===norm(x.nome)); if(p) Object.assign(p,{preco:x.preco,ativo:x.ativo},x.categoria?{categoria:x.categoria}:{}); else S.produtos.push({id:S.nextProd++,...x}); }); syncCardapio(); }
+  if(P.tipo==='vendas'){ const gr={}; P.itens.forEach(x=>(gr[x.tel+'|'+x.quando]||=[]).push(x));
+    Object.values(gr).forEach(its=>{ const x=its[0], numero='#'+(++S.seqPedido), sub=its.reduce((s,i)=>s+i.preco*i.qtd,0);
+      garantirCliente(x.tel,x.nome);
+      S.pedidosProprios[numero]={numero,tel:x.tel,quando:x.quando,itens:its.map(i=>({nome:i.produto,preco:i.preco,qtd:i.qtd})),sub,total:sub,canal:x.canal,origem:'planilha'}; }); }
+  audit('Importação da planilha: '+P.itens.length+' linha(s) de '+P.tipo); $('impTxt').value=''; show('impMsg','ok','Importado ✓'); toast('Importado ✓'); render();
+}
+const dataPlan=ms=>{ const d=new Date(ms), z=n=>String(n).padStart(2,'0'); return z(d.getDate())+'/'+z(d.getMonth()+1)+'/'+d.getFullYear()+' '+z(d.getHours())+':'+z(d.getMinutes()); };
+function csvCampo(v){ const s=String(v??''); return /[;"\n\r]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s; }
+function baixar(nome,blob){ const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=nome; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href),3000); }
+function baixarCSV(nome,linhas){ baixar(nome,new Blob(['﻿'+linhas.map(l=>l.map(csvCampo).join(';')).join('\r\n')],{type:'text/csv;charset=utf-8'})); }
+function exportar(tipo){
+  const hoje=diaStr(agora());
+  if(tipo==='clientes') baixarCSV('clientes-'+hoje+'.csv',[['nome','whatsapp','aniversario','bairro','obs','pedidos','total_gasto','ultima_compra','mais_compra'],
+    ...Object.values(S.clientes).map(c=>{ const r=resumoCliente(c.tel); return [c.nome,c.tel,isoBR(c.nasc),c.bairro,c.obs,r.n,num(r.total),r.ult?dataPlan(r.ult):'',r.top[0]?r.top[0][0]:'']; })]);
+  if(tipo==='produtos') baixarCSV('produtos-'+hoje+'.csv',[['nome','preco','categoria','ativo'],...S.produtos.map(p=>[p.nome,num(p.preco),p.categoria||'',p.ativo?'sim':'não'])]);
+  if(tipo==='vendas') baixarCSV('vendas-'+hoje+'.csv',[['data','pedido','whatsapp','nome','produto','quantidade','preco','canal','total_pedido'],
+    ...Object.values(S.pedidosProprios).sort((a,b)=>a.quando-b.quando).flatMap(v=>(v.itens&&v.itens.length?v.itens:[{nome:'',qtd:'',preco:''}]).map(i=>[dataPlan(v.quando),v.numero||'',v.tel,S.clientes[v.tel]?S.clientes[v.tel].nome:'',i.nome,i.qtd,i.preco===''?'':num(i.preco??0),v.canal||'Cardápio',num(v.total??v.sub??0)]))]);
+  toast('Arquivo baixado. No Google Sheets: Arquivo → Importar');
+}
+function backupBaixar(){ S.ui.ultimoBackup=agora(); salvar(); baixar('raspadinha-backup-'+diaStr(agora())+'.json',new Blob([JSON.stringify(S)],{type:'application/json'})); toast('Cópia de segurança baixada ✓'); render(); }
+function backupRestaurar(inp){ const f=inp.files[0]; inp.value=''; if(!f) return;
+  f.text().then(t=>{ let o=null; try{ o=JSON.parse(t); }catch(e){}
+    if(!o||o.v!==2||!o.cfg) return show('bkMsg','err','Este arquivo não é uma cópia de segurança deste sistema.');
+    if(!confirm('Trocar TODOS os dados deste aparelho pelos da cópia?')) return;
+    try{ localStorage.setItem(CHAVE,JSON.stringify(o)); }catch(e){ return show('bkMsg','err','Não consegui gravar neste navegador.'); }
+    location.reload(); }); }
+function renderDados(){ const u=S.ui.ultimoBackup; $('bkUltimo').innerHTML=u?'Última cópia: <b>'+dataHora(u)+'</b>':'<b style="color:var(--warn)">Nenhuma cópia feita ainda.</b>'; }
+
 // ================= Painel =================
 // [D17] único parâmetro de regra que sobrou: limite por dia.
 function setRegra(k,v){ S.regras={...S.regras,[k]:v,versao:S.regras.versao+1}; audit('Regra "'+k+'" = '+v+' → regras v'+S.regras.versao); render(); }
@@ -1441,7 +1918,7 @@ function editPremio(id,k,v){
 function resetar(){
   if(!confirm('Apagar todos os pedidos, brindes e configurações de teste deste aparelho?')) return;
   try{ localStorage.removeItem(CHAVE); }catch(e){}
-  S=estadoInicial(); clienteTel=null; carrinho={}; $('tkCard').style.display='none'; $('pedMsg').innerHTML=''; $('raspaArea').innerHTML='';
+  S=estadoInicial(); syncCardapio(); clienteTel=null; carrinho={}; cliAberto=null; vCarrinho={}; $('tkCard').style.display='none'; $('pedMsg').innerHTML=''; $('raspaArea').innerHTML='';
   initForm(); audit('Dados de teste apagados'); render();
 }
 function render(){
@@ -1479,6 +1956,7 @@ function render(){
   $('tbHist').innerHTML=ps.slice().reverse().map(p=>'<tr><td>'+esc(p.pedido)+'</td><td>'+esc(p.canal)+'</td><td>'+(p.premio?esc(p.premio.nome)+' <span class="tag">v'+p.regrasVersao+'</span>':'—')+'</td><td>'+esc(p.status)+'</td><td>'+(p.cliente?fim4(p.cliente):'não identificado')+'</td></tr>').join('')||'<tr><td colspan="5" class="muted">Nenhuma participação ainda.</td></tr>';
   $('rVersao').textContent='v'+S.regras.versao;
   $('relogio').textContent=new Date(agora()).toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'2-digit',year:'numeric'});
+  renderVenda(); renderClientes(); renderProdutos(); renderDados();
   renderChecklist(); renderIg(); renderIgCli(); renderCardapio(); renderWhats(); renderQrList(); renderLog(); salvar();
 }
 function waFmt(t){ return esc(t).replace(/\*([^*\n]+)\*/g,'<b>$1</b>').replace(/_([^_\n]+)_/g,'<i>$1</i>').replace(/\n/g,'<br>'); }
@@ -1536,23 +2014,35 @@ function renderChecklist(){
     [pct<c.alerta,'Gasto do mês abaixo do alerta',Math.floor(pct)+'% do teto usado.'],
     [/SAIR/i.test(c.lembrete.texto),'Lembrete oferece "responda SAIR"','Coloque a opção de sair no texto [D13].'],
     [!TERMOS_SORTE.test(textos),'Nenhum termo de sorte nos textos','Troque palavras como "sorte" ou "concorra" [D19].'],
-    [!c.insta.ativo||!!c.insta.perfil,'Perfil do Instagram configurado','Informe o @ da loja em Instagram.']];
+    [!c.insta.ativo||!!c.insta.perfil,'Perfil do Instagram configurado','Informe o @ da loja em Instagram.'],
+    [!!S.ui.ultimoBackup&&agora()-S.ui.ultimoBackup<=7*DIA,'Cópia de segurança nos últimos 7 dias','Baixe em Mais → Planilha e backup.']];
   const ok=itens.filter(i=>i[0]).length;
   $('checklist').innerHTML='<p class="muted" style="margin-top:0">'+ok+' de '+itens.length+' itens ok</p>'+itens.map(([v,t,d])=>'<div class="ck"><span aria-hidden="true">'+(v?'✅':'⚠️')+'</span><span><b>'+t+'</b>'+(v?'':'<br><span class="muted">'+d+'</span>')+'</span></div>').join('');
 }
+// UX: a loja tem 5 grupos; os que têm mais de uma tela mostram uma segunda linha de botões
+const GRUPOS={vender:[['venda','Lançar venda']],clientes:[['clientes','Clientes']],produtos:[['produtos','Produtos']],
+  campanhas:[['painel','Painel'],['pedidos','Pedidos e QR'],['linsta','Instagram']],
+  mais:[['ajuda','Ajuda'],['dados','Planilha e backup'],['lwhats','WhatsApp'],['impressora','Impressora'],['legal','Antes de lançar']]};
+const grupoDe=t=>Object.keys(GRUPOS).find(g=>GRUPOS[g].some(x=>x[0]===t));
 function irView(v,t){
-  S.ui.view=v; t=t||(v==='loja'?'pedidos':'raspa'); S.ui.tab=t;
+  if(v==='loja'&&t&&!grupoDe(t)) t=null;
+  S.ui.view=v; t=t||(v==='loja'?'venda':'raspa'); S.ui.tab=t;
   document.querySelectorAll('.views button').forEach(b=>b.classList.toggle('on',b.dataset.v===v));
   $('navLoja').style.display=v==='loja'?'':'none'; $('navCliente').style.display=v==='cliente'?'':'none';
   document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.t===t));
   document.querySelectorAll('section').forEach(s=>s.classList.toggle('on',s.id===t));
   if(t==='raspa') renderQrList();
   if(t==='impressora') desenharTeste();
+  const g=v==='loja'?grupoDe(t):null, sub=$('subLoja');
+  document.querySelectorAll('#navLoja button').forEach(b=>{ b.classList.toggle('on',b.dataset.g===g); if(b.dataset.g===g) b.setAttribute('aria-current','page'); else b.removeAttribute('aria-current'); });
+  sub.style.display=g&&GRUPOS[g].length>1?'':'none';
+  sub.innerHTML=g?GRUPOS[g].map(([id,n])=>'<button class="chip'+(id===t?' on':'')+'"'+(id===t?' aria-current="page"':'')+' onclick="irView(\'loja\',\''+id+'\')">'+n+'</button>').join(''):'';
   document.body.classList.toggle('cli',v==='cliente');
   salvar(); window.scrollTo(0,0);
 }
 document.querySelectorAll('.views button').forEach(b=>b.onclick=()=>irView(b.dataset.v));
-document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>irView(S.ui.view,b.dataset.t));
+document.querySelectorAll('#navCliente button').forEach(b=>b.onclick=()=>irView('cliente',b.dataset.t));
+document.querySelectorAll('#navLoja button').forEach(b=>b.onclick=()=>{ if(b.dataset.g==='clientes') cliAberto=null; irView('loja',GRUPOS[b.dataset.g][0][0]); });
 function initForm(){
   const c=S.cfg;
   $('pData').value=localISO(new Date());
@@ -1569,6 +2059,9 @@ function initForm(){
   $('igHashtag').value=ig.hashtag; $('igAcumula').checked=ig.acumula; $('igMarket').checked=ig.marketplace; $('igMoldura').checked=ig.moldura; $('igMolduraTxt').value=ig.molduraTexto; $('sLegenda').value='Batata recheada da @'+ig.perfil+' 😍 '+ig.hashtag;
   previewLembrete(); desenharTeste(); $('testBar').innerHTML=printBar('testCv');
 }
+syncCardapio();
+Object.values(S.pedidosProprios).forEach(v=>{ if(v.tel&&!String(v.tel).startsWith('anon')) garantirCliente(v.tel); });   // dados de antes do cadastro de clientes
+Object.keys(S.carteira).forEach(t=>garantirCliente(t));
 initForm();
 dobraveis();
 if(!S.logs.length) audit('Campanha "'+S.cfg.nome+'" carregada (regras v1)');
