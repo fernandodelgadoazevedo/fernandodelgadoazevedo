@@ -8,7 +8,8 @@
   Cada decisão tem um código [Dxx], que aparece nos comentários do código onde ela se aplica.
 -->
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#E62B1E">
 <title>Raspadinha saas.delivery</title>
 <style>
 :root{
@@ -97,6 +98,38 @@ td select{padding:6px;max-width:150px}
 .opt:not(:disabled):hover{border-color:var(--brand)}
 .opt:disabled{opacity:.55;cursor:not-allowed}
 ol,ul{padding-left:20px} li{margin:4px 0}
+/* ===== UX: alvos de toque, foco visível, movimento reduzido, navegação no polegar ===== */
+.btn{min-height:44px;transition:transform .08s,filter .15s}
+.btn:active{transform:scale(.97)}
+.btn:hover{filter:brightness(1.05)}
+.btn.sm{min-height:40px}
+input,select{min-height:44px}
+input[type=checkbox]:not(.sw){width:22px;height:22px;min-height:0;accent-color:var(--brand)}
+.qty button{width:40px;height:40px;font-size:18px}
+:focus-visible{outline:3px solid var(--brand2);outline-offset:2px}
+.card{box-shadow:0 1px 3px #0000000d}
+nav{scrollbar-width:none} nav::-webkit-scrollbar{display:none}
+nav button{min-height:40px}
+#navCliente{position:fixed;top:auto;bottom:0;left:0;right:0;z-index:20;gap:0;justify-content:space-around;padding:6px 4px calc(6px + env(safe-area-inset-bottom));border-top:1px solid var(--line);border-bottom:0;box-shadow:0 -4px 16px #0000001a}
+#navCliente button{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;border:0;background:transparent;border-radius:12px;padding:6px 2px;font-size:11px;min-height:54px;color:var(--muted)}
+#navCliente button .ic{font-size:21px;line-height:1}
+#navCliente button.on{background:#E62B1E1f;color:var(--brand)}
+body.cli main{padding-bottom:110px}
+.card h2 .fold{all:unset;box-sizing:border-box;cursor:pointer;display:flex;align-items:center;gap:6px;width:100%;min-height:32px}
+.card h2 .fold:focus-visible{outline:3px solid var(--brand2);outline-offset:2px;border-radius:6px}
+.card h2 .fold::after{content:'▾';margin-left:auto;color:var(--muted);transition:transform .2s}
+.card.fechado h2{margin:0} .card.fechado .fold-body{display:none} .card.fechado h2 .fold::after{transform:rotate(-90deg)}
+.ck{display:flex;gap:8px;align-items:flex-start;padding:6px 0;border-bottom:1px solid var(--line);font-size:14px}
+.ck:last-child{border-bottom:0}
+.steps{display:flex;list-style:none;padding:0;margin:10px 0;gap:4px;counter-reset:st}
+.steps li{flex:1;text-align:center;font-size:12px;color:var(--muted);margin:0;position:relative}
+.steps li::before{counter-increment:st;content:counter(st);display:flex;align-items:center;justify-content:center;width:30px;height:30px;margin:0 auto 4px;border-radius:50%;border:2px solid var(--line);background:var(--card);font-weight:700}
+.steps li.ok{color:var(--ok)} .steps li.ok::before{content:'✓';background:var(--ok);border-color:var(--ok);color:#fff}
+.steps li.atual{color:var(--text);font-weight:700} .steps li.atual::before{border-color:var(--brand);color:var(--brand)}
+#toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,20px);opacity:0;background:#222;color:#fff;padding:11px 18px;border-radius:22px;z-index:60;transition:opacity .25s,transform .25s;pointer-events:none;max-width:90vw;font-size:14px;box-shadow:0 6px 20px #0004}
+#toast.on{opacity:1;transform:translate(-50%,0)}
+body.cli #toast{bottom:96px}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;animation:none!important;scroll-behavior:auto!important}}
 #printArea{display:none}
 @media print{
   @page{size:58mm auto;margin:0}
@@ -124,11 +157,11 @@ ol,ul{padding-left:20px} li{margin:4px 0}
   <button data-t="impressora">Impressora</button>
   <button data-t="legal">Antes de lançar</button>
 </nav>
-<nav id="navCliente" style="display:none">
-  <button data-t="raspa">Raspadinha</button>
-  <button data-t="cardapio">Cardápio</button>
-  <button data-t="cwhats">Meu WhatsApp</button>
-  <button data-t="cinsta">Instagram</button>
+<nav id="navCliente" style="display:none" aria-label="Navegação do cliente">
+  <button data-t="raspa"><span class="ic" aria-hidden="true">🎟️</span>Raspadinha</button>
+  <button data-t="cardapio"><span class="ic" aria-hidden="true">🍟</span>Cardápio</button>
+  <button data-t="cinsta"><span class="ic" aria-hidden="true">📸</span>Poste e ganhe</button>
+  <button data-t="cwhats"><span class="ic" aria-hidden="true">💬</span>WhatsApp</button>
 </nav>
 <main>
 
@@ -173,6 +206,10 @@ ol,ul{padding-left:20px} li{margin:4px 0}
 </section>
 
 <section id="painel">
+  <div class="card">
+    <h2>Pronto para lançar?</h2>
+    <div id="checklist"></div>
+  </div>
   <div class="card">
     <h2>Visão geral</h2>
     <div class="kpis" id="kpis"></div>
@@ -449,6 +486,7 @@ ol,ul{padding-left:20px} li{margin:4px 0}
   <div class="card">
     <h2>📸 Poste e ganhe</h2>
     <div id="igRegrasCli"></div>
+    <ol class="steps" id="igPassos" aria-label="Seu progresso"><li>Cadastro</li><li>Story</li><li>Desconto</li></ol>
     <h3>1. Cadastre seu @ e o pedido</h3>
     <div class="row">
       <input id="igTel" placeholder="Seu WhatsApp (DDD+número)" inputmode="numeric" style="flex:1;min-width:150px" oninput="renderIgCli()">
@@ -980,7 +1018,8 @@ function abrirRaspadinha(tok){
   if(r.repetido){ show('raspaMsg','info',p.status==='escolhendo'?'Você já raspou: agora é só escolher seu brinde.':'Este código já foi usado. O brinde escolhido continua o mesmo.');
     $('raspaArea').innerHTML='<div class="prize" style="position:relative;border-radius:14px;min-height:120px">'+premioCard(p)+'</div><div id="posRaspa">'+resultadoHtml(p)+'</div>'; return; }
   $('raspaArea').innerHTML='<p style="text-align:center;margin:4px 0"><b>'+esc(S.cfg.nome)+'</b><br><span class="muted">Raspe com o dedo para revelar seu presente</span></p>'+
-    '<div class="scratch-wrap"><div class="prize">'+premioCard(p)+'</div><canvas id="scv"></canvas></div><div id="posRaspa"></div>';
+    '<div class="scratch-wrap"><div class="prize">'+premioCard(p)+'</div><canvas id="scv" aria-hidden="true"></canvas></div>'+
+    '<button class="btn alt full" id="revelarBtn" type="button">Revelar sem raspar</button><div id="posRaspa"></div>';
   iniciarRaspagem(()=>{ $('posRaspa').innerHTML=resultadoHtml(p); });
 }
 // [D02] Embaixo da raspagem há sempre a mesma mensagem: ganhou e vai escolher. Sem "não foi dessa vez" [D01].
@@ -989,7 +1028,7 @@ function atualizarRaspa(p){ const pr=document.querySelector('#raspaArea .prize')
 function escolher(token,id){
   const r=escolherBrinde(token,id);
   if(r.erro){ show('escMsg','err',r.erro); return; }
-  atualizarRaspa(r.p);
+  atualizarRaspa(r.p); comemorar(); toast('Brinde escolhido: '+r.p.premio.nome);
 }
 function resultadoHtml(p){
   if(p.status==='escolhendo'){                                        // [D01] escolha livre entre os disponíveis
@@ -1030,8 +1069,12 @@ function iniciarRaspagem(onDone){
   let down=false,done=false,moves=0;
   const pos=e=>{const b=cv.getBoundingClientRect();return[e.clientX-b.left,e.clientY-b.top]};
   const limpo=()=>{ const d=ctx.getImageData(0,0,cv.width,cv.height).data; let t=0,c=0; for(let i=3;i<d.length;i+=64){t++; if(d[i]===0)c++;} return c/t; };
+  // UX: quem não consegue arrastar (ou usa leitor de tela/teclado) revela pelo botão. A raspagem continua sem decidir nada [D02].
+  const revelar=()=>{ if(done) return; done=true; cv.style.transition='opacity .4s'; cv.style.opacity=0; setTimeout(()=>cv.remove(),400);
+    const rb=$('revelarBtn'); if(rb) rb.remove(); onDone(); comemorar(); };
+  const rb=$('revelarBtn'); if(rb) rb.onclick=revelar;
   const risca=e=>{ if(!down||done) return; const[x,y]=pos(e); ctx.beginPath(); ctx.arc(x,y,20,0,Math.PI*2); ctx.fill();
-    if(++moves%8===0&&limpo()>0.5){ done=true; cv.style.transition='opacity .4s'; cv.style.opacity=0; setTimeout(()=>cv.remove(),400); onDone(); } };
+    if(++moves%8===0&&limpo()>0.5) revelar(); };
   cv.addEventListener('pointerdown',e=>{down=true;cv.setPointerCapture(e.pointerId);risca(e)});
   cv.addEventListener('pointermove',risca);
   cv.addEventListener('pointerup',()=>down=false);
@@ -1065,6 +1108,11 @@ function brindesDisp(){ return clienteTel?(S.carteira[clienteTel]||[]).filter(b=
 function descDisp(){ return clienteTel?(S.carteira[clienteTel]||[]).filter(b=>b.tipo==='desconto'&&b.status==='disponivel'&&agora()<=b.validade).sort((a,b)=>b.pct-a.pct):[]; }
 // [D27] desconto sobre os produtos, limitado ao máximo em R$; não acumula com brinde se a loja desligar
 function descAplicado(d,sub,ap){ if(!d||sub<d.minimo||(ap&&!S.cfg.insta.acumula)) return 0; return Math.round(Math.min(sub*d.pct/100,d.maxReais)*100)/100; }
+function repetirPedido(){
+  const ult=Object.values(S.pedidosProprios).filter(x=>x.tel===clienteTel&&x.itens).sort((a,b)=>b.quando-a.quando)[0]; if(!ult) return;
+  carrinho={}; ult.itens.forEach(x=>{ const i=cardapio.findIndex(c=>c.nome===x.nome); if(i>=0) carrinho[i]=x.qtd; });
+  renderCardapio(); toast('Itens do último pedido no carrinho');
+}
 function renderCardapio(){
   const c=ctxPedido(), disp=brindesDisp();
   if(brindeSel&&!disp.find(b=>b.id===brindeSel)) brindeSel=null;
@@ -1081,6 +1129,9 @@ function renderCardapio(){
   if(d) g+='<div class="gift"><b>📸 Desconto do Instagram: '+d.pct+'%</b> <span class="muted">(até '+brl(d.maxReais)+' · até '+dataBR(d.validade)+')</span><br>'+
     (dv>0?'<span style="color:var(--ok);font-weight:700">✅ Aplicado neste pedido: −'+brl(dv)+'</span>':
       '<span style="color:var(--warn)">'+(c.sub<=0?'Adicione produtos ao pedido.':c.sub<d.minimo?'faltam '+brl(d.minimo-c.sub)+' para usar':'não acumula com o brinde da raspadinha')+'</span>')+'</div>';
+  // UX: atalho de recompra (o que mais traz pedido de volta), só com o carrinho vazio
+  const ult=clienteTel&&!c.itens.length&&Object.values(S.pedidosProprios).filter(x=>x.tel===clienteTel&&x.itens&&x.itens.length).sort((a,b)=>b.quando-a.quando)[0];
+  if(ult) g='<button class="btn alt full" onclick="repetirPedido()">🔁 Pedir de novo: '+esc(ult.itens.map(x=>x.qtd+'x '+x.nome).join(', '))+'</button>'+g;
   $('giftBox').innerHTML=g;
   $('menuBox').innerHTML=cardapio.map((x,i)=>'<div class="item"><span>'+esc(x.nome)+'<br><span class="muted">'+brl(x.preco)+'</span></span><span class="qty"><button onclick="mudaQtd('+i+',-1)">−</button><b>'+(carrinho[i]||0)+'</b><button onclick="mudaQtd('+i+',1)">+</button></span></div>').join('');
   const b=disp.find(x=>x.id===brindeSel), ap=b&&condOk(b,c).ok?b:null;
@@ -1109,7 +1160,7 @@ function finalizarPedido(){
     msgLoja('🧾 Pedido '+numero+' com brinde da raspadinha: '+ap.nome+'. Conferir na entrega!'); }
   if(dv>0||ap) checarTeto();
   const r=criarParticipacao('Próprio',numero,clienteTel,c.dist,agora(),numero);
-  S.pedidosProprios[numero]={tel:clienteTel,quando:agora()};          // [D21]
+  S.pedidosProprios[numero]={tel:clienteTel,quando:agora(),itens:c.itens.map(x=>({nome:x.nome,qtd:x.qtd}))};   // [D21] + "pedir de novo"
   const t={tipo:'proprio',numero,canal:'Próprio',cliente:clienteTel,itens:c.itens,frete,dist:c.dist,brinde:ap?{nome:ap.nome,tipo:ap.tipo}:null,
     desconto:dv>0?{pct:d.pct,valor:dv}:null,total:c.sub-dv+(ap&&ap.tipo==='frete'?0:frete),pagamento:'Pix (pago)',quando:agora(),token:r.token||null,semQr:r.motivo||null};
   carrinho={}; brindeSel=null;
@@ -1302,7 +1353,7 @@ async function igCompartilhar(){
 }
 function igBaixarFoto(){ if(!igFotoBlob) return; const a=document.createElement('a'); a.href=URL.createObjectURL(igFotoBlob); a.download='recheadinha-story.jpg'; a.click(); }
 function igCopiar(){ const t='@'+S.cfg.insta.perfil;
-  (navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(()=>show('igFotoMsg','ok','Copiado: '+esc(t)),()=>show('igFotoMsg','info','Marque: '+esc(t))); }
+  (navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(()=>toast('Copiado: '+t),()=>show('igFotoMsg','info','Marque: '+esc(t))); }
 
 // ---- Cliente ----
 function irInsta(ref){ irView('cliente','cinsta'); $('igTel').value=clienteTel||''; $('igRef').value=ref||''; renderIgCli(); }
@@ -1365,6 +1416,9 @@ function renderIgCli(){
     '<p class="muted">Até '+c.maxPct+'% (máximo '+brl(c.maxReais)+'), para pedidos a partir de '+brl(c.minimo)+' no cardápio, por '+c.validade+' dias, sobre os produtos. '+
     (c.marketplace?'':'Vale para pedidos feitos no nosso cardápio. ')+'A foto precisa mostrar o seu pedido. A conferência é automática: não precisa mandar print.</p>';
   const tel=$('igTel').value.replace(/\D/g,''), ps=Object.values(S.insta.parts).filter(p=>tel.length>=10&&p.tel===tel).sort((a,b)=>b.criado-a.criado);
+  // UX: passos 1-2-3 mostram onde o cliente está (cadastro → story recebido → desconto na conta)
+  const u=ps[0], et=!u?0:u.cupomId?3:u.status==='aguardando story'?1:0;
+  [...$('igPassos').children].forEach((li,i)=>{ li.className=i<et?'ok':i===et?'atual':''; if(i===et) li.setAttribute('aria-current','step'); else li.removeAttribute('aria-current'); });
   $('igMinhas').innerHTML=ps.length?'<h3>Suas participações</h3>'+ps.map(p=>'<div class="item"><span>@'+esc(p.user)+' · pedido '+esc(p.pedidoTxt)+'<br><span class="muted">'+esc(p.status)+'</span></span><b>'+(p.pct?p.pct+'%':'—')+'</b></div>').join(''):'';
   const dm=S.msgs.filter(m=>m.para==='ig').slice().reverse();
   $('igDm').innerHTML=dm.map(m=>'<div class="bub'+(m.de==='loja'?'':' c')+'"><small>'+(m.de==='loja'?'@'+esc(c.perfil)+' → @'+esc(m.user):'@'+esc(m.user))+' · '+dataHora(m.quando)+'</small>'+waFmt(m.texto)+'</div>').join('')||'<span class="muted">Nenhuma mensagem.</span>';
@@ -1400,6 +1454,7 @@ function render(){
     ['QR gerados',ps.length],['Raspados',rasp.length+' <small class="muted">'+pct(rasp.length,ps.length)+'</small>'],
     ['Brindes escolhidos',conc.length],['Usados em pedidos',usados.length+' <small class="muted">'+pct(usados.length,conc.length)+'</small>'],
     ['Gasto no mês',brl(g.real)],['Mais escolhido',top?esc(top[0])+' <small class="muted">'+top[1]+'x</small>':'—'],
+    ['WhatsApp enviados no mês',S.msgs.filter(m=>m.para==='cliente'&&mesStr(m.quando)===mesStr(agora())).length+' <small class="muted">confira a franquia grátis</small>'],
     ['Descontos Instagram',igs.filter(p=>p.cupomId).length+' <small class="muted">'+igs.filter(p=>p.status==='desconto usado').length+' usados</small>']
   ].map(k=>'<div class="kpi"><span class="muted">'+k[0]+'</span><b>'+k[1]+'</b></div>').join('');
   const t=S.cfg.teto||0, pr=t?Math.min(100,g.real/t*100):0, pc=t?Math.min(100-pr,g.comp/t*100):0;
@@ -1424,7 +1479,7 @@ function render(){
   $('tbHist').innerHTML=ps.slice().reverse().map(p=>'<tr><td>'+esc(p.pedido)+'</td><td>'+esc(p.canal)+'</td><td>'+(p.premio?esc(p.premio.nome)+' <span class="tag">v'+p.regrasVersao+'</span>':'—')+'</td><td>'+esc(p.status)+'</td><td>'+(p.cliente?fim4(p.cliente):'não identificado')+'</td></tr>').join('')||'<tr><td colspan="5" class="muted">Nenhuma participação ainda.</td></tr>';
   $('rVersao').textContent='v'+S.regras.versao;
   $('relogio').textContent=new Date(agora()).toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'2-digit',year:'numeric'});
-  renderIg(); renderIgCli(); renderCardapio(); renderWhats(); renderQrList(); renderLog(); salvar();
+  renderChecklist(); renderIg(); renderIgCli(); renderCardapio(); renderWhats(); renderQrList(); renderLog(); salvar();
 }
 function waFmt(t){ return esc(t).replace(/\*([^*\n]+)\*/g,'<b>$1</b>').replace(/_([^_\n]+)_/g,'<i>$1</i>').replace(/\n/g,'<br>'); }
 function renderWhats(){
@@ -1436,7 +1491,55 @@ function previewLembrete(){ $('lPrev').innerHTML=waFmt(aplicarTemplate(S.cfg.lem
 function renderLog(){ $('log').innerHTML=S.logs.map(l=>'<div>'+esc(l)+'</div>').join('')||'<div class="muted">Sem eventos.</div>'; }
 
 // ================= navegação =================
-function show(id,tipo,t){ $(id).innerHTML='<div class="msg '+tipo+'">'+t+'</div>'; }
+// UX/acessibilidade: mensagens anunciadas pelo leitor de tela (erro = alerta)
+function show(id,tipo,t){ const el=$(id); el.setAttribute('role',tipo==='err'?'alert':'status'); el.innerHTML='<div class="msg '+tipo+'">'+t+'</div>'; }
+function toast(t){ let el=$('toast'); if(!el){ el=document.createElement('div'); el.id='toast'; el.setAttribute('role','status'); document.body.appendChild(el); }
+  el.textContent=t; el.classList.add('on'); clearTimeout(toast.h); toast.h=setTimeout(()=>el.classList.remove('on'),2400); }
+const menosMovimento=()=>matchMedia('(prefers-reduced-motion: reduce)').matches;
+// Comemoração leve: vibração no Android (iPhone não suporta) + confete curto, desligado com "reduzir movimento"
+function comemorar(){
+  try{ navigator.vibrate&&navigator.vibrate([30,40,30]); }catch(e){}
+  if(menosMovimento()) return;
+  const cv=document.createElement('canvas'), x=cv.getContext('2d'), w=cv.width=innerWidth, h=cv.height=innerHeight;
+  cv.setAttribute('aria-hidden','true'); cv.style.cssText='position:fixed;inset:0;pointer-events:none;z-index:70'; document.body.appendChild(cv);
+  const cores=['#E62B1E','#FF6A00','#FFC107','#1f9d55','#ffffff'], ps=Array.from({length:90},()=>({x:w/2,y:h*.35,vx:(Math.random()-.5)*12,vy:-Math.random()*12-4,r:Math.random()*6+3,c:cores[Math.random()*5|0],a:Math.random()*6}));
+  const t0=performance.now();
+  (function quadro(t){ const d=t-t0; x.clearRect(0,0,w,h);
+    ps.forEach(p=>{ p.vy+=.35; p.x+=p.vx; p.y+=p.vy; p.a+=.2; x.save(); x.translate(p.x,p.y); x.rotate(p.a); x.globalAlpha=Math.max(0,1-d/1400); x.fillStyle=p.c; x.fillRect(-p.r/2,-p.r/2,p.r,p.r*1.6); x.restore(); });
+    if(d<1400) requestAnimationFrame(quadro); else cv.remove(); })(t0);
+}
+// UX: cartões do painel recolhíveis (menos rolagem); o que fica aberto é lembrado neste aparelho
+const FECHADOS_PADRAO=['Pausas programadas','Lembrete pelo WhatsApp','Histórico de participações','Auditoria e eventos','Dados de teste','Eventos recebidos do Instagram'];
+function dobraveis(){
+  S.ui.fechados||=Object.fromEntries(FECHADOS_PADRAO.map(t=>[t,true]));
+  document.querySelectorAll('#painel > .card, #linsta > .card').forEach(card=>{
+    const h=card.querySelector(':scope > h2'); if(!h||card.dataset.fold) return;
+    const id=h.childNodes[0].textContent.trim(); card.dataset.fold=id;
+    const btn=document.createElement('button'); btn.type='button'; btn.className='fold'; btn.innerHTML=h.innerHTML; h.innerHTML=''; h.appendChild(btn);
+    const corpo=document.createElement('div'); corpo.className='fold-body'; while(h.nextSibling) corpo.appendChild(h.nextSibling); card.appendChild(corpo);
+    const set=f=>{ card.classList.toggle('fechado',f); btn.setAttribute('aria-expanded',String(!f)); };
+    set(!!S.ui.fechados[id]);
+    btn.onclick=()=>{ const f=!card.classList.contains('fechado'); S.ui.fechados[id]=f; set(f); salvar(); };
+  });
+}
+// UX: checklist de lançamento, recalculado a cada mudança. Inclui a checagem automática de termos de sorte [D19].
+const TERMOS_SORTE=/sorte|sorteio|sortud|concorr/i;
+function renderChecklist(){
+  const c=S.cfg, prod=S.premios.filter(p=>p.ativo&&p.tipo!=='frete'&&(p.estoque===null||p.estoque>0));
+  const textos=[c.nome,c.lembrete.texto,c.insta.molduraTexto].concat(S.premios.map(p=>p.nome)).join(' ');
+  const pct=c.teto>0?gastos().real/c.teto*100:0;
+  const itens=[
+    [c.ativa,'Campanha ligada','Ligue em Campanha.'],
+    [prod.length>0,'Há brinde de produto com estoque','Sem isso, cliente de marketplace não tem o que escolher.'],
+    [!c.freteAtivo||c.raioKm>0,'Frete grátis com raio definido','Defina o raio em Frete grátis, ou desligue.'],
+    [c.teto>0,'Teto de gasto mensal definido','Ele só alerta, mas ajuda a acompanhar [D11].'],
+    [pct<c.alerta,'Gasto do mês abaixo do alerta',Math.floor(pct)+'% do teto usado.'],
+    [/SAIR/i.test(c.lembrete.texto),'Lembrete oferece "responda SAIR"','Coloque a opção de sair no texto [D13].'],
+    [!TERMOS_SORTE.test(textos),'Nenhum termo de sorte nos textos','Troque palavras como "sorte" ou "concorra" [D19].'],
+    [!c.insta.ativo||!!c.insta.perfil,'Perfil do Instagram configurado','Informe o @ da loja em Instagram.']];
+  const ok=itens.filter(i=>i[0]).length;
+  $('checklist').innerHTML='<p class="muted" style="margin-top:0">'+ok+' de '+itens.length+' itens ok</p>'+itens.map(([v,t,d])=>'<div class="ck"><span aria-hidden="true">'+(v?'✅':'⚠️')+'</span><span><b>'+t+'</b>'+(v?'':'<br><span class="muted">'+d+'</span>')+'</span></div>').join('');
+}
 function irView(v,t){
   S.ui.view=v; t=t||(v==='loja'?'pedidos':'raspa'); S.ui.tab=t;
   document.querySelectorAll('.views button').forEach(b=>b.classList.toggle('on',b.dataset.v===v));
@@ -1445,6 +1548,7 @@ function irView(v,t){
   document.querySelectorAll('section').forEach(s=>s.classList.toggle('on',s.id===t));
   if(t==='raspa') renderQrList();
   if(t==='impressora') desenharTeste();
+  document.body.classList.toggle('cli',v==='cliente');
   salvar(); window.scrollTo(0,0);
 }
 document.querySelectorAll('.views button').forEach(b=>b.onclick=()=>irView(b.dataset.v));
@@ -1466,6 +1570,7 @@ function initForm(){
   previewLembrete(); desenharTeste(); $('testBar').innerHTML=printBar('testCv');
 }
 initForm();
+dobraveis();
 if(!S.logs.length) audit('Campanha "'+S.cfg.nome+'" carregada (regras v1)');
 render();
 if(S.ticket) mostrarTicket(S.ticket,S.ticket.titulo||'Último cupom');
