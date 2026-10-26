@@ -10,7 +10,8 @@ const aberto=id=>{ const e=document.getElementById(id); return !!e && !e.classLi
 const foco=id=>document.activeElement===document.getElementById(id);
 const val=id=>String((document.getElementById(id)||{}).value||'');
 const digitos=id=>val(id).replace(/\D/g,'').length;
-const TAB=n=>`.tab[data-tab="${n}"]`, CHIP=a=>`#admTabs [data-a="${a}"]`;
+const TAB=n=>`#nav .tab[data-tab="${n}"]`, HUB=a=>`#hub [data-ir="${a}"]`;
+const noCarrinho=()=>Object.values(carrinho).reduce((a,b)=>a+b,0);
 const marcas={}; const marca=n=>{ marcas[n]=(marcas[n]||0)+1; };
 const novo=(c,n)=>(marcas[n]||0)>(c.m[n]||0);
 function foto(){ return {prod:prodAtivos().length, cli:cliAtivos().length, vendas:ativas().length, pagos:ativas().filter(s=>s.paid).length, m:{...marcas}}; }
@@ -25,75 +26,84 @@ window.fetch=()=>Promise.reject(new Error('treino'));
 const PRE={
   produto:{ok:()=>prodAtivos().length>0, txt:'cadastrar pelo menos um produto', tarefa:'produto'},
   venda:{ok:()=>ativas().length>0, txt:'fazer uma venda', tarefa:'venda'},
-  aberta:{ok:()=>ativas().some(s=>!s.paid&&s.date===hoje()), txt:'ter uma venda em aberto (fiado)', tarefa:'venda'},
+  aberta:{ok:()=>ativas().some(s=>!s.paid&&s.date===hoje()), txt:'ter uma venda pendurada (fiado)', tarefa:'venda'},
   whats:{ok:()=>cliAtivos().some(c=>c.phone), txt:'cadastrar um cliente com WhatsApp', tarefa:'cliente'},
   pix:{ok:()=>pixConfigurado(), txt:'configurar o Pix da loja', tarefa:'pix'}
 };
 /* ---- Tarefas ---- */
-const ir=(n,txt,extra)=>({tipo:'toque', alvo:TAB(n), ok:()=>abaAtiva(n), t:txt||('Toque na aba '+n.toUpperCase()+'.'), ...(extra||{})});
-const chip=(a,nome)=>({tipo:'toque', alvo:CHIP(a), ok:()=>admAtiva(a), t:'Toque em '+nome+'.'});
+const ir=(n,txt,extra)=>({tipo:'toque', alvo:TAB(n), ok:()=>abaAtiva(n), t:txt||('Toque em '+n.toUpperCase()+', no menu lá embaixo.'), ...(extra||{})});
+const mais=a=>({tipo:'toque', alvo:HUB('adm:'+a), ok:()=>admAtiva(a), t:'Toque em '+({apar:'APARÊNCIA',pix:'PIX',gs:'PLANILHA',bkp:'BACKUP',seg:'SEGURANÇA'}[a])+'.'});
 const tocarCampo=(id,nome,extra)=>({tipo:'toque', alvo:'#'+id, ok:()=>foco(id)||val(id).length>0, t:'Toque no espaço '+nome+'.', ...(extra||{})});
 const info=(alvo,t,small)=>({tipo:'info', alvo, t, small});
 const TAREFAS=[
  {id:'conhecer', grupo:'Comece aqui', ic:'👀', titulo:'Conhecer o app', desc:'As partes do app, uma por uma', passos:[
-   info('.tabs','Bem-vindo! Lá em cima ficam as ABAS. Cada aba é uma parte do app.','Vamos passar por todas. É só tocar onde a mãozinha mostrar.'),
-   ir('rel','Toque em RELATÓRIO.',{small:'Aqui você vê quem está devendo.'}),
-   ir('camp','Agora toque em CAMPANHA.',{small:'Aqui você manda avisos para os clientes.'}),
+   info('#nav','Bem-vindo! Lá embaixo fica o MENU. Cada botão abre uma parte do app.','Fica perto do dedão. Vamos passar por todos: é só tocar onde a mãozinha mostrar.'),
+   ir('rel','Toque em FIADO.',{small:'Aqui você vê quem está devendo e quanto.'}),
+   ir('cli','Agora toque em CLIENTES.',{small:'Aqui fica a ficha de cada cliente: o que leva, quanto deve, quando comprou.'}),
    ir('prod','Toque em PRODUTOS.',{small:'Aqui você cadastra o que vende.'}),
-   ir('admin','Toque em ADMIN.',{small:'Aqui ficam as configurações. No app de verdade, o Admin pede usuário e senha.'}),
-   ir('vendas','Para voltar, toque em VENDAS.',{small:'É a tela principal, onde você anota as vendas.'}),
-   info('#btnMsg','Este botão lá embaixo monta o resumo do dia para mandar no WhatsApp.')
+   ir('mais','Toque em MAIS.',{small:'Campanha, Pix, planilha e configurações. As configurações pedem usuário e senha no app de verdade.'}),
+   ir('vendas','Para voltar, toque em VENDER.',{small:'É a tela principal, onde você anota as vendas.'}),
+   info('#btnMsg','Este botão monta o resumo do dia para mandar no WhatsApp.')
  ]},
  {id:'produto', grupo:'Comece aqui', ic:'📦', titulo:'Cadastrar um produto', desc:'O que você vende e o preço', sozinho:'Cadastre OUTRO produto, com um nome diferente.', passos:[
-   ir('prod','Toque na aba PRODUTOS.'),
+   ir('prod','Toque em PRODUTOS, no menu lá embaixo.'),
    tocarCampo('pNome','NOME'),
    {tipo:'digitar', alvo:'#pNome', ok:()=>val('pNome').trim().length>=2, t:'Escreva o nome do produto.', small:'Exemplo: Bolo de pote', ex:'Bolo de pote', ex2:'Pão de mel', s:'Escrever o nome'},
    tocarCampo('pPreco','PREÇO'),
    {tipo:'digitar', alvo:'#pPreco', ok:()=>(parsePreco(val('pPreco'))||0)>0, t:'Escreva o preço.', small:'Exemplo: 12,50. Embaixo aparece o valor que o app entendeu.', ex:'12,50', ex2:'8,00', s:'Escrever o preço'},
    {tipo:'toque', alvo:'#btnAddProd', ok:c=>prodAtivos().length>c.prod, t:'Toque em + ADICIONAR PRODUTO.'},
-   info('#listaProd','Pronto! Seu produto está na lista.','Para mudar o preço depois, use EDITAR (no app de verdade pede senha do gerente).')
+   info('#listaProd','Pronto! Seu produto está na lista. Na tela de vender, ele vira um botão.','Para mudar o preço depois, use EDITAR (no app de verdade pede senha do gerente).')
  ]},
  {id:'cliente', grupo:'Comece aqui', ic:'👤', titulo:'Cadastrar um cliente', desc:'Nome e WhatsApp de quem compra', sozinho:'Cadastre OUTRO cliente, com um nome diferente.', passos:[
-   ir('admin','Toque na aba ADMIN.'),
-   chip('cad','CLIENTES'),
-   tocarCampo('cNome','NOME'),
+   ir('cli','Toque em CLIENTES, no menu lá embaixo.'),
+   tocarCampo('cNome','NOME',{small:'Ele fica no cartão NOVO CLIENTE, mais para baixo.'}),
    {tipo:'digitar', alvo:'#cNome', ok:()=>val('cNome').trim().length>=2, t:'Escreva o nome ou apelido do cliente.', small:'Exemplo: Dona Maria', ex:'Dona Maria', ex2:'Seu João', s:'Escrever o nome'},
    tocarCampo('cFone','WHATSAPP'),
    {tipo:'digitar', alvo:'#cFone', ok:()=>digitos('cFone')>=10, t:'Escreva o WhatsApp com DDD.', small:'Exemplo: 11 91234-5678', ex:'11 91234-5678', ex2:'11 98888-7777', s:'Escrever o WhatsApp'},
-   {tipo:'toque', alvo:'#btnAddCli', ok:c=>cliAtivos().length>c.cli, t:'Toque em + ADICIONAR NOME.'},
-   info('#listaCli','Cliente cadastrado! Com o WhatsApp dá para cobrar e mandar avisos para ele.','Dica: na hora da venda, um nome novo também é cadastrado sozinho.')
+   {tipo:'toque', alvo:'#btnAddCli', ok:c=>cliAtivos().length>c.cli, t:'Toque em + ADICIONAR CLIENTE.'},
+   info('#cliLista','Cliente cadastrado! Ele aparece nesta lista. Tocando no nome, abre a ficha dele.','Dica: na hora da venda, um nome novo também é cadastrado sozinho.')
  ]},
- {id:'venda', grupo:'Comece aqui', ic:'📝', titulo:'Fazer uma venda', desc:'Anotar quem pegou o quê', pre:['produto'], passos:[
-   ir('vendas','Toque na aba VENDAS.'),
+ {id:'venda', grupo:'Comece aqui', ic:'📝', titulo:'Fazer uma venda', desc:'Anotar quem levou o quê', pre:['produto'], passos:[
+   ir('vendas','Toque em VENDER, no menu lá embaixo.'),
    tocarCampo('vNome','NOME / APELIDO',{small:'Vai abrir a lista dos seus clientes.'}),
    {tipo:'digitar', alvo:'#vNome', permite:['#vNome','#acLista'], ok:()=>val('vNome').trim().length>=2, t:'Escreva o nome de quem comprou, ou toque num nome da lista.', small:'Exemplo: Dona Maria', ex:'Dona Maria', s:'Escrever quem comprou'},
-   info('#vProd','Aqui fica o PRODUTO. Se for outro, toque aqui e escolha.'),
-   {tipo:'toque', alvo:'.qtd-btn[data-q="2"]', ok:()=>val('vQtd')==='2', t:'A pessoa pegou 2? Toque no número 2.', small:'Se foi só 1, nem precisa mexer: o 1 já vem marcado.', s:'Escolher a quantidade 2'},
-   info('#vPago','Se a pessoa JÁ PAGOU, marque esta caixinha. Desta vez deixe SEM marcar: vai ficar no fiado.'),
-   {tipo:'toque', alvo:'#btnAddVenda', ok:c=>ativas().length>c.vendas, t:'Toque em + REGISTRAR VENDA.'},
-   info('#listaVendas','Venda anotada! Ela aparece aqui embaixo, em vermelho: EM ABERTO.','Lá em cima, os totais do dia já mudaram.')
+   {tipo:'toque', alvo:'#vTiles .tile', permite:['#vTiles'], ok:()=>noCarrinho()>=1, t:'Toque no produto que a pessoa levou.', small:'Cada toque soma 1.', s:'Tocar no produto'},
+   {tipo:'toque', alvo:()=>q('#vTiles .tile.on')||q('#vTiles .tile'), permite:[()=>q('#vTiles .tile.on')||q('#vTiles .tile'),'#vCarrinho'], ok:()=>noCarrinho()>=2, t:'Levou 2? Toque DE NOVO no mesmo produto.', small:'Veja o número que aparece no canto. Errou? Use o − na lista que aparece embaixo.', s:'Somar mais um'},
+   info('#vFormas','Aqui você diz COMO PAGOU. Pagou agora: Pix, Dinheiro ou Cartão. Vai pagar depois: PENDURA.','Desta vez deixe em PENDURA: vai ficar no fiado.'),
+   {tipo:'toque', alvo:'#btnAddVenda', ok:c=>ativas().length>c.vendas, t:'Toque no botão azul para registrar.', small:'Ele mostra o total da venda.'},
+   info('#listaVendas','Venda anotada! Ela aparece aqui, em vermelho: PENDURADO.','Lá em cima, os totais do dia já mudaram.')
  ]},
- {id:'pago', grupo:'Comece aqui', ic:'✅', titulo:'Marcar que pagou', desc:'Quando a pessoa paga o fiado', pre:['aberta'], passos:[
-   ir('vendas','Toque na aba VENDAS.'),
-   {tipo:'toque', alvo:'#listaVendas .pay.open', ok:c=>ativas().filter(s=>s.paid).length>c.pagos, t:'Recebeu o dinheiro? Toque no EM ABERTO, em vermelho.', small:'Ele vira PAGO, em verde.', s:'Marcar a venda como paga'},
-   info('.totals','Veja: o PAGO aumentou e o EM ABERTO diminuiu.','Tocou errado? No app de verdade, voltar para EM ABERTO pede senha do gerente.')
+ {id:'pago', grupo:'Comece aqui', ic:'✅', titulo:'Receber o fiado', desc:'Quando a pessoa paga o que pendurou', pre:['aberta'], passos:[
+   ir('vendas','Toque em VENDER, no menu lá embaixo.'),
+   {tipo:'toque', alvo:'#listaVendas .pay.open', ok:()=>!!document.getElementById('formaSheet'), t:'Recebeu o dinheiro? Toque no PENDURADO, em vermelho.', s:'Tocar na venda pendurada'},
+   {tipo:'toque', alvo:'#formaSheet [data-f="dinheiro"]', ok:c=>ativas().filter(s=>s.paid).length>c.pagos, t:'O app pergunta como a pessoa pagou. Toque em DINHEIRO.', small:'Se foi Pix ou cartão, é só tocar no certo. Isso aparece no resumo do dia.', s:'Dizer como pagou'},
+   info('.totals','Veja: o RECEBIDO aumentou e o PENDURADO diminuiu.','Tocou errado? No app de verdade, voltar para PENDURADO pede senha do gerente.')
+ ]},
+ {id:'ficha', grupo:'Clientes', ic:'🗂️', titulo:'A ficha do cliente', desc:'O que leva, quanto deve, quando volta', pre:['venda'], passos:[
+   ir('cli','Toque em CLIENTES, no menu lá embaixo.'),
+   info('#cliFiltros','Estes botões separam os clientes: quem está DEVENDO, os FREQUENTES e os SUMIDOS.','Sumido é quem não compra há 30 dias ou mais: bom para mandar um oi.'),
+   {tipo:'toque', alvo:'#cliLista .cli-row', permite:['#cliLista'], ok:()=>!document.getElementById('cliFicha').classList.contains('hidden'), t:'Toque no nome de um cliente.', s:'Abrir a ficha'},
+   info('#cliFicha .saldo','Aqui mostra se a pessoa está devendo, e desde quando.','Se deve, tem os botões para receber, mostrar o QR do Pix e mandar a cobrança.'),
+   info('#cliFicha .kgrid','Quanto já comprou, quando foi a última compra e de quantos em quantos dias costuma voltar.'),
+   info('#cliFicha .rel-det','E aqui estão todas as compras dela.','Dá para marcar como pago, trocar a pessoa ou excluir.'),
+   {tipo:'toque', alvo:'#cliFicha [data-act="fechaficha"]', ok:()=>document.getElementById('cliFicha').classList.contains('hidden'), t:'Para voltar à lista, toque em VOLTAR.', s:'Voltar para a lista'}
  ]},
  {id:'relatorio', grupo:'Receber e cobrar', ic:'📊', titulo:'Ver quem está devendo', desc:'O total de cada pessoa', pre:['venda'], passos:[
-   ir('rel','Toque na aba RELATÓRIO.'),
+   ir('rel','Toque em FIADO, no menu lá embaixo.'),
    info('#relFiltros','Aqui você escolhe o período: o DIA, o MÊS ou TUDO.'),
    {tipo:'toque', alvo:'#relLista [data-act="relx"]', ok:()=>relAberto.size>0, t:'Toque no botão colorido ao lado do nome (DEVE ou QUITADO).', small:'Abre a lista de compras da pessoa.', s:'Abrir as compras de uma pessoa'},
    info('.rel-det','Aqui estão as compras dessa pessoa. Dá para marcar pago, trocar a pessoa ou excluir.','Trocar e excluir pedem senha do gerente no app de verdade.')
  ]},
  {id:'cobrar', grupo:'Receber e cobrar', ic:'📲', titulo:'Cobrar pelo WhatsApp', desc:'Mandar o extrato para a pessoa', pre:['aberta'], passos:[
-   ir('rel','Toque na aba RELATÓRIO.'),
+   ir('rel','Toque em FIADO, no menu lá embaixo.'),
    {tipo:'toque', alvo:'#relLista [data-act="ext"]', ok:()=>aberto('modal'), t:'Toque no 📲 ao lado de quem está devendo.', s:'Abrir o extrato da pessoa'},
-   info('#msgTxt','Esta é a mensagem de cobrança: tem as datas, o que pegou e quanto falta.','Se o Pix estiver configurado, o código Pix já vai junto.'),
+   info('#msgTxt','Esta é a mensagem de cobrança: tem as datas, o que levou e quanto falta.','Se o Pix estiver configurado, o código Pix já vai junto.'),
    {tipo:'toque', alvo:'#btnWa', ok:c=>novo(c,'whats'), t:'Toque no botão verde WHATSAPP.', s:'Mandar pelo WhatsApp'},
    {tipo:'toque', alvo:'#btnClose', ok:()=>!aberto('modal'), t:'Toque em FECHAR.', s:'Fechar'}
  ]},
  {id:'pix', grupo:'Receber e cobrar', ic:'💳', titulo:'Configurar o Pix', desc:'Para receber pelo Pix', passos:[
-   ir('admin','Toque na aba ADMIN.'),
-   chip('pix','PIX'),
+   ir('mais','Toque em MAIS, no menu lá embaixo.'),
+   mais('pix'),
    info('#pixTipo','Aqui você escolhe o tipo da sua chave Pix. Vamos usar CELULAR.'),
    tocarCampo('pixChave','CHAVE PIX'),
    {tipo:'digitar', alvo:'#pixChave', ok:()=>digitos('pixChave')>=10, t:'Escreva a chave Pix: o celular com DDD.', small:'Exemplo: 11 91234-5678', ex:'11 91234-5678', s:'Escrever a chave'},
@@ -104,54 +114,55 @@ const TAREFAS=[
    info('#pixAtualTxt','Pronto! Aqui aparece, em verde, a chave que vai receber os pagamentos.')
  ]},
  {id:'qr', grupo:'Receber e cobrar', ic:'🔳', titulo:'Receber com QR Code', desc:'A pessoa paga na sua frente', pre:['pix','aberta'], passos:[
-   ir('rel','Toque na aba RELATÓRIO.'),
+   ir('rel','Toque em FIADO, no menu lá embaixo.'),
    {tipo:'toque', alvo:'#relLista [data-act="qr"]', ok:()=>aberto('qrTela'), t:'Toque no 🔳 ao lado de quem está devendo.', small:'Abre o QR Code do Pix com o valor certo.', s:'Abrir o QR Code'},
    info('#qrBox','A pessoa abre o app do banco, escolhe Pix › Ler QR Code e aponta para cá. O valor já vem preenchido.'),
    {tipo:'toque', alvo:'#qrFechar', ok:()=>!aberto('qrTela'), t:'Toque em FECHAR.', s:'Fechar'}
  ]},
- {id:'resumo', grupo:'Receber e cobrar', ic:'📋', titulo:'Resumo do dia', desc:'O que vendeu, pagos e fiados', pre:['venda'], passos:[
-   ir('vendas','Toque na aba VENDAS.'),
-   {tipo:'toque', alvo:'#btnMsg', ok:()=>aberto('modal'), t:'Toque em MONTAR MENSAGEM DO DIA, lá embaixo.', s:'Montar o resumo'},
-   info('#msgTxt','Este é o resumo: o que vendeu, quem pagou e quem ficou devendo.'),
+ {id:'resumo', grupo:'Receber e cobrar', ic:'📋', titulo:'Resumo do dia', desc:'O que vendeu, pagos e pendurados', pre:['venda'], passos:[
+   ir('vendas','Toque em VENDER, no menu lá embaixo.'),
+   {tipo:'toque', alvo:'#btnMsg', ok:()=>aberto('modal'), t:'Toque em RESUMO DO DIA.', s:'Montar o resumo'},
+   info('#msgTxt','Este é o resumo: o que vendeu, quem pagou (e como) e quem pendurou.'),
    {tipo:'toque', alvo:'#btnCopy', ok:c=>novo(c,'copiou'), t:'Toque em COPIAR.', small:'Depois é só colar no WhatsApp.', s:'Copiar'},
    {tipo:'toque', alvo:'#btnClose', ok:()=>!aberto('modal'), t:'Toque em FECHAR.', s:'Fechar'}
  ]},
  {id:'campanha', grupo:'Divulgar', ic:'📣', titulo:'Avisar os clientes', desc:'"Hoje tem…" para todo mundo', pre:['produto','whats'], antes:()=>{ camp().env=[]; save(); }, passos:[
-   ir('prod','Toque na aba PRODUTOS.'),
-   {tipo:'toque', alvo:'#listaProd .dia-flag', ok:()=>produtosDoDia().length>0, t:'Marque a caixinha PRODUTO DO DIA no que você tem hoje.', s:'Marcar o produto do dia'},
-   ir('camp','Agora toque na aba CAMPANHA.'),
+   ir('prod','Toque em PRODUTOS, no menu lá embaixo.'),
+   {tipo:'toque', alvo:'#listaProd .dia-flag', ok:()=>produtosDoDia().length>0, t:'Marque a caixinha PRODUTO DO DIA no que você tem hoje.', small:'Ele também fica em primeiro, com ⭐, na tela de vender.', s:'Marcar o produto do dia'},
+   ir('mais','Agora toque em MAIS, no menu lá embaixo.'),
+   {tipo:'toque', alvo:HUB('camp'), ok:()=>abaAtiva('camp'), t:'Toque em CAMPANHA.', s:'Abrir a campanha'},
    {tipo:'toque', alvo:'#campExemplo', ok:()=>!!(camp().texto||'').trim(), t:'Toque em ✨ USAR UM EXEMPLO.', small:'Se aparecer uma pergunta, toque em OK. Depois você pode mudar o texto.', s:'Escrever a mensagem'},
    info('#campPrevia','Veja a prévia: o nome do cliente e o produto do dia entram sozinhos na mensagem.'),
    {tipo:'toque', alvo:'#campTodos', ok:()=>camp().sel.length>0, t:'Toque em MARCAR TODOS.', s:'Escolher quem recebe'},
    {tipo:'toque', alvo:'#campUmAUm', ok:()=>aberto('campProx'), t:'Toque em 📲 ENVIAR UM A UM.', s:'Começar o envio'},
    {tipo:'toque', alvo:'#campAbrir', ok:c=>novo(c,'whats'), t:'Toque em ABRIR WHATSAPP.', small:'No celular de verdade, abre a conversa com a mensagem pronta. Você manda, volta e passa para o próximo.', s:'Mandar para o primeiro'}
  ]},
- {id:'aparencia', grupo:'Configurações (Admin)', ic:'🎨', titulo:'Nome e logo da empresa', desc:'Deixar o app com a sua cara', passos:[
-   ir('admin','Toque na aba ADMIN.'),
-   chip('apar','APARÊNCIA'),
+ {id:'aparencia', grupo:'Configurações (Mais)', ic:'🎨', titulo:'Nome e logo da empresa', desc:'Deixar o app com a sua cara', passos:[
+   ir('mais','Toque em MAIS, no menu lá embaixo.'),
+   mais('apar'),
    tocarCampo('aNome','NOME DO NEGÓCIO'),
    {tipo:'digitar', alvo:'#aNome', ok:()=>val('aNome').trim().length>=2, t:'Escreva o nome da sua empresa.', small:'Ele aparece lá em cima, no topo do app.', ex:'Minha Loja', s:'Escrever o nome da empresa'},
    info('#logoUrl','Aqui entra a LOGO: escolha uma foto do celular ou cole o link do Google Drive.','No Drive: compartilhe como "qualquer pessoa com o link" e cole aqui.'),
    info('#corBrand','E aqui você muda as cores, se quiser.')
  ]},
- {id:'planilha', grupo:'Configurações (Admin)', ic:'☁️', titulo:'A planilha do Google', desc:'Onde as vendas ficam guardadas', passos:[
-   ir('admin','Toque na aba ADMIN.'),
-   chip('gs','PLANILHA'),
+ {id:'planilha', grupo:'Configurações (Mais)', ic:'☁️', titulo:'A planilha do Google', desc:'Onde as vendas ficam guardadas', passos:[
+   ir('mais','Toque em MAIS, no menu lá embaixo.'),
+   mais('gs'),
    info('#gsPainel','Aqui mostra se a planilha do Google está ligada.','No treino ela não está. No app de verdade aparece "☁ Planilha em dia".'),
    info('#gsUrl','Este é o link da planilha. Quem liga é o responsável da empresa, uma vez só.'),
    info('#gsRestaurar','Celular novo ou trocado? Este botão traz todas as vendas, clientes e produtos da planilha.'),
    info('#gsToken','Este é o CÓDIGO DE SEGURANÇA da empresa.','Nunca mande para quem não é da empresa.')
  ]},
- {id:'backup', grupo:'Configurações (Admin)', ic:'💾', titulo:'Guardar uma cópia', desc:'Para não perder nada', passos:[
-   ir('admin','Toque na aba ADMIN.'),
-   chip('bkp','BACKUP'),
+ {id:'backup', grupo:'Configurações (Mais)', ic:'💾', titulo:'Guardar uma cópia', desc:'Para não perder nada', passos:[
+   ir('mais','Toque em MAIS, no menu lá embaixo.'),
+   mais('bkp'),
    info('#ultBackup','Aqui mostra quando foi salva a última cópia.'),
    {tipo:'toque', alvo:'#btnExportTxt', ok:c=>novo(c,'baixou'), t:'Toque em SALVAR TXT.', small:'O app salva uma cópia das vendas no celular. Mande para você mesmo no WhatsApp para guardar.', s:'Salvar a cópia'},
    info('#btnImport','Se trocar de celular, é aqui que a cópia volta para o app.')
  ]},
- {id:'usuarios', grupo:'Configurações (Admin)', ic:'🔑', titulo:'Usuários e senhas', desc:'Quem pode fazer o quê', passos:[
-   ir('admin','Toque na aba ADMIN.'),
-   chip('seg','SEGURANÇA'),
+ {id:'usuarios', grupo:'Configurações (Mais)', ic:'🔑', titulo:'Usuários e senhas', desc:'Quem pode fazer o quê', passos:[
+   ir('mais','Toque em MAIS, no menu lá embaixo.'),
+   mais('seg'),
    info('#usuNome','Este é o nome de quem usa este celular. Toda venda fica marcada com esse nome.'),
    info('.perm','Esta tabela mostra o que cada pessoa pode fazer.','As coisas importantes pedem usuário e senha do gerente ou do dono. As senhas ficam só na planilha.'),
    info('#btnCfgWa','Para colocar outra pessoa da empresa no app, mande o LINK DE CONFIGURAÇÃO por aqui.')
