@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Impressora POS-5820</string>
+    <string name="print_service_name">Térmica POS-5820 (Bluetooth)</string>
+</resources>

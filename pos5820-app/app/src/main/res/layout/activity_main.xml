@@ -1,0 +1,310 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FAFAFA">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- Conexão -->
+        <TextView style="@style/Section" android:layout_marginTop="0dp" android:text="Impressora Bluetooth" />
+
+        <TextView
+            android:id="@+id/txtStatus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:background="#ECEFF1"
+            android:padding="10dp"
+            android:text="Nenhuma impressora selecionada" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btnConnect"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Escolher / conectar" />
+
+            <Button
+                android:id="@+id/btnDisconnect"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Desconectar" />
+        </LinearLayout>
+
+        <!-- Papel -->
+        <TextView style="@style/Section" android:text="Papel e protocolo" />
+
+        <TextView style="@style/Label" android:text="Modo" />
+        <Spinner
+            android:id="@+id/spnProtocol"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <LinearLayout
+            android:id="@+id/boxLabel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView style="@style/Label" android:text="Tipo de etiqueta (sensor)" />
+            <Spinner
+                android:id="@+id/spnMedia"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+                    <TextView style="@style/Label" android:text="Largura (mm)" />
+                    <EditText
+                        android:id="@+id/edtLabelW"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="number" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+                    <TextView style="@style/Label" android:text="Altura (mm)" />
+                    <EditText
+                        android:id="@+id/edtLabelH"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="number" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+                    <TextView style="@style/Label" android:text="Gap (mm)" />
+                    <EditText
+                        android:id="@+id/edtGap"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="numberDecimal" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+                    <TextView style="@style/Label" android:text="Densid. 0-15" />
+                    <EditText
+                        android:id="@+id/edtDensity"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="number" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <CheckBox
+                android:id="@+id/chkInvert"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Inverter cores (use se a etiqueta sair em negativo)" />
+        </LinearLayout>
+
+        <CheckBox
+            android:id="@+id/chkNextLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Papel de etiqueta no modo recibo: avançar até a próxima etiqueta" />
+
+        <!-- Conteúdo -->
+        <TextView style="@style/Section" android:text="O que imprimir" />
+
+        <EditText
+            android:id="@+id/edtText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="top"
+            android:hint="Texto (aceita acentos e várias linhas)"
+            android:inputType="textMultiLine|textCapSentences"
+            android:minLines="3" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <Spinner
+                android:id="@+id/spnFont"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" />
+
+            <Spinner
+                android:id="@+id/spnAlign"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" />
+
+            <CheckBox
+                android:id="@+id/chkBold"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Negrito" />
+        </LinearLayout>
+
+        <EditText
+            android:id="@+id/edtQr"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="QR code (link, PIX, texto) — opcional"
+            android:inputType="text" />
+
+        <EditText
+            android:id="@+id/edtBarcode"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Código de barras CODE128 — opcional"
+            android:inputType="text" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btnPickImage"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Imagem / logo" />
+
+            <Button
+                android:id="@+id/btnClearImage"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Remover imagem" />
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/imgThumb"
+            android:layout_width="wrap_content"
+            android:layout_height="80dp"
+            android:adjustViewBounds="true"
+            android:visibility="gone" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView style="@style/Label" android:layout_marginTop="0dp" android:text="Cópias: " />
+
+            <EditText
+                android:id="@+id/edtCopies"
+                android:layout_width="64dp"
+                android:layout_height="wrap_content"
+                android:inputType="number" />
+
+            <Button
+                android:id="@+id/btnPreview"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Pré-visualizar" />
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/btnPrint"
+            android:layout_width="match_parent"
+            android:layout_height="64dp"
+            android:backgroundTint="#FF6F00"
+            android:text="IMPRIMIR"
+            android:textColor="#FFFFFF"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <ProgressBar
+            android:id="@+id/progress"
+            style="@android:style/Widget.Material.ProgressBar.Horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:indeterminate="true"
+            android:visibility="gone" />
+
+        <ImageView
+            android:id="@+id/imgPreview"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:adjustViewBounds="true"
+            android:background="#B0BEC5"
+            android:padding="2dp"
+            android:scaleType="fitCenter"
+            android:visibility="gone" />
+
+        <!-- Ferramentas -->
+        <TextView style="@style/Section" android:text="Ferramentas" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btnTest"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Página de teste" />
+
+            <Button
+                android:id="@+id/btnFeed"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Avançar papel" />
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/btnCalibrate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Calibrar sensor de etiqueta" />
+
+        <Button
+            android:id="@+id/btnPrintSettings"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Ativar driver no Android (imprimir de outros apps)" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Dica: pareie a impressora em Configurações &gt; Bluetooth (PIN 0000 ou 1234). Depois de ativar o driver, use Compartilhar &gt; Imprimir em qualquer app e escolha a POS-5820."
+            android:textColor="#607D8B"
+            android:textSize="12sp" />
+    </LinearLayout>
+</ScrollView>
